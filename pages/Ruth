@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ruth Travel Progress</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+
+<body>
+
+<h1>Ruth's Travel Progress</h1>
+
+<p>This page will contain analytics about Ruth's travel progress.</p>
+
+<a href="../index.html">← Back to Home</a>
+
+</body>
+</html>
