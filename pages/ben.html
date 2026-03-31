@@ -3,69 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ben — Travel Progress</title>
+  <title>Ben - Travel Progress</title>
   <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body class="page-wrapper">
-
   <nav class="site-nav"><div class="nav-inner"></div></nav>
-
   <main>
     <div class="container">
-
       <div class="person-hero">
         <div class="person-avatar avatar-ben">B</div>
         <h1 style="color:var(--color-ben)">Ben</h1>
         <p style="color:var(--color-muted)">Travel Progress</p>
       </div>
-
       <section class="section">
         <h2 class="section-title">Summary</h2>
-        <div class="stats-grid" id="benStats"><p class="loading-msg">Loading…</p></div>
+        <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
       </section>
-
       <section class="section">
-        <h2 class="section-title">&#127757; Countries</h2>
-        <div id="benCountries"><p class="loading-msg">Loading…</p></div>
+        <h2 class="section-title">&#127757; Countries &amp; Capitals</h2>
+        <div id="pCountries"><p class="loading-msg">Loading...</p></div>
       </section>
-
       <section class="section">
         <h2 class="section-title">&#129409; Animals</h2>
-        <div id="benAnimals"><p class="loading-msg">Loading…</p></div>
+        <div id="pAnimals"><p class="loading-msg">Loading...</p></div>
       </section>
-
       <section class="section">
         <h2 class="section-title">&#127963; UNESCO World Heritage Sites</h2>
-        <div id="benUnesco"><p class="loading-msg">Loading…</p></div>
+        <div id="pUnesco"><p class="loading-msg">Loading...</p></div>
       </section>
-
       <section class="section">
-        <h2 class="section-title">&#9968; County Peaks</h2>
-        <div id="benPeaks"><p class="loading-msg">Loading…</p></div>
+        <h2 class="section-title">&#9989; Travel List I</h2>
+        <div id="pTL1"><p class="loading-msg">Loading...</p></div>
       </section>
-
+      <section class="section">
+        <h2 class="section-title">&#9989; Travel List II</h2>
+        <div id="pTL2"><p class="loading-msg">Loading...</p></div>
+      </section>
     </div>
   </main>
-
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
-
   <script src="../js/travel.js"></script>
   <script>
     var app = window.TravelApp;
-    var PERSON = 'ben';
+    var PERSON = "ben";
     app.renderNav(PERSON);
     app.loadAllData().then(function(data) {
       var travellers = data.travellers;
       var countries  = data.countries;
       var animals    = data.animals;
       var unesco     = data.unesco;
-      var peaks      = data.peaks;
+      var tl1        = data.tl1;
+      var tl2        = data.tl2;
       var t = null;
       for (var i = 0; i < travellers.length; i++) {
         if (travellers[i].id === PERSON) { t = travellers[i]; break; }
       }
-      if (!t) t = { countries:[], animals:[], unesco:[], county_peaks:[] };
-
+      if (!t) t = {};
       var continents = [];
       for (var ci = 0; ci < countries.length; ci++) {
         if (continents.indexOf(countries[ci].continent) === -1) continents.push(countries[ci].continent);
@@ -73,7 +66,6 @@
       continents.sort();
       var continentFilters = [];
       for (var cfi = 0; cfi < continents.length; cfi++) continentFilters.push({ label: continents[cfi], key: continents[cfi] });
-
       var aniCats = [];
       for (var ai = 0; ai < animals.length; ai++) {
         if (aniCats.indexOf(animals[ai].category) === -1) aniCats.push(animals[ai].category);
@@ -81,33 +73,47 @@
       aniCats.sort();
       var aniFilters = [];
       for (var afi = 0; afi < aniCats.length; afi++) aniFilters.push({ label: aniCats[afi], key: aniCats[afi] });
-
-      document.getElementById('benStats').innerHTML =
-        app.buildStatCard((t.countries||[]).length, '/ ' + countries.length + ' Countries') +
-        app.buildStatCard((t.animals||[]).length, '/ ' + animals.length + ' Animals') +
-        app.buildStatCard((t.unesco||[]).length, '/ ' + unesco.length + ' UNESCO Sites') +
-        app.buildStatCard((t.county_peaks||[]).length, '/ ' + peaks.length + ' County Peaks');
-
-      app.renderChecklist({ container: document.getElementById('benCountries'), masterList: countries,
-        visitedIds: t.countries||[], labelFn: function(i){return i.name;},
-        groupFn: function(i){return i.continent;}, filterGroups: continentFilters, travClass: PERSON });
-
-      app.renderChecklist({ container: document.getElementById('benAnimals'), masterList: animals,
-        visitedIds: t.animals||[], labelFn: function(i){return i.name;},
-        groupFn: function(i){return i.category;}, filterGroups: aniFilters, travClass: PERSON });
-
-      app.renderChecklist({ container: document.getElementById('benUnesco'), masterList: unesco,
-        visitedIds: t.unesco||[], labelFn: function(i){return i.name + ' (' + i.country + ')';},
-        groupFn: function(i){return i.type;},
-        filterGroups: [{label:'Cultural',key:'Cultural'},{label:'Natural',key:'Natural'},{label:'Mixed',key:'Mixed'}],
-        travClass: PERSON });
-
-      app.renderChecklist({ container: document.getElementById('benPeaks'), masterList: peaks,
-        visitedIds: t.county_peaks||[], labelFn: function(i){return i.name + ' — ' + i.county + ' (' + i.height_m + 'm)';},
-        travClass: PERSON });
-
+      document.getElementById("pStats").innerHTML =
+        app.buildStatCard((t.countries||[]).length, "/ " + countries.length + " Countries") +
+        app.buildStatCard((t.animals||[]).length, "/ " + animals.length + " Animals") +
+        app.buildStatCard((t.unesco||[]).length, "/ " + unesco.length + " UNESCO Sites") +
+        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length + " Travel List I") +
+        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length + " Travel List II");
+      app.renderChecklist({
+        container: document.getElementById("pCountries"),
+        masterList: countries, visitedIds: t.countries||[],
+        labelFn: function(i){ return i.name + (i.capital ? " — " + i.capital : ""); },
+        groupFn: function(i){ return i.continent; },
+        filterGroups: continentFilters, travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pAnimals"),
+        masterList: animals, visitedIds: t.animals||[],
+        labelFn: function(i){ return i.name; },
+        groupFn: function(i){ return i.category; },
+        filterGroups: aniFilters, travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pUnesco"),
+        masterList: unesco, visitedIds: t.unesco||[],
+        labelFn: function(i){ return i.name + " (" + i.country + ")"; },
+        groupFn: function(i){ return i.type; },
+        filterGroups: [{label:"Cultural",key:"Cultural"},{label:"Natural",key:"Natural"},{label:"Mixed",key:"Mixed"}],
+        travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pTL1"),
+        masterList: tl1, visitedIds: t.travellist1||[],
+        labelFn: function(i){ return i.name; },
+        travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pTL2"),
+        masterList: tl2, visitedIds: t.travellist2||[],
+        labelFn: function(i){ return i.name; },
+        travClass: PERSON
+      });
     }).catch(function(err) { console.error(err); });
   </script>
-
 </body>
 </html>
