@@ -19,25 +19,23 @@ function fetchJSON(file) {
 }
 
 function loadAllData() {
-     return Promise.all([
-            fetchJSON('travellers.json'),
-            fetchJSON('countries.json'),
-            fetchJSON('animals.json'),
-            fetchJSON('unesco.json'),
-            fetchJSON('county_peaks.json'),
-            fetchJSON('travellist1.json'),
-            fetchJSON('travellist2.json').catch(function() { return []; })
-          ]).then(function(results) {
-            return {
-                     travellers: results[0],
-                     countries:  results[1],
-                     animals:    results[2],
-                     unesco:     results[3],
-                     peaks:      results[4],
-                     tl1:        results[5],
-                     tl2:        results[6]
-            };
-     });
+  return Promise.all([
+    fetchJSON('travellers.json'),
+    fetchJSON('countries.json'),
+    fetchJSON('animals.json'),
+    fetchJSON('unesco.json'),
+    fetchJSON('travellist1.json'),
+    fetchJSON('travellist2.json').catch(function() { return []; })
+  ]).then(function(results) {
+    return {
+      travellers: results[0],
+      countries:  results[1],
+      animals:    results[2],
+      unesco:     results[3],
+      tl1:        results[4],
+      tl2:        results[5]
+    };
+  });
 }
 
 /* ---- PROGRESS HELPERS ---- */
@@ -76,55 +74,57 @@ function buildStatCard(number, label) {
 }
 
 function renderNav(activeKey) {
-     var root = getRoot();
+  var root = getRoot();
 
   var travellers = [
-     { key: 'ben',  label: 'Ben',  href: root + 'pages/ben.html',  color: '#4f8ef7' },
-     { key: 'shaz', label: 'Shaz', href: root + 'pages/shaz.html', color: '#9b59f5' },
-     { key: 'paul', label: 'Paul', href: root + 'pages/paul.html', color: '#3ecf8e' },
-     { key: 'ruth', label: 'Ruth', href: root + 'pages/ruth.html', color: '#e05c8e' }
-       ];
+    { key: 'ben',  label: 'Ben',  href: root + 'pages/ben.html',  color: '#4f8ef7' },
+    { key: 'shaz', label: 'Shaz', href: root + 'pages/shaz.html', color: '#9b59f5' },
+    { key: 'paul', label: 'Paul', href: root + 'pages/paul.html', color: '#3ecf8e' },
+    { key: 'ruth', label: 'Ruth', href: root + 'pages/ruth.html', color: '#e05c8e' }
+  ];
 
   var lists = [
-     { key: 'overview',  label: 'Family Overview', href: root + 'pages/overview.html' },
-     { key: 'countries', label: 'Countries',        href: root + 'pages/countries.html' },
-     { key: 'animals',   label: 'Animals',          href: root + 'pages/animals.html' },
-     { key: 'unesco',    label: 'UNESCO',            href: root + 'pages/unesco.html' },
-     { key: 'peaks',     label: 'County Peaks',     href: root + 'pages/peaks.html' },
-     { key: 'list1',     label: 'Travel List I',    href: root + 'pages/ultimatetravellist1.html' },
-     { key: 'list2',     label: 'Travel List II',   href: root + 'pages/ultimatetravellist2.html' }
-       ];
+    { key: 'list1',     label: 'Travel List I',        href: root + 'pages/ultimatetravellist1.html' },
+    { key: 'list2',     label: 'Travel List II',       href: root + 'pages/ultimatetravellist2.html' },
+    { key: 'countries', label: 'Countries & Capitals', href: root + 'pages/countries.html' },
+    { key: 'unesco',    label: 'UNESCO',               href: root + 'pages/unesco.html' },
+    { key: 'animals',   label: 'Animals',              href: root + 'pages/animals.html' }
+  ];
+
+  var analytics = [
+    { key: 'analytics', label: 'Family Dashboard', href: root + 'pages/analytics.html' }
+  ];
 
   var travHtml = '';
-     for (var i = 0; i < travellers.length; i++) {
-            var t = travellers[i];
-            var aCls = (t.key === activeKey) ? ' class="active"' : '';
-            travHtml += '<li><a href="' + t.href + '"' + aCls + '>' +
-                     '<span class="nav-dot" style="background:' + t.color + '"></span>' +
-                     t.label + '</a></li>';
-     }
+  for (var i = 0; i < travellers.length; i++) {
+    var t = travellers[i];
+    var aCls = (t.key === activeKey) ? ' class="active"' : '';
+    travHtml += '<li><a href="' + t.href + '"' + aCls + '><span class="nav-dot" style="background:' + t.color + '"></span>' + t.label + '</a></li>';
+  }
 
   var listsHtml = '';
-     for (var j = 0; j < lists.length; j++) {
-            var l = lists[j];
-            var lCls = (l.key === activeKey) ? ' class="active"' : '';
-            listsHtml += '<li><a href="' + l.href + '"' + lCls + '>' + l.label + '</a></li>';
-     }
+  for (var j = 0; j < lists.length; j++) {
+    var l = lists[j];
+    var lCls = (l.key === activeKey) ? ' class="active"' : '';
+    listsHtml += '<li><a href="' + l.href + '"' + lCls + '>' + l.label + '</a></li>';
+  }
+
+  var analyticsHtml = '';
+  for (var k = 0; k < analytics.length; k++) {
+    var a = analytics[k];
+    var aCl = (a.key === activeKey) ? ' class="active"' : '';
+    analyticsHtml += '<li><a href="' + a.href + '"' + aCl + '>' + a.label + '</a></li>';
+  }
 
   var html = '<a class="nav-brand" href="' + root + 'index.html">&#9992; Travel Tracker</a>' +
-         '<ul class="nav-menu">' +
-           '<li class="nav-dropdown">' +
-             '<span class="nav-dropdown-label">Travel Lists <span class="caret">&#9660;</span></span>' +
-             '<ul class="nav-submenu">' + listsHtml + '</ul>' +
-           '</li>' +
-           '<li class="nav-dropdown">' +
-             '<span class="nav-dropdown-label">Travellers <span class="caret">&#9660;</span></span>' +
-             '<ul class="nav-submenu">' + travHtml + '</ul>' +
-           '</li>' +
-         '</ul>';
+    '<ul class="nav-menu">' +
+      '<li class="nav-dropdown"><span class="nav-dropdown-label">Travel Lists <span class="caret">&#9660;</span></span><ul class="nav-submenu">' + listsHtml + '</ul></li>' +
+      '<li class="nav-dropdown"><span class="nav-dropdown-label">Travellers <span class="caret">&#9660;</span></span><ul class="nav-submenu">' + travHtml + '</ul></li>' +
+      '<li class="nav-dropdown"><span class="nav-dropdown-label">Analytics <span class="caret">&#9660;</span></span><ul class="nav-submenu">' + analyticsHtml + '</ul></li>' +
+    '</ul>';
 
   var inner = document.querySelector('.site-nav .nav-inner');
-     if (inner) { inner.innerHTML = html; }
+  if (inner) { inner.innerHTML = html; }
 }
 
 /* ---- LIST RENDERERS ---- */
