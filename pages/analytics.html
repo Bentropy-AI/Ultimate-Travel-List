@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Dashboard - Ultimate Travel List</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body class="page-wrapper">
+  <nav class="site-nav"><div class="nav-inner"></div></nav>
+
+  <header class="page-hero">
+    <h1>&#128202; Family Dashboard</h1>
+    <p>How the whole family is tracking across all travel lists</p>
+  </header>
+
+  <main>
+    <div class="container">
+
+      <section class="section">
+        <h2 class="section-title">Family Comparison</h2>
+        <div id="comparisonTable"><p class="loading-msg">Loading...</p></div>
+      </section>
+
+      <section class="section">
+        <h2 class="section-title">Progress by Category</h2>
+        <div class="grid" id="categoryCards"><p class="loading-msg">Loading...</p></div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>Ultimate Travel List &copy; 2026 &mdash; Built for the family, by the family.</p>
+  </footer>
+
+  <script src="../js/travel.js"></script>
+  <script>
+    var app = window.TravelApp;
+    app.renderNav("analytics");
+    app.loadAllData().then(function(data) {
+      var travellers = data.travellers;
+      var countries  = data.countries;
+      var animals    = data.animals;
+      var unesco     = data.unesco;
+      var tl1        = data.tl1;
+      var tl2        = data.tl2;
+
+      // Build comparison table
+      var categories = [
+        { key: "countries",   label: "Countries & Capitals", total: countries.length },
+        { key: "animals",     label: "Animals",              total: animals.length   },
+        { key: "unesco",      label: "UNESCO Sites",         total: unesco.length    },
+        { key: "travellist1", label: "Travel List I",        total: tl1.length       },
+        { key: "travellist2", label: "Travel List II",       total: tl2.length       }
+      ];
+
+      var headerRow = "<tr><th>Category</th><th>Total</th>";
+      for (var hi = 0; hi < travellers.length; hi++) {
+        headerRow += "<th style=\"color:" + travellers[hi].color + "\">" + travellers[hi].name + "</th>";
+      }
+      headerRow += "</tr>";
+
+      var bodyRows = "";
+      for (var ci = 0; ci < categories.length; ci++) {
+        var cat = categories[ci];
+        var row = "<tr><td>" + cat.label + "</td><td>" + cat.total + "</td>";
+        for (var ti = 0; ti < travellers.length; ti++) {
+          var t = travellers[ti];
+          var visited = (t[cat.key] || []).length;
+          var pct = cat.total ? Math.round((visited / cat.total) * 100) : 0;
+          row += "<td style=\"color:" + t.color + "\">" + visited + " <span style=\"font-size:.75rem;color:var(--color-muted)\">(" + pct + "%)</span></td>";
+        }
+        row += "</tr>";
+        bodyRows += row;
+      }
+
+      document.getElementById("comparisonTable").innerHTML =
+        "<div style=\"overflow-x:auto\"><table class=\"comparison-table\">" +
+        "<thead>" + headerRow + "</thead>" +
+        "<tbody>" + bodyRows + "</tbody>" +
+        "</table></div>";
+
+      // Build per-category progress cards
+      var cardsHtml = "";
+      for (var ki = 0; ki < categories.length; ki++) {
+        var cat2 = categories[ki];
+        cardsHtml += "<div class=\"card\">";
+        cardsHtml += "<h3 style=\"margin-bottom:1rem\">" + cat2.label + "</h3>";
+        for (var pi = 0; pi < travellers.length; pi++) {
+          var tv = travellers[pi];
+          var vis = (tv[cat2.key] || []).length;
+          var p2 = cat2.total ? Math.round((vis / cat2.total) * 100) : 0;
+          cardsHtml += "<div style=\"margin-bottom:.6rem\">";
+          cardsHtml += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem\">";
+          cardsHtml += "<span style=\"color:" + tv.color + "\">" + (tv.emoji || "") + " " + tv.name + "</span>";
+          cardsHtml += "<span style=\"color:var(--color-muted)\">" + vis + "/" + cat2.total + " (" + p2 + "%)</span>";
+          cardsHtml += "</div>";
+          cardsHtml += "<div class=\"progress-bar\"><div class=\"progress-fill " + tv.id + "\" style=\"width:" + p2 + "%\"></div></div>";
+          cardsHtml += "</div>";
+        }
+        cardsHtml += "</div>";
+      }
+      document.getElementById("categoryCards").innerHTML = cardsHtml;
+
+    }).catch(function(err) {
+      console.error("Failed to load data:", err);
+    });
+  </script>
+</body>
+</html>
