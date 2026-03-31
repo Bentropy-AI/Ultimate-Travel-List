@@ -1,1 +1,22 @@
-[{"destination":"Paris","visited":true},{"destination":"New York","visited":false}]
+[
+    { "id": "temples-of-angkor",        "name": "Temples of Angkor",           "country": "Cambodia",      "region": "Asia" },
+    { "id": "great-barrier-reef",       "name": "Great Barrier Reef",          "country": "Australia",     "region": "Oceania" },
+    { "id": "machu-picchu",             "name": "Machu Picchu",                "country": "Peru",          "region": "S. America" },
+    { "id": "great-wall-of-china",      "name": "Great Wall of China",         "country": "China",         "region": "Asia" },
+    { "id": "taj-mahal",                "name": "Taj Mahal",                   "country": "India",         "region": "Asia" },
+    { "id": "grand-canyon",             "name": "Grand Canyon National Park",  "country": "USA",           "region": "N. America" },
+    { "id": "colosseum",                "name": "Colosseum",                   "country": "Italy",         "region": "Europe" },
+    { "id": "iguazu-falls",             "name": "Iguazú Falls",                "country": "Argentina/Brazil", "region": "S. America" },
+    { "id": "alhambra",                 "name": "Alhambra",                    "country": "Spain",         "region": "Europe" },
+    { "id": "aya-sofya",                "name": "Aya Sofya",                   "country": "Turkey",        "region": "Europe" },
+    { "id": "fez-medina",               "name": "Fez medina",                  "country": "Morocco",       "region": "Africa" },
+    { "id": "twelve-apostles",          "name": "Twelve Apostles",             "country": "Australia",     "region": "Oceania" },
+    { "id": "petra",                    "name": "Petra",                       "country": "Jordan",        "region": "Asia" },
+    { "id": "tikal",                    "name": "Tikal",                       "country": "Guatemala",     "region": "N. America" },
+    { "id": "british-museum",           "name": "British Museum",              "country": "UK",            "region": "Europe" },
+    { "id": "sagrada-familia",          "name": "Sagrada Familia",             "country": "Spain",         "region": "Europe" },
+    { "id": "fiordland-national-park",  "name": "Fiordland National Park",     "country": "New Zealand",   "region": "Oceania" },
+    { "id": "santorini",                "name": "Santorini",                   "country": "Greece",        "region": "Europe" },
+    { "id": "galapagos-islands",        "name": "Galapagos Islands",           "country": "Ecuador",       "region": "S. America" },
+    { "id": "mona",                     "name": "Museum of Old and New Art",   "country": "Australia",     "region": "Oceania" }
+]
