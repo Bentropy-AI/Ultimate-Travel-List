@@ -7,10 +7,7 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="page-wrapper">
-
-  <nav class="site-nav">
-    <div class="nav-inner"></div>
-  </nav>
+  <nav class="site-nav"><div class="nav-inner"></div></nav>
 
   <header class="page-hero">
     <h1>&#9992; Ultimate Travel List</h1>
@@ -21,32 +18,21 @@
     <div class="container">
 
       <section class="section">
-        <h2 class="section-title">Family Overview</h2>
-        <div class="stats-grid" id="globalStats">
-          <div class="stat-card">
-            <span class="stat-number" id="statCountries">&#8212;</span>
-            <span class="stat-label">Countries</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="statAnimals">&#8212;</span>
-            <span class="stat-label">Animals</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="statUnesco">&#8212;</span>
-            <span class="stat-label">UNESCO Sites</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number" id="statPeaks">&#8212;</span>
-            <span class="stat-label">County Peaks</span>
-          </div>
+        <h2 class="section-title">Master List Overview</h2>
+        <p style="color:var(--color-muted);margin-bottom:1.5rem">Total unique entries across all travel lists</p>
+        <div class="stats-grid" id="masterStats">
+          <div class="stat-card"><span class="stat-number" id="statCountries">-</span><span class="stat-label">Countries &amp; Capitals</span></div>
+          <div class="stat-card"><span class="stat-number" id="statAnimals">-</span><span class="stat-label">Animals</span></div>
+          <div class="stat-card"><span class="stat-number" id="statUnesco">-</span><span class="stat-label">UNESCO Sites</span></div>
+          <div class="stat-card"><span class="stat-number" id="statTL1">-</span><span class="stat-label">Travel List I</span></div>
+          <div class="stat-card"><span class="stat-number" id="statTL2">-</span><span class="stat-label">Travel List II</span></div>
         </div>
       </section>
 
       <section class="section">
-        <h2 class="section-title">Travellers</h2>
-        <div class="grid" id="travellerCards">
-          <p class="loading-msg">Loading...</p>
-        </div>
+        <h2 class="section-title">Traveller Progress</h2>
+        <p style="color:var(--color-muted);margin-bottom:1.5rem">How each family member is doing across all lists</p>
+        <div class="grid" id="travellerCards"><p class="loading-msg">Loading...</p></div>
       </section>
 
     </div>
@@ -59,47 +45,82 @@
   <script src="js/travel.js"></script>
   <script>
     var app = window.TravelApp;
-    app.renderNav('home');
+    app.renderNav("home");
     app.loadAllData().then(function(data) {
       var travellers = data.travellers;
       var countries  = data.countries;
       var animals    = data.animals;
       var unesco     = data.unesco;
-      var peaks      = data.peaks;
+      var tl1        = data.tl1;
+      var tl2        = data.tl2;
 
-      document.getElementById('statCountries').textContent = countries.length;
-      document.getElementById('statAnimals').textContent   = animals.length;
-      document.getElementById('statUnesco').textContent    = unesco.length;
-      document.getElementById('statPeaks').textContent     = peaks.length;
+      // Master list counts
+      document.getElementById("statCountries").textContent = countries.length;
+      document.getElementById("statAnimals").textContent   = animals.length;
+      document.getElementById("statUnesco").textContent    = unesco.length;
+      document.getElementById("statTL1").textContent       = tl1.length;
+      document.getElementById("statTL2").textContent       = tl2.length;
 
-      var grid = document.getElementById('travellerCards');
-      var html = '';
+      // Per-traveller progress cards
+      var grid = document.getElementById("travellerCards");
+      var html = "";
       for (var i = 0; i < travellers.length; i++) {
         var t = travellers[i];
-        var cVisited = (t.countries || []).length;
-        var p = countries.length ? Math.round((cVisited / countries.length) * 100) : 0;
-        html += '<a class="card-link" href="pages/' + t.id + '.html">' +
-          '<div class="card traveller-' + t.id + '">' +
-            '<h3 style="color:' + t.color + '">' + t.emoji + ' ' + t.name + '<\/h3>' +
-            '<p style="margin-bottom:.5rem">View travel progress<\/p>' +
-            '<div style="font-size:.78rem;color:var(--color-muted);margin-bottom:.25rem">' +
-              cVisited + ' / ' + countries.length + ' countries' +
-            '<\/div>' +
-            '<div class="progress-wrap">' +
-              '<div class="progress-bar">' +
-                '<div class="progress-fill ' + t.id + '" style="width:' + p + '%"><\/div>' +
-              '<\/div>' +
-            '<\/div>' +
-          '<\/div>' +
-        '<\/a>';
+
+        var cVis  = (t.countries || []).length;
+        var aVis  = (t.animals   || []).length;
+        var uVis  = (t.unesco    || []).length;
+        var t1Vis = (t.travellist1 || []).length;
+        var t2Vis = (t.travellist2 || []).length;
+
+        var cPct  = countries.length ? Math.round((cVis  / countries.length) * 100) : 0;
+        var aPct  = animals.length   ? Math.round((aVis  / animals.length)   * 100) : 0;
+        var uPct  = unesco.length    ? Math.round((uVis  / unesco.length)    * 100) : 0;
+        var t1Pct = tl1.length       ? Math.round((t1Vis / tl1.length)       * 100) : 0;
+        var t2Pct = tl2.length       ? Math.round((t2Vis / tl2.length)       * 100) : 0;
+
+        html += "<a class=\"card-link\" href=\"pages/" + t.id + ".html\">";
+        html += "<div class=\"card traveller-" + t.id + "\">";
+        html += "<h3 style=\"color:" + t.color + ";margin-bottom:1rem\">" + (t.emoji || "") + " " + t.name + "</h3>";
+
+        // Countries & Capitals
+        html += "<div style=\"margin-bottom:.75rem\">";
+        html += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem\"><span style=\"color:var(--color-muted)\">Countries &amp; Capitals</span><span style=\"color:" + t.color + "\">" + cVis + "/" + countries.length + " (" + cPct + "%)</span></div>";
+        html += "<div class=\"progress-bar\"><div class=\"progress-fill " + t.id + "\" style=\"width:" + cPct + "%\"></div></div>";
+        html += "</div>";
+
+        // Animals
+        html += "<div style=\"margin-bottom:.75rem\">";
+        html += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem\"><span style=\"color:var(--color-muted)\">Animals</span><span style=\"color:" + t.color + "\">" + aVis + "/" + animals.length + " (" + aPct + "%)</span></div>";
+        html += "<div class=\"progress-bar\"><div class=\"progress-fill " + t.id + "\" style=\"width:" + aPct + "%\"></div></div>";
+        html += "</div>";
+
+        // UNESCO
+        html += "<div style=\"margin-bottom:.75rem\">";
+        html += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem\"><span style=\"color:var(--color-muted)\">UNESCO Sites</span><span style=\"color:" + t.color + "\">" + uVis + "/" + unesco.length + " (" + uPct + "%)</span></div>";
+        html += "<div class=\"progress-bar\"><div class=\"progress-fill " + t.id + "\" style=\"width:" + uPct + "%\"></div></div>";
+        html += "</div>";
+
+        // Travel List I
+        html += "<div style=\"margin-bottom:.75rem\">";
+        html += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem\"><span style=\"color:var(--color-muted)\">Travel List I</span><span style=\"color:" + t.color + "\">" + t1Vis + "/" + tl1.length + " (" + t1Pct + "%)</span></div>";
+        html += "<div class=\"progress-bar\"><div class=\"progress-fill " + t.id + "\" style=\"width:" + t1Pct + "%\"></div></div>";
+        html += "</div>";
+
+        // Travel List II
+        html += "<div style=\"margin-bottom:.75rem\">";
+        html += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem\"><span style=\"color:var(--color-muted)\">Travel List II</span><span style=\"color:" + t.color + "\">" + t2Vis + "/" + tl2.length + " (" + t2Pct + "%)</span></div>";
+        html += "<div class=\"progress-bar\"><div class=\"progress-fill " + t.id + "\" style=\"width:" + t2Pct + "%\"></div></div>";
+        html += "</div>";
+
+        html += "<div style=\"text-align:right;margin-top:.5rem;font-size:.8rem;color:var(--color-muted)\">View full profile &rarr;</div>";
+        html += "</div></a>";
       }
-      grid.innerHTML = html || '<p class="empty-msg">No traveller data found.<\/p>';
+      grid.innerHTML = html || "<p class=\"empty-msg\">No traveller data found.</p>";
     }).catch(function(err) {
-      console.error('Failed to load data:', err);
-      document.getElementById('travellerCards').innerHTML =
-        '<p class="empty-msg">Could not load data.<\/p>';
+      console.error("Failed to load data:", err);
+      document.getElementById("travellerCards").innerHTML = "<p class=\"empty-msg\">Could not load data.</p>";
     });
   </script>
-
 </body>
 </html>
