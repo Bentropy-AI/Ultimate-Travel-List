@@ -1,17 +1,64 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>Shaz Travel Progress</title>
-<link rel="stylesheet" href="../css/styles.css">
-</head>
-
-<body>
-
-<h1>Shaz's Travel Progress</h1>
-
-<p>This page will contain analytics about Shaz's travel progress.</p>
-
-<a href="../index.html">← Back to Home</a>
-
-</body>
-</html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Shaz — Travel Progress</title>
+    <link rel="stylesheet" href="../css/styles.css">
+  </head>
+<body class="page-wrapper">
+  <nav class="site-nav"><div class="nav-inner"></div>div></nav>nav>
+  <main>
+      <div class="container">
+            <a class="back-link" href="../index.html">&#8592; Home</a>a>
+            <div class="person-hero">
+                    <div class="person-avatar avatar-shaz">S</div>div>
+                    <h1 style="color:var(--color-shaz)">Shaz</h1>h1>
+                    <p style="color:var(--color-muted)">Travel Progress</p>p>
+            </div>div>
+            <section class="section">
+                    <h2 class="section-title">Summary</h2>h2>
+                    <div class="stats-grid" id="shazStats"><p class="loading-msg">Loading…</p>p></div>div>
+            </section>section>
+            <section class="section">
+                    <h2 class="section-title">🌍 Countries</h2>h2>
+                    <div id="shazCountries"><p class="loading-msg">Loading…</p>p></div>div>
+            </section>section>
+            <section class="section">
+                    <h2 class="section-title">🦁 Animals</h2>h2>
+                    <div id="shazAnimals"><p class="loading-msg">Loading…</p>p></div>div>
+            </section>section>
+            <section class="section">
+                    <h2 class="section-title">🏛 UNESCO World Heritage Sites</h2>h2>
+                    <div id="shazUnesco"><p class="loading-msg">Loading…</p>p></div>div>
+            </section>section>
+            <section class="section">
+                    <h2 class="section-title">⛰ County Peaks</h2>h2>
+                    <div id="shazPeaks"><p class="loading-msg">Loading…</p>p></div>div>
+            </section>section>
+      </div>div>
+  </main>main>
+  <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>footer>
+  <script src="../js/travel.js"></script>
+  <script>
+        const { loadAllData, buildStatCard, renderNav, renderChecklist } = window.TravelApp;
+        const PERSON = 'shaz';
+        renderNav(PERSON);
+        loadAllData().then(({ travellers, countries, animals, unesco, peaks }) => {
+                const t = travellers.find(x => x.id === PERSON) || { countries:[], animals:[], unesco:[], county_peaks:[] };
+                document.getElementById('shazStats').innerHTML = [
+                          buildStatCard(t.countries.length, `/ ${countries.length} Countries`),
+                          buildStatCard(t.animals.length,   `/ ${animals.length} Animals`),
+                          buildStatCard(t.unesco.length,    `/ ${unesco.length} UNESCO Sites`),
+                          buildStatCard(t.county_peaks.length, `/ ${peaks.length} County Peaks`),
+                        ].join('');
+                renderChecklist({ container: document.getElementById('shazCountries'), masterList: countries, visitedIds: t.countries, labelFn: i => i.name, groupFn: i => i.continent, filterGroups: [...new Set(countries.map(c => c.continent))].sort().map(c => ({ label: c, key: c })), travClass: PERSON });
+                renderChecklist({ container: document.getElementById('shazAnimals'),   masterList: animals,   visitedIds: t.animals,   labelFn: i => i.name, groupFn: i => i.category, filterGroups: [...new Set(animals.map(a => a.category))].sort().map(c => ({ label: c, key: c })), travClass: PERSON });
+                renderChecklist({ container: document.getElementById('shazUnesco'),    masterList: unesco,    visitedIds: t.unesco,    labelFn: i => `${i.name} (${i.country})`, groupFn: i => i.type, filterGroups: [{ label:'Cultural', key:'Cultural' },{ label:'Natural', key:'Natural' },{ label:'Mixed', key:'Mixed' }], travClass: PERSON });
+                renderChecklist({ container: document.getElementById('shazPeaks'),     masterList: peaks,     visitedIds: t.county_peaks, labelFn: i => `${i.name} — ${i.county} (${i.height_m}m)`, travClass: PERSON });
+        }).catch(err => console.error(err));
+  </script>
+</body>body>
+</html>html>
+  </script></p></title>
+  </head>
