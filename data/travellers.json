@@ -1,50 +1,46 @@
 [
-    {
-          "id": "paul",
-          "name": "Paul",
-          "emoji": "P",
-          "color": "#4f8ef7",
-          "countries":     [],
-          "animals":       [],
-          "unesco":        [],
-          "county_peaks":  [],
-          "travellist1":   [],
-          "travellist2":   []
-    },
-    {
-          "id": "ruth",
-          "name": "Ruth",
-          "emoji": "R",
-          "color": "#e05c8e",
-          "countries":     [],
-          "animals":       [],
-          "unesco":        [],
-          "county_peaks":  [],
-          "travellist1":   [],
-          "travellist2":   []
-    },
-    {
-          "id": "ben",
-          "name": "Ben",
-          "emoji": "B",
-          "color": "#3ecf8e",
-          "countries":     [],
-          "animals":       [],
-          "unesco":        [],
-          "county_peaks":  [],
-          "travellist1":   [],
-          "travellist2":   []
-    },
-    {
-          "id": "shaz",
-          "name": "Shaz",
-          "emoji": "S",
-          "color": "#f6a623",
-          "countries":     [],
-          "animals":       [],
-          "unesco":        [],
-          "county_peaks":  [],
-          "travellist1":   [],
-          "travellist2":   []
-    }
+  {
+    "id": "ben",
+    "name": "Ben",
+    "emoji": "B",
+    "color": "#4f8ef7",
+    "countries": [],
+    "animals": [],
+    "unesco": [],
+    "travellist1": [],
+    "travellist2": []
+  },
+  {
+    "id": "shaz",
+    "name": "Shaz",
+    "emoji": "S",
+    "color": "#9b59f5",
+    "countries": [],
+    "animals": [],
+    "unesco": [],
+    "travellist1": [],
+    "travellist2": []
+  },
+  {
+    "id": "paul",
+    "name": "Paul",
+    "emoji": "P",
+    "color": "#3ecf8e",
+    "countries": [],
+    "animals": [],
+    "unesco": [],
+    "travellist1": [],
+    "travellist2": []
+  },
+  {
+    "id": "ruth",
+    "name": "Ruth",
+    "emoji": "R",
+    "color": "#e05c8e",
+    "countries": [],
+    "animals": [],
+    "unesco": [],
+    "travellist1": [],
+    "travellist2": []
+  }
 ]
