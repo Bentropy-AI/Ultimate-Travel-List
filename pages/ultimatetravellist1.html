@@ -1,17 +1,292 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-<title>Ultimate Travel Progress</title>
-<link rel="stylesheet" href="../css/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel List I - Ultimate Travel List</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        .cc-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .cc-table th,
+        .cc-table td {
+            padding: 0.5rem 0.6rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+        }
+
+        .cc-table thead tr:first-child th {
+            background: var(--color-surface2);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-muted);
+        }
+
+        .cc-table thead tr.subheader th {
+            background: var(--color-surface);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--color-border);
+            padding: 0.35rem 0.6rem;
+        }
+
+        .cc-table tbody tr:hover td {
+            background: var(--color-surface2);
+        }
+
+        .cc-table td.place-name {
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .cc-table td.place-country {
+            color: var(--color-muted);
+            font-style: italic;
+        }
+
+        .cc-table td.region-col {
+            color: var(--color-muted);
+            font-size: 0.75rem;
+        }
+
+        .cc-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .cc-check.yes {
+            background: rgba(62, 207, 142, 0.2);
+            color: var(--color-success);
+            border: 1px solid var(--color-success);
+        }
+
+        .cc-check.no {
+            background: rgba(46, 51, 80, 0.4);
+            color: var(--color-muted);
+            border: 1px solid var(--color-border);
+        }
+
+        .traveller-header {
+            text-align: center !important;
+        }
+
+        .sub-col {
+            text-align: center !important;
+        }
+
+        .progress-summary {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .prog-pill {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 0.75rem 1rem;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .prog-pill .pill-name {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .prog-pill .pill-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--color-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        .prog-pill .pill-stats span b {
+            font-weight: 700;
+        }
+    </style>
 </head>
 
-<body>
+<body class="page-wrapper">
+    <nav class="site-nav">
+        <div class="nav-inner"></div>
+    </nav>
 
-<h1>Ultimate Travel Progress</h1>
+    <header class="page-hero">
+        <h1>&#9989; Travel List I</h1>
+        <p>Track the Ultimate Travel List I destinations visited</p>
+    </header>
 
-<p>This page will contain analytics about Ultimate Travel progress.</p>
+    <main>
+        <div class="container">
 
-<a href="../index.html">← Back to Home</a>
+            <section class="section">
+                <h2 class="section-title">Family Progress</h2>
+                <div class="progress-summary" id="progressSummary">
+                    <p class="loading-msg">Loading...</p>
+                </div>
+            </section>
 
+            <section class="section">
+                <h2 class="section-title">Travel List I Tracker</h2>
+                <div class="filter-bar" id="filterBar">
+                    <input class="search-input" type="search" id="searchInput"
+                        placeholder="Search destination or country...">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="Africa">Africa</button>
+                    <button class="filter-btn" data-filter="Asia">Asia</button>
+                    <button class="filter-btn" data-filter="Europe">Europe</button>
+                    <button class="filter-btn" data-filter="N. America">N. America</button>
+                    <button class="filter-btn" data-filter="S. America">S. America</button>
+                    <button class="filter-btn" data-filter="Oceania">Oceania</button>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="cc-table" id="ccTable">
+                        <thead id="ccHead"></thead>
+                        <tbody id="ccBody">
+                            <tr>
+                                <td colspan="20" style="text-align:center;padding:2rem;color:var(--color-muted)">
+                                    Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <p>Ultimate Travel List &copy; 2026</p>
+    </footer>
+
+    <script src="../js/travel.js"></script>
+    <script>
+        var app = window.TravelApp;
+        app.renderNav("travellist1");
+
+        var allPlaces = [];
+        var travellers = [];
+        var searchTerm = "";
+        var currentFilter = "all";
+
+        app.loadAllData().then(function (data) {
+            travellers = data.travellers;
+            allPlaces = data.tl1 || [];
+
+            // Build visited sets per traveller for travellist1
+            var visitedSets = {};
+            for (var i = 0; i < travellers.length; i++) {
+                var t = travellers[i];
+                var set = {};
+                var list = t.travellist1 || [];
+                for (var j = 0; j < list.length; j++) { set[list[j]] = true; }
+                visitedSets[t.id] = set;
+            }
+
+            function renderSummary() {
+                var html = "";
+                for (var i = 0; i < travellers.length; i++) {
+                    var t = travellers[i];
+                    var visited = (t.travellist1 || []).length;
+                    var total = allPlaces.length;
+                    var pct = total > 0 ? Math.round(visited / total * 100) : 0;
+                    html += '<div class="prog-pill">';
+                    html += '<div class="pill-name">' + t.emoji + " " + t.name + '</div>';
+                    html += '<div class="pill-stats"><span><b>' + visited + '</b> / ' + total + ' visited</span><span><b>' + pct + '%</b></span></div>';
+                    html += '<div style="background:var(--color-border);border-radius:4px;height:6px;overflow:hidden"><div style="background:var(--color-success);height:6px;width:' + pct + '%"></div></div>';
+                    html += '</div>';
+                }
+                document.getElementById("progressSummary").innerHTML = html;
+            }
+
+            function buildHead() {
+                var topRow = '<tr><th colspan="3"></th>';
+                for (var i = 0; i < travellers.length; i++) {
+                    topRow += '<th class="traveller-header" colspan="1" style="color:' + travellers[i].color + '">' + travellers[i].emoji + " " + travellers[i].name + '</th>';
+                }
+                topRow += '</tr>';
+                var subRow = '<tr class="subheader"><th>#</th><th>Destination</th><th class="region-col">Region</th>';
+                for (var i = 0; i < travellers.length; i++) {
+                    subRow += '<th class="sub-col">Visited</th>';
+                }
+                subRow += '</tr>';
+                document.getElementById("ccHead").innerHTML = topRow + subRow;
+            }
+
+            function renderTable() {
+                var filtered = [];
+                for (var i = 0; i < allPlaces.length; i++) {
+                    var p = allPlaces[i];
+                    var matchFilter = currentFilter === "all" || p.region === currentFilter;
+                    var matchSearch = !searchTerm || p.name.toLowerCase().indexOf(searchTerm) !== -1 || (p.country && p.country.toLowerCase().indexOf(searchTerm) !== -1);
+                    if (matchFilter && matchSearch) filtered.push(p);
+                }
+                if (filtered.length === 0) {
+                    document.getElementById("ccBody").innerHTML = '<tr><td colspan="' + (3 + travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
+                    return;
+                }
+                var html = "";
+                for (var i = 0; i < filtered.length; i++) {
+                    var p = filtered[i];
+                    var rowNum = allPlaces.indexOf(p) + 1;
+                    html += '<tr>';
+                    html += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
+                    html += '<td><span class="place-name">' + p.name + '</span><br><span class="place-country">' + (p.country || "") + '</span></td>';
+                    html += '<td class="region-col">' + (p.region || "") + '</td>';
+                    for (var j = 0; j < travellers.length; j++) {
+                        var t = travellers[j];
+                        var been = visitedSets[t.id] && visitedSets[t.id][p.id];
+                        html += '<td class="sub-col"><span class="cc-check ' + (been ? "yes" : "no") + '">' + (been ? "&#10003;" : "&#10007;") + '</span></td>';
+                    }
+                    html += '</tr>';
+                }
+                document.getElementById("ccBody").innerHTML = html;
+            }
+
+            renderSummary();
+            buildHead();
+            renderTable();
+
+            // Wire up search
+            document.getElementById("searchInput").addEventListener("input", function (e) {
+                searchTerm = e.target.value.toLowerCase();
+                renderTable();
+            });
+
+            // Wire up filter buttons
+            var btns = document.querySelectorAll("#filterBar .filter-btn");
+            for (var bi = 0; bi < btns.length; bi++) {
+                btns[bi].addEventListener("click", function () {
+                    currentFilter = this.getAttribute("data-filter");
+                    var allBtns = document.querySelectorAll("#filterBar .filter-btn");
+                    for (var b = 0; b < allBtns.length; b++) allBtns[b].classList.remove("active");
+                    this.classList.add("active");
+                    renderTable();
+                });
+            }
+
+        }).catch(function (err) { console.error(err); });
+    </script>
 </body>
-</html>
+
+</html>>
