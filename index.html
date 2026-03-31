@@ -1,111 +1,140 @@
 <!DOCTYPE html>
-
 <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="Track your family's travel progress across countries, wildlife, UNESCO sites and more.">
+      <title>Ultimate Travel List</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+<body class="page-wrapper">
 
-<head>
-<meta charset="UTF-8">
-<title>Ultimate Travel List</title>
-<link rel="stylesheet" href="css/styles.css">
-</head>
+  <!-- Shared Navigation -->
+  <nav class="site-nav">
+      <div class="nav-inner"><!-- populated by travel.js --></div>div>
+  </nav>nav>
 
-<body>
+  <!-- Hero -->
+  <header class="page-hero">
+      <h1>✈ Ultimate Travel List</h1>
+      <p>Track travel achievements across the whole family</p>
+  </header>header>
 
-<header class="main-header">
-<h1>Ultimate Travel List</h1>
-<p>Track travel achievements across multiple explorers</p>
-</header>
+  <main>
+        <div class="container">
 
-<section class="section">
+                <!-- Global Stats -->
+                <section class="section">
+                          <h2 class="section-title">Family Overview</h2>
+                          <div class="stats-grid" id="globalStats">
+                                      <div class="stat-card"><span class="stat-number" id="statCountries">—</span>span><span class="stat-label">Countries (master list)</span>span></div>div>
+                                      <div class="stat-card"><span class="stat-number" id="statAnimals">—</span>span><span class="stat-label">Animals (master list)</span>span></div>div>
+                                      <div class="stat-card"><span class="stat-number" id="statUnesco">—</span>span><span class="stat-label">UNESCO Sites (master list)</span>span></div>div>
+                                      <div class="stat-card"><span class="stat-number" id="statPeaks">—</span>span><span class="stat-label">County Peaks</span>span></div>div>
+                          </div>div>
+                </section>section>
 
-<h2>Travellers</h2>
+                <!-- Travellers -->
+                <section class="section">
+                          <h2 class="section-title">Travellers</h2>
+                          <div class="grid" id="travellerCards">
+                                      <p class="loading-msg">Loading…</p>
+                          </div>div>
+                </section>section>
 
-<div class="grid">
+                <!-- Travel Lists -->
+                <section class="section">
+                          <h2 class="section-title">Travel Lists &amp; Categories</h2>
+                          <div class="grid">
+                                      <a class="card-link" href="pages/overview.html">
+                                                    <div class="card">
+                                                                    <h3>🗺 Family Overview</h3>
+                                                                    <p>Compare everyone's progress side by side</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/countries.html">
+                                                    <div class="card">
+                                                                    <h3>🌍 Countries</h3>
+                                                                    <p>Track visited countries worldwide</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/animals.html">
+                                                    <div class="card">
+                                                                    <h3>🦁 Animals</h3>
+                                                                    <p>Wildlife encounters around the globe</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/unesco.html">
+                                                    <div class="card">
+                                                                    <h3>🏛 UNESCO</h3>
+                                                                    <p>World Heritage Sites visited</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/peaks.html">
+                                                    <div class="card">
+                                                                    <h3>⛰ County Peaks</h3>
+                                                                    <p>Highest point in every English county</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/ultimatetravellist1.html">
+                                                    <div class="card">
+                                                                    <h3>📋 Travel List I</h3>
+                                                                    <p>Master adventure checklist</p>
+                                                    </div>div>
+                                      </a>a>
+                                      <a class="card-link" href="pages/ultimatetravellist2.html">
+                                                    <div class="card">
+                                                                    <h3>📋 Travel List II</h3>
+                                                                    <p>Extended bucket list</p>
+                                                    </div>div>
+                                      </a>a>
+                          </div>div>
+                </section>section>
 
-<a class="card-link" href="pages/paul.html">
-<div class="card">
-<h3>Paul</h3>
-<p>View travel progress</p>
-</div>
-</a>
+        </div>div>
+  </main>
 
-<a class="card-link" href="pages/ruth.html">
-<div class="card">
-<h3>Ruth</h3>
-<p>View travel progress</p>
-</div>
-</a>
+    <footer class="site-footer">
+          <p>Ultimate Travel List &copy; 2026 — Built for the family, by the family.</p>
+    </footer>footer>
 
-<a class="card-link" href="pages/ben.html">
-<div class="card">
-<h3>Ben</h3>
-<p>View travel progress</p>
-</div>
-</a>
+    <script src="js/travel.js"></script>
+    <script>
+          const { loadAllData, buildProgressBar, renderNav } = window.TravelApp;
 
-<a class="card-link" href="pages/shaz.html">
-<div class="card">
-<h3>Shaz</h3>
-<p>View travel progress</p>
-</div>
-</a>
+          renderNav('home');
 
-</div>
+          loadAllData().then(({ travellers, countries, animals, unesco, peaks }) => {
+                  // Global stats
+                  document.getElementById('statCountries').textContent = countries.length;
+                  document.getElementById('statAnimals').textContent   = animals.length;
+                  document.getElementById('statUnesco').textContent    = unesco.length;
+                  document.getElementById('statPeaks').textContent     = peaks.length;
 
-</section>
-
-<section class="section">
-
-<h2>Travel Lists</h2>
-
-<div class="grid">
-
-<a class="card-link" href="pages/ultimatetravellist1.html">
-<div class="card">
-<h3>Ultimate Travel List 1</h3>
-<p>Master adventure checklist</p>
-</div>
-</a>
-
-<a class="card-link" href="pages/ultimatetravellist2.html">
-<div class="card">
-<h3>Ultimate Travel List 2</h3>
-<p>Extended bucket list</p>
-</div>
-</a>
-
-<a class="card-link" href="pages/countries.html">
-<div class="card">
-<h3>Countries</h3>
-<p>Track visited countries</p>
-</div>
-</a>
-
-<a class="card-link" href="pages/animals.html">
-<div class="card">
-<h3>Animals</h3>
-<p>Wildlife encounters</p>
-</div>
-</a>
-
-</div>
-
-</section>
-
-<section class="stats">
-
-<div class="card">
-<h2 id="countryCount">0</h2>
-<p>Countries Visited</p>
-</div>
-
-<div class="card">
-<h2 id="animalCount">0</h2>
-<p>Animals Seen</p>
-</div>
-
-</section>
-
-<script src="app.js"></script>
-
-</body>
-</html>
+                  // Traveller cards
+                  const grid = document.getElementById('travellerCards');
+                  grid.innerHTML = travellers.map(t => {
+                            const cVisited = (t.countries || []).length;
+                            return `
+                                      <a class="card-link" href="pages/${t.id}.html">
+                                                  <div class="card traveller-${t.id}">
+                                                                <h3 style="color:${t.color}">${t.emoji} ${t.name}</h3>
+                                                                              <p style="margin-bottom:.5rem">View travel progress</p>
+                                                                                            <div style="font-size:.78rem;color:var(--color-muted);margin-bottom:.25rem">
+                                                                                                            ${cVisited} / ${countries.length} countries
+                                                                                                                          </div>
+                                                                                                                                        ${buildProgressBar(cVisited, countries.length, t.id)}
+                                                                                                                                                    </div>
+                                                                                                                                                              </a>`;
+                  }).join('');
+          }).catch(err => {
+                  console.error('Failed to load data:', err);
+                  document.getElementById('travellerCards').innerHTML =
+                            '<p class="empty-msg">Could not load data. Make sure JSON files exist in /data/.</p>';
+          });
+    </script>
+</body>body>
+</html>html>
+    </script>
+  </main></p></h1></title>
+  </head>
