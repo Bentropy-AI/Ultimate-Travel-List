@@ -1,65 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Ruth — Travel Progress</title>
-    <link rel="stylesheet" href="../css/styles.css">
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ruth - Travel Progress</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
 <body class="page-wrapper">
-  <nav class="site-nav"><div class="nav-inner"></div>div></nav>nav>
+  <nav class="site-nav"><div class="nav-inner"></div></nav>
   <main>
-        <div class="container">
-                <a class="back-link" href="../index.html">&#8592; Home</a>a>
-                <div class="person-hero">
-                          <div class="person-avatar avatar-ruth">R</div>div>
-                          <h1 style="color:var(--color-ruth)">Ruth</h1>h1>
-                          <p style="color:var(--color-muted)">Travel Progress</p>p>
-                </div>div>
-                <section class="section">
-                          <h2 class="section-title">Summary</h2>h2>
-                          <div class="stats-grid" id="ruthStats"><p class="loading-msg">Loading…</p>p></div>div>
-                </section>section>
-                <section class="section">
-                          <h2 class="section-title">🌍 Countries</h2>h2>
-                          <div id="ruthCountries"><p class="loading-msg">Loading…</p>p></div>div>
-                </section>section>
-                <section class="section">
-                          <h2 class="section-title">🦁 Animals</h2>h2>
-                          <div id="ruthAnimals"><p class="loading-msg">Loading…</p>p></div>div>
-                </section>section>
-                <section class="section">
-                          <h2 class="section-title">🏛 UNESCO World Heritage Sites</h2>h2>
-                          <div id="ruthUnesco"><p class="loading-msg">Loading…</p>p></div>div>
-                </section>section>
-                <section class="section">
-                          <h2 class="section-title">⛰ County Peaks</h2>h2>
-                          <div id="ruthPeaks"><p class="loading-msg">Loading…</p>p></div>div>
-                </section>section>
-        </div>div>
+    <div class="container">
+      <div class="person-hero">
+        <div class="person-avatar avatar-ruth">R</div>
+        <h1 style="color:var(--color-ruth)">Ruth</h1>
+        <p style="color:var(--color-muted)">Travel Progress</p>
+      </div>
+      <section class="section">
+        <h2 class="section-title">Summary</h2>
+        <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#127757; Countries &amp; Capitals</h2>
+        <div id="pCountries"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#129409; Animals</h2>
+        <div id="pAnimals"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#127963; UNESCO World Heritage Sites</h2>
+        <div id="pUnesco"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#9989; Travel List I</h2>
+        <div id="pTL1"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#9989; Travel List II</h2>
+        <div id="pTL2"><p class="loading-msg">Loading...</p></div>
+      </section>
+    </div>
   </main>
-    <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>footer>
+  <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
   <script src="../js/travel.js"></script>
   <script>
-        const { loadAllData, buildStatCard, renderNav, renderChecklist } = window.TravelApp;
-        const PERSON = 'ruth';
-        renderNav(PERSON);
-        loadAllData().then(({ travellers, countries, animals, unesco, peaks }) => {
-                const t = travellers.find(x => x.id === PERSON) || { countries:[], animals:[], unesco:[], county_peaks:[] };
-                document.getElementById('ruthStats').innerHTML = [
-                          buildStatCard(t.countries.length, `/ ${countries.length} Countries`),
-                          buildStatCard(t.animals.length,   `/ ${animals.length} Animals`),
-                          buildStatCard(t.unesco.length,    `/ ${unesco.length} UNESCO Sites`),
-                          buildStatCard(t.county_peaks.length, `/ ${peaks.length} County Peaks`),
-                        ].join('');
-                renderChecklist({ container: document.getElementById('ruthCountries'), masterList: countries, visitedIds: t.countries, labelFn: i => i.name, groupFn: i => i.continent, filterGroups: [...new Set(countries.map(c => c.continent))].sort().map(c => ({ label: c, key: c })), travClass: PERSON });
-                renderChecklist({ container: document.getElementById('ruthAnimals'),   masterList: animals,   visitedIds: t.animals,   labelFn: i => i.name, groupFn: i => i.category, filterGroups: [...new Set(animals.map(a => a.category))].sort().map(c => ({ label: c, key: c })), travClass: PERSON });
-                renderChecklist({ container: document.getElementById('ruthUnesco'),    masterList: unesco,    visitedIds: t.unesco,    labelFn: i => `${i.name} (${i.country})`, groupFn: i => i.type, filterGroups: [{ label:'Cultural', key:'Cultural' },{ label:'Natural', key:'Natural' },{ label:'Mixed', key:'Mixed' }], travClass: PERSON });
-                renderChecklist({ container: document.getElementById('ruthPeaks'),     masterList: peaks,     visitedIds: t.county_peaks, labelFn: i => `${i.name} — ${i.county} (${i.height_m}m)`, travClass: PERSON });
-        }).catch(err => console.error(err));
+    var app = window.TravelApp;
+    var PERSON = "ruth";
+    app.renderNav(PERSON);
+    app.loadAllData().then(function(data) {
+      var travellers = data.travellers;
+      var countries  = data.countries;
+      var animals    = data.animals;
+      var unesco     = data.unesco;
+      var tl1        = data.tl1;
+      var tl2        = data.tl2;
+      var t = null;
+      for (var i = 0; i < travellers.length; i++) {
+        if (travellers[i].id === PERSON) { t = travellers[i]; break; }
+      }
+      if (!t) t = {};
+      var continents = [];
+      for (var ci = 0; ci < countries.length; ci++) {
+        if (continents.indexOf(countries[ci].continent) === -1) continents.push(countries[ci].continent);
+      }
+      continents.sort();
+      var continentFilters = [];
+      for (var cfi = 0; cfi < continents.length; cfi++) continentFilters.push({ label: continents[cfi], key: continents[cfi] });
+      var aniCats = [];
+      for (var ai = 0; ai < animals.length; ai++) {
+        if (aniCats.indexOf(animals[ai].category) === -1) aniCats.push(animals[ai].category);
+      }
+      aniCats.sort();
+      var aniFilters = [];
+      for (var afi = 0; afi < aniCats.length; afi++) aniFilters.push({ label: aniCats[afi], key: aniCats[afi] });
+      document.getElementById("pStats").innerHTML =
+        app.buildStatCard((t.countries||[]).length, "/ " + countries.length + " Countries") +
+        app.buildStatCard((t.animals||[]).length, "/ " + animals.length + " Animals") +
+        app.buildStatCard((t.unesco||[]).length, "/ " + unesco.length + " UNESCO Sites") +
+        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length + " Travel List I") +
+        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length + " Travel List II");
+      app.renderChecklist({
+        container: document.getElementById("pCountries"),
+        masterList: countries, visitedIds: t.countries||[],
+        labelFn: function(i){ return i.name + (i.capital ? " — " + i.capital : ""); },
+        groupFn: function(i){ return i.continent; },
+        filterGroups: continentFilters, travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pAnimals"),
+        masterList: animals, visitedIds: t.animals||[],
+        labelFn: function(i){ return i.name; },
+        groupFn: function(i){ return i.category; },
+        filterGroups: aniFilters, travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pUnesco"),
+        masterList: unesco, visitedIds: t.unesco||[],
+        labelFn: function(i){ return i.name + " (" + i.country + ")"; },
+        groupFn: function(i){ return i.type; },
+        filterGroups: [{label:"Cultural",key:"Cultural"},{label:"Natural",key:"Natural"},{label:"Mixed",key:"Mixed"}],
+        travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pTL1"),
+        masterList: tl1, visitedIds: t.travellist1||[],
+        labelFn: function(i){ return i.name; },
+        travClass: PERSON
+      });
+      app.renderChecklist({
+        container: document.getElementById("pTL2"),
+        masterList: tl2, visitedIds: t.travellist2||[],
+        labelFn: function(i){ return i.name; },
+        travClass: PERSON
+      });
+    }).catch(function(err) { console.error(err); });
   </script>
-</body>body>
-</html>html>
-  </script></p>
-  </main></title>
-  </head>
+</body>
+</html>
