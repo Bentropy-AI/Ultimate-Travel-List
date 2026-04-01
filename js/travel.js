@@ -19,6 +19,7 @@ function fetchJSON(file) {
 }
 
 function loadAllData() {
+  var STORE_KEY = "utl_travellers";
   return Promise.all([
     fetchJSON('travellers.json'),
     fetchJSON('countries.json'),
@@ -27,8 +28,30 @@ function loadAllData() {
     fetchJSON('travellist1.json'),
     fetchJSON('travellist2.json').catch(function() { return []; })
   ]).then(function(results) {
+    var travellers = results[0];
+    // Merge any locally-saved visited data on top of the base JSON
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (raw) {
+        var local = JSON.parse(raw);
+        var localMap = {};
+        for (var i = 0; i < local.length; i++) localMap[local[i].id] = local[i];
+        for (var j = 0; j < travellers.length; j++) {
+          var t = travellers[j];
+          var l = localMap[t.id];
+          if (l) {
+            t.countries   = l.countries   || [];
+            t.capitals    = l.capitals    || [];
+            t.animals     = l.animals     || [];
+            t.unesco      = l.unesco      || [];
+            t.travellist1 = l.travellist1 || [];
+            t.travellist2 = l.travellist2 || [];
+          }
+        }
+      }
+    } catch (e) { /* localStorage unavailable or corrupt -- use JSON data as-is */ }
     return {
-      travellers: results[0],
+      travellers: travellers,
       countries:  results[1],
       animals:    results[2],
       unesco:     results[3],
@@ -37,6 +60,7 @@ function loadAllData() {
     };
   });
 }
+
 
 /* ---- PROGRESS HELPERS ---- */
 
