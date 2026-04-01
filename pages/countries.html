@@ -14,9 +14,11 @@
     .cc-table td.country-name { font-weight:600; color:var(--color-text); }
     .cc-table td.capital-name { color:var(--color-muted); font-style:italic; }
     .cc-table td.continent-col { color:var(--color-muted); font-size:0.75rem; }
-    .cc-check { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:0.7rem; font-weight:700; }
+    .cc-check { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:0.7rem; font-weight:700; cursor:pointer; transition:all 0.15s ease; user-select:none; }
+    .cc-check:hover { transform:scale(1.2); }
     .cc-check.yes { background:rgba(62,207,142,0.2); color:var(--color-success); border:1px solid var(--color-success); }
     .cc-check.no { background:rgba(46,51,80,0.4); color:var(--color-muted); border:1px solid var(--color-border); }
+    .cc-check.no:hover { background:rgba(62,207,142,0.1); border-color:var(--color-success); color:var(--color-success); opacity:0.6; }
     .traveller-header { text-align:center !important; }
     .sub-col { text-align:center !important; }
     .progress-summary { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
@@ -24,24 +26,22 @@
     .prog-pill .pill-name { font-size:0.8rem; font-weight:700; margin-bottom:0.5rem; }
     .prog-pill .pill-stats { display:flex; gap:1rem; font-size:0.75rem; color:var(--color-muted); margin-bottom:0.4rem; }
     .prog-pill .pill-stats span b { font-weight:700; }
+    .save-toast { position:fixed; bottom:1.5rem; right:1.5rem; background:var(--color-success); color:#fff; padding:0.6rem 1.2rem; border-radius:var(--radius); font-size:0.8rem; font-weight:600; opacity:0; transform:translateY(10px); transition:all 0.3s ease; pointer-events:none; z-index:999; }
+    .save-toast.show { opacity:1; transform:translateY(0); }
   </style>
 </head>
 <body class="page-wrapper">
   <nav class="site-nav"><div class="nav-inner"></div></nav>
-
   <header class="page-hero">
     <h1>&#127757; Countries &amp; Capitals</h1>
     <p>Track visited countries and their capital cities</p>
   </header>
-
   <main>
     <div class="container">
-
       <section class="section">
         <h2 class="section-title">Family Progress</h2>
         <div class="progress-summary" id="progressSummary"><p class="loading-msg">Loading...</p></div>
       </section>
-
       <section class="section">
         <h2 class="section-title">Countries &amp; Capitals Tracker</h2>
         <div class="filter-bar" id="filterBar">
@@ -61,147 +61,240 @@
           </table>
         </div>
       </section>
-
     </div>
   </main>
-
+  <div class="save-toast" id="saveToast">Saved &#10003;</div>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
-
   <script src="../js/travel.js"></script>
   <script>
-    var app = window.TravelApp;
-    app.renderNav("countries");
+  var app = window.TravelApp;
+  app.renderNav("countries");
 
-    app.loadAllData().then(function(data) {
-      var travellers = data.travellers;
-      var countries  = data.countries;
+  /* ---- localStorage helpers ---- */
+  var STORE_KEY = "utl_travellers";
 
-      // Build visited sets for countries and capitals per traveller
-      var cSets = {}; // country visited sets
-      var kSets = {}; // capital visited sets
-      for (var ti = 0; ti < travellers.length; ti++) {
-        var t = travellers[ti];
-        cSets[t.id] = {};
-        kSets[t.id] = {};
-        var cArr = t.countries || [];
-        var kArr = t.capitals  || [];
-        for (var ci = 0; ci < cArr.length; ci++) cSets[t.id][cArr[ci]] = true;
-        for (var ki = 0; ki < kArr.length; ki++) kSets[t.id][kArr[ki]] = true;
-      }
+  function loadLocal() {
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
 
-      var currentFilter = "all";
-      var searchTerm    = "";
-
-      function getFiltered() {
-        var result = [];
-        for (var i = 0; i < countries.length; i++) {
-          var c = countries[i];
-          var matchSearch = !searchTerm ||
-            c.name.toLowerCase().indexOf(searchTerm) !== -1 ||
-            (c.capital && c.capital.toLowerCase().indexOf(searchTerm) !== -1);
-          var matchFilter = currentFilter === "all" || c.continent === currentFilter;
-          if (matchSearch && matchFilter) result.push(c);
-        }
-        return result;
-      }
-
-      function renderTable() {
-        var items = getFiltered();
-
-        // Build header - two rows
-        // Row 1: Country | Capital | Continent | [traveller name spanning 2 cols each]
-        // Row 2: (empty) | (empty) | (empty) | Country | Capital (per traveller)
-        var colCount = 3 + travellers.length * 2;
-        var hRow1 = "<tr><th>Country</th><th>Capital</th><th>Continent</th>";
-        for (var thi = 0; thi < travellers.length; thi++) {
-          var tv = travellers[thi];
-          hRow1 += "<th colspan=\"2\" class=\"traveller-header\" style=\"color:" + tv.color + ";border-left:2px solid " + tv.color + "33\">" + tv.name + "</th>";
-        }
-        hRow1 += "</tr>";
-
-        var hRow2 = "<tr class=\"subheader\"><th></th><th></th><th></th>";
-        for (var shi = 0; shi < travellers.length; shi++) {
-          var stv = travellers[shi];
-          hRow2 += "<th class=\"sub-col\" style=\"border-left:2px solid " + stv.color + "33\">&#127757;</th>";
-          hRow2 += "<th class=\"sub-col\">&#127960;</th>";
-        }
-        hRow2 += "</tr>";
-
-        document.getElementById("ccHead").innerHTML = hRow1 + hRow2;
-
-        // Build body rows
-        var rows = "";
-        for (var ri = 0; ri < items.length; ri++) {
-          var item = items[ri];
-          rows += "<tr>";
-          rows += "<td class=\"country-name\">" + item.name + "</td>";
-          rows += "<td class=\"capital-name\">" + (item.capital || "—") + "</td>";
-          rows += "<td class=\"continent-col\"><span class=\"badge badge-info\">" + item.continent + "</span></td>";
-          for (var tdi = 0; tdi < travellers.length; tdi++) {
-            var tdv = travellers[tdi];
-            var cVis = !!cSets[tdv.id][item.id];
-            var kVis = !!kSets[tdv.id][item.id];
-            rows += "<td class=\"sub-col\" style=\"border-left:2px solid " + tdv.color + "33\">";
-            rows += "<span class=\"cc-check " + (cVis ? "yes" : "no") + "\">" + (cVis ? "&#10003;" : "") + "</span>";
-            rows += "</td>";
-            rows += "<td class=\"sub-col\">";
-            rows += "<span class=\"cc-check " + (kVis ? "yes" : "no") + "\">" + (kVis ? "&#10003;" : "") + "</span>";
-            rows += "</td>";
-          }
-          rows += "</tr>";
-        }
-
-        if (!rows) {
-          rows = "<tr><td colspan=\"" + colCount + "\" style=\"text-align:center;padding:2rem;color:var(--color-muted)\">No countries match.</td></tr>";
-        }
-
-        document.getElementById("ccBody").innerHTML = rows;
-      }
-
-      function renderSummary() {
-        var html = "";
-        for (var si = 0; si < travellers.length; si++) {
-          var sv = travellers[si];
-          var cCount = Object.keys(cSets[sv.id]).length;
-          var kCount = Object.keys(kSets[sv.id]).length;
-          var cPct = countries.length ? Math.round((cCount / countries.length) * 100) : 0;
-          var kPct = countries.length ? Math.round((kCount / countries.length) * 100) : 0;
-          html += "<div class=\"prog-pill\">";
-          html += "<div class=\"pill-name\" style=\"color:" + sv.color + "\">" + (sv.emoji || "") + " " + sv.name + "</div>";
-          html += "<div class=\"pill-stats\">";
-          html += "<span>&#127757; Countries: <b style=\"color:" + sv.color + "\">" + cCount + "/" + countries.length + " (" + cPct + "%)</b></span>";
-          html += "<span>&#127960; Capitals: <b style=\"color:" + sv.color + "\">" + kCount + "/" + countries.length + " (" + kPct + "%)</b></span>";
-          html += "</div>";
-          html += "<div class=\"progress-bar\" style=\"margin-bottom:.3rem\">";
-          html += "<div class=\"progress-fill " + sv.id + "\" style=\"width:" + cPct + "%\"></div></div>";
-          html += "<div class=\"progress-bar\"><div class=\"progress-fill " + sv.id + "\" style=\"width:" + kPct + "%;opacity:0.5\"></div></div>";
-          html += "</div>";
-        }
-        document.getElementById("progressSummary").innerHTML = html;
-      }
-
-      renderSummary();
-      renderTable();
-
-      // Wire up search
-      document.getElementById("searchInput").addEventListener("input", function(e) {
-        searchTerm = e.target.value.toLowerCase();
-        renderTable();
-      });
-
-      // Wire up filter buttons
-      var btns = document.querySelectorAll("#filterBar .filter-btn");
-      for (var bi = 0; bi < btns.length; bi++) {
-        btns[bi].addEventListener("click", function() {
-          currentFilter = this.getAttribute("data-filter");
-          var allBtns = document.querySelectorAll("#filterBar .filter-btn");
-          for (var b = 0; b < allBtns.length; b++) allBtns[b].classList.remove("active");
-          this.classList.add("active");
-          renderTable();
+  function saveLocal(travellers) {
+    try {
+      var slim = [];
+      for (var i = 0; i < travellers.length; i++) {
+        var t = travellers[i];
+        slim.push({
+          id: t.id,
+          countries: t.countries || [],
+          capitals: t.capitals || [],
+          animals: t.animals || [],
+          unesco: t.unesco || [],
+          travellist1: t.travellist1 || [],
+          travellist2: t.travellist2 || []
         });
       }
+      localStorage.setItem(STORE_KEY, JSON.stringify(slim));
+    } catch (e) { /* storage full or unavailable */ }
+  }
 
-    }).catch(function(err) { console.error(err); });
+  function mergeTravellers(remote, local) {
+    if (!local) return remote;
+    var localMap = {};
+    for (var i = 0; i < local.length; i++) localMap[local[i].id] = local[i];
+    for (var j = 0; j < remote.length; j++) {
+      var t = remote[j];
+      var l = localMap[t.id];
+      if (l) {
+        t.countries = l.countries || [];
+        t.capitals = l.capitals || [];
+        t.animals = l.animals || [];
+        t.unesco = l.unesco || [];
+        t.travellist1 = l.travellist1 || [];
+        t.travellist2 = l.travellist2 || [];
+      }
+    }
+    return remote;
+  }
+
+  function showToast() {
+    var el = document.getElementById("saveToast");
+    el.classList.add("show");
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(function() { el.classList.remove("show"); }, 1200);
+  }
+
+  app.loadAllData().then(function(data) {
+    var local = loadLocal();
+    var travellers = mergeTravellers(data.travellers, local);
+    var countries  = data.countries;
+
+    /* build lookup sets */
+    var cSets = {};
+    var kSets = {};
+    for (var ti = 0; ti < travellers.length; ti++) {
+      var t = travellers[ti];
+      cSets[t.id] = {};
+      kSets[t.id] = {};
+      var cArr = t.countries || [];
+      var kArr = t.capitals  || [];
+      for (var ci = 0; ci < cArr.length; ci++) cSets[t.id][cArr[ci]] = true;
+      for (var ki = 0; ki < kArr.length; ki++) kSets[t.id][kArr[ki]] = true;
+    }
+
+    var currentFilter = "all";
+    var searchTerm    = "";
+
+    function syncArrays() {
+      for (var si = 0; si < travellers.length; si++) {
+        var sv = travellers[si];
+        sv.countries = Object.keys(cSets[sv.id]);
+        sv.capitals  = Object.keys(kSets[sv.id]);
+      }
+    }
+
+    function getFiltered() {
+      var result = [];
+      for (var i = 0; i < countries.length; i++) {
+        var c = countries[i];
+        var matchSearch = !searchTerm ||
+          c.name.toLowerCase().indexOf(searchTerm) !== -1 ||
+          (c.capital && c.capital.toLowerCase().indexOf(searchTerm) !== -1);
+        var matchFilter = currentFilter === "all" || c.continent === currentFilter;
+        if (matchSearch && matchFilter) result.push(c);
+      }
+      return result;
+    }
+
+    /* ---- toggle handler ---- */
+    function handleToggle(travId, countryId, type) {
+      var set = (type === "country") ? cSets[travId] : kSets[travId];
+      if (set[countryId]) {
+        delete set[countryId];
+      } else {
+        set[countryId] = true;
+      }
+      syncArrays();
+      saveLocal(travellers);
+      renderSummary();
+      renderTable();
+      showToast();
+    }
+
+    function renderTable() {
+      var items = getFiltered();
+      var colCount = 3 + travellers.length * 2;
+
+      /* header row 1 */
+      var hRow1 = "<tr><th>Country</th><th>Capital</th><th>Continent</th>";
+      for (var thi = 0; thi < travellers.length; thi++) {
+        var tv = travellers[thi];
+        hRow1 += '<th colspan="2" class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + "</th>";
+      }
+      hRow1 += "</tr>";
+
+      /* header row 2 */
+      var hRow2 = '<tr class="subheader"><th></th><th></th><th></th>';
+      for (var shi = 0; shi < travellers.length; shi++) {
+        var stv = travellers[shi];
+        hRow2 += '<th class="sub-col" style="border-left:2px solid ' + stv.color + '33">&#127757;</th>';
+        hRow2 += '<th class="sub-col">&#127960;</th>';
+      }
+      hRow2 += "</tr>";
+      document.getElementById("ccHead").innerHTML = hRow1 + hRow2;
+
+      /* body */
+      var rows = "";
+      for (var ri = 0; ri < items.length; ri++) {
+        var item = items[ri];
+        rows += "<tr>";
+        rows += '<td class="country-name">' + item.name + "</td>";
+        rows += '<td class="capital-name">' + (item.capital || "\u2014") + "</td>";
+        rows += '<td class="continent-col"><span class="badge badge-info">' + item.continent + "</span></td>";
+
+        for (var tdi = 0; tdi < travellers.length; tdi++) {
+          var tdv = travellers[tdi];
+          var cVis = !!cSets[tdv.id][item.id];
+          var kVis = !!kSets[tdv.id][item.id];
+
+          rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
+          rows += '<span class="cc-check ' + (cVis ? "yes" : "no") + '" data-trav="' + tdv.id + '" data-cid="' + item.id + '" data-type="country">' + (cVis ? "&#10003;" : "") + "</span>";
+          rows += "</td>";
+
+          rows += '<td class="sub-col">';
+          rows += '<span class="cc-check ' + (kVis ? "yes" : "no") + '" data-trav="' + tdv.id + '" data-cid="' + item.id + '" data-type="capital">' + (kVis ? "&#10003;" : "") + "</span>";
+          rows += "</td>";
+        }
+        rows += "</tr>";
+      }
+
+      if (!rows) {
+        rows = '<tr><td colspan="' + colCount + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No countries match.</td></tr>';
+      }
+      document.getElementById("ccBody").innerHTML = rows;
+    }
+
+    function renderSummary() {
+      var html = "";
+      for (var si = 0; si < travellers.length; si++) {
+        var sv  = travellers[si];
+        var cCount = Object.keys(cSets[sv.id]).length;
+        var kCount = Object.keys(kSets[sv.id]).length;
+        var cPct = countries.length ? Math.round((cCount / countries.length) * 100) : 0;
+        var kPct = countries.length ? Math.round((kCount / countries.length) * 100) : 0;
+        html += '<div class="prog-pill">';
+        html += '<div class="pill-name" style="color:' + sv.color + '">' + (sv.emoji || "") + " " + sv.name + "</div>";
+        html += '<div class="pill-stats">';
+        html += '<span>&#127757; Countries: <b style="color:' + sv.color + '">' + cCount + "/" + countries.length + " (" + cPct + "%)</b></span>";
+        html += '<span>&#127960; Capitals: <b style="color:' + sv.color + '">' + kCount + "/" + countries.length + " (" + kPct + "%)</b></span>";
+        html += "</div>";
+        html += '<div class="progress-bar" style="margin-bottom:.3rem">';
+        html += '<div class="progress-fill ' + sv.id + '" style="width:' + cPct + '%"></div></div>';
+        html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + kPct + '%;opacity:0.5"></div></div>';
+        html += "</div>";
+      }
+      document.getElementById("progressSummary").innerHTML = html;
+    }
+
+    renderSummary();
+    renderTable();
+
+    /* ---- delegate click on table for toggles ---- */
+    document.getElementById("ccTable").addEventListener("click", function(e) {
+      var el = e.target.closest(".cc-check");
+      if (!el) return;
+      var trav = el.getAttribute("data-trav");
+      var cid  = el.getAttribute("data-cid");
+      var type = el.getAttribute("data-type");
+      if (trav && cid && type) handleToggle(trav, cid, type);
+    });
+
+    /* search */
+    document.getElementById("searchInput").addEventListener("input", function(e) {
+      searchTerm = e.target.value.toLowerCase();
+      renderTable();
+    });
+
+    /* filter buttons */
+    var btns = document.querySelectorAll("#filterBar .filter-btn");
+    for (var bi = 0; bi < btns.length; bi++) {
+      btns[bi].addEventListener("click", function() {
+        currentFilter = this.getAttribute("data-filter");
+        var allBtns = document.querySelectorAll("#filterBar .filter-btn");
+        for (var b = 0; b < allBtns.length; b++) allBtns[b].classList.remove("active");
+        this.classList.add("active");
+        renderTable();
+      });
+    }
+
+    /* save initial local copy so other pages can read it */
+    saveLocal(travellers);
+
+  }).catch(function(err) {
+    console.error("Failed to load data:", err);
+    document.getElementById("progressSummary").innerHTML = '<p style="color:var(--color-muted)">Could not load data.</p>';
+  });
   </script>
 </body>
 </html>
