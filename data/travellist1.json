@@ -458,7 +458,7 @@
   { "id": "lanse-aux-meadows", "name": "L'Anse aux Meadows", "country": "Canada", "region": "N. America" },
   { "id": "black-forest", "name": "Black Forest", "country": "Germany", "region": "Europe" },
   { "id": "mt-fuji", "name": "Mt Fuji", "country": "Japan", "region": "Asia" },
-  { "id": "mighty-volcano", "name": "The Mighty Volcano", "country": "New Zealand", "region": "Oceania" },
+  { "id": "mighty-volcano", "name": "The Mighty Volcano", "country": "Réunion", "region": "Africa" },
   { "id": "mt-kenya", "name": "Mt Kenya", "country": "Kenya", "region": "Africa" },
   { "id": "kalon", "name": "Kalon Minaret", "country": "Uzbekistan", "region": "Asia" },
   { "id": "trakai", "name": "Trakai Castle", "country": "Lithuania", "region": "Europe" },
