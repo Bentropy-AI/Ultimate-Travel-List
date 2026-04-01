@@ -366,6 +366,12 @@
     "continent": "Europe"
   },
   {
+    "id": "GF",
+    "name": "French Guiana",
+    "capital": "Cayenne",
+    "continent": "South America"
+  },
+  {
     "id": "GA",
     "name": "Gabon",
     "capital": "Libreville",
