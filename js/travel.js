@@ -140,7 +140,7 @@ function renderNav(activeKey) {
     analyticsHtml += '<li><a href="' + a.href + '"' + aCl + '>' + a.label + '</a></li>';
   }
 
-  var html = '<a class="nav-brand" href="' + root + 'index.html">&#9992; Travel Tracker</a>' +
+  var html = '<a class="nav-brand" href="' + root + '">&#9992; Travel Tracker</a>' +
     '<ul class="nav-menu">' +
       '<li class="nav-dropdown"><span class="nav-dropdown-label">Travel Lists <span class="caret">&#9660;</span></span><ul class="nav-submenu">' + listsHtml + '</ul></li>' +
       '<li class="nav-dropdown"><span class="nav-dropdown-label">Travellers <span class="caret">&#9660;</span></span><ul class="nav-submenu">' + travHtml + '</ul></li>' +
