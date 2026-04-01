@@ -175,7 +175,7 @@
           var rowNum = allPlaces.indexOf(item) + 1;
           rows += "<tr>";
           rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + "</td>";
-          rows += '<td><span class="place-name">' + item.name + "</span><br><span class="place-country">" + (item.country || "") + "</span></td>";
+          rows += '<td><span class="place-name">' + item.name + '</span><br><span class="place-country">' + (item.country || "") + '</span></td>';
           rows += '<td class="region-col">' + (item.region || "") + "</td>";
           for (var tdi = 0; tdi < travellers.length; tdi++) {
             var tdv = travellers[tdi];
