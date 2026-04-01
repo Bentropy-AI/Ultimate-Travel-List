@@ -244,7 +244,7 @@
         var cPct = countries.length ? Math.round((cCount / countries.length) * 100) : 0;
         var kPct = countries.length ? Math.round((kCount / countries.length) * 100) : 0;
         html += '<div class="prog-pill">';
-        html += '<div class="pill-name" style="color:' + sv.color + '">' + (sv.emoji || "") + " " + sv.name + "</div>";
+        html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + "</div>";
         html += '<div class="pill-stats">';
         html += '<span>&#127757; Countries: <b style="color:' + sv.color + '">' + cCount + "/" + countries.length + " (" + cPct + "%)</b></span>";
         html += '<span>&#127960; Capitals: <b style="color:' + sv.color + '">' + kCount + "/" + countries.length + " (" + kPct + "%)</b></span>";
