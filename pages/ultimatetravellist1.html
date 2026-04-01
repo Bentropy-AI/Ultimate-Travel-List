@@ -157,7 +157,7 @@
         var hRow1 = "<tr><th colspan=\"4\"></th>";
         for (var thi = 0; thi < travellers.length; thi++) {
           var tv = travellers[thi];
-          hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + (tv.emoji || "") + " " + tv.name + "</th>";
+          hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + "</th>";
         }
         hRow1 += "</tr>";
 
@@ -203,7 +203,7 @@
           var total = allPlaces.length;
           var pct = total ? Math.round((count / total) * 100) : 0;
           html += '<div class="prog-pill">';
-          html += '<div class="pill-name" style="color:' + sv.color + '">' + (sv.emoji || "") + " " + sv.name + "</div>";
+          html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + "</div>";
           html += '<div class="pill-stats"><span>&#9989; Visited: <b style="color:' + sv.color + '">' + count + "/" + total + " (" + pct + "%)</b></span></div>";
           html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + pct + '%"></div></div>';
           html += "</div>";
