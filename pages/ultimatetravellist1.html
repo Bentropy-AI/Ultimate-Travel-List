@@ -149,10 +149,10 @@
 
       function renderTable() {
         var items = getFiltered();
-        var colCount = 3 + travellers.length;
+        var colCount = 4 + travellers.length;
 
         /* header row 1 */
-        var hRow1 = "<tr><th colspan=\"3\"></th>";
+        var hRow1 = "<tr><th colspan=\"4\"></th>";
         for (var thi = 0; thi < travellers.length; thi++) {
           var tv = travellers[thi];
           hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + (tv.emoji || "") + " " + tv.name + "</th>";
@@ -160,7 +160,7 @@
         hRow1 += "</tr>";
 
         /* header row 2 */
-        var hRow2 = '<tr class="subheader"><th>#</th><th>Destination</th><th>Region</th>';
+        var hRow2 = '<tr class="subheader"><th>#</th><th>Destination</th><th>Country</th><th>Region</th>';
         for (var shi = 0; shi < travellers.length; shi++) {
           hRow2 += '<th class="sub-col" style="border-left:2px solid ' + travellers[shi].color + '33">Visited</th>';
         }
@@ -175,7 +175,8 @@
           var rowNum = allPlaces.indexOf(item) + 1;
           rows += "<tr>";
           rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + "</td>";
-          rows += '<td><span class="place-name">' + item.name + '</span><br><span class="place-country">' + (item.country || "") + '</span></td>';
+          rows += '<td class="place-name">' + item.name + '</td>';
+            rows += '<td class="place-country">' + (item.country || '') + '</td>';
           rows += '<td class="region-col">' + (item.region || "") + "</td>";
           for (var tdi = 0; tdi < travellers.length; tdi++) {
             var tdv = travellers[tdi];
