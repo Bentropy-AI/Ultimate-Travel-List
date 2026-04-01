@@ -21,12 +21,12 @@
         <h2 class="section-title">Master List Overview</h2>
         <p style="color:var(--color-muted);margin-bottom:1.5rem">Total unique entries across all travel lists</p>
         <div class="stats-grid" id="masterStats">
-          <div class="stat-card"><span class="stat-number" id="statCountries">-</span><span class="stat-label">Countries</span></div>
-          <div class="stat-card"><span class="stat-number" id="statCapitals">-</span><span class="stat-label">Capitals</span></div>
-          <div class="stat-card"><span class="stat-number" id="statAnimals">-</span><span class="stat-label">Animals</span></div>
-          <div class="stat-card"><span class="stat-number" id="statUnesco">-</span><span class="stat-label">UNESCO Sites</span></div>
           <div class="stat-card"><span class="stat-number" id="statTL1">-</span><span class="stat-label">Travel List I</span></div>
           <div class="stat-card"><span class="stat-number" id="statTL2">-</span><span class="stat-label">Travel List II</span></div>
+          <div class="stat-card"><span class="stat-number" id="statCountries">-</span><span class="stat-label">Countries</span></div>
+          <div class="stat-card"><span class="stat-number" id="statCapitals">-</span><span class="stat-label">Capitals</span></div>
+          <div class="stat-card"><span class="stat-number" id="statUnesco">-</span><span class="stat-label">UNESCO Sites</span></div>
+          <div class="stat-card"><span class="stat-number" id="statAnimals">-</span><span class="stat-label">Animals</span></div>
         </div>
       </section>
 
@@ -87,6 +87,18 @@
         html += '<div class="card traveller-' + t.id + '">';
         html += '<h3 style="color:' + t.color + ';margin-bottom:1rem">' + (t.emoji || "") + " " + t.name + "</h3>";
 
+        // Travel List I
+        html += '<div style="margin-bottom:.75rem">';
+        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Travel List I</span><span style="color:' + t.color + '">' + t1Vis + "/" + tl1.length + " (" + t1Pct + "%)</span></div>";
+        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + t1Pct + '%"></div></div>';
+        html += "</div>";
+
+        // Travel List II
+        html += '<div style="margin-bottom:.75rem">';
+        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Travel List II</span><span style="color:' + t.color + '">' + t2Vis + "/" + tl2.length + " (" + t2Pct + "%)</span></div>";
+        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + t2Pct + '%"></div></div>';
+        html += "</div>";
+
         // Countries
         html += '<div style="margin-bottom:.75rem">';
         html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Countries</span><span style="color:' + t.color + '">' + cVis + "/" + countries.length + " (" + cPct + "%)</span></div>";
@@ -99,28 +111,16 @@
         html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + kPct + '%"></div></div>';
         html += "</div>";
 
-        // Animals
-        html += '<div style="margin-bottom:.75rem">';
-        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Animals</span><span style="color:' + t.color + '">' + aVis + "/" + animals.length + " (" + aPct + "%)</span></div>";
-        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + aPct + '%"></div></div>';
-        html += "</div>";
-
         // UNESCO
         html += '<div style="margin-bottom:.75rem">';
         html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">UNESCO Sites</span><span style="color:' + t.color + '">' + uVis + "/" + unesco.length + " (" + uPct + "%)</span></div>";
         html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + uPct + '%"></div></div>';
         html += "</div>";
 
-        // Travel List I
+        // Animals
         html += '<div style="margin-bottom:.75rem">';
-        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Travel List I</span><span style="color:' + t.color + '">' + t1Vis + "/" + tl1.length + " (" + t1Pct + "%)</span></div>";
-        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + t1Pct + '%"></div></div>';
-        html += "</div>";
-
-        // Travel List II
-        html += '<div style="margin-bottom:.75rem">';
-        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Travel List II</span><span style="color:' + t.color + '">' + t2Vis + "/" + tl2.length + " (" + t2Pct + "%)</span></div>";
-        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + t2Pct + '%"></div></div>';
+        html += '<div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.25rem"><span style="color:var(--color-muted)">Animals</span><span style="color:' + t.color + '">' + aVis + "/" + animals.length + " (" + aPct + "%)</span></div>";
+        html += '<div class="progress-bar"><div class="progress-fill ' + t.id + '" style="width:' + aPct + '%"></div></div>';
         html += "</div>";
 
         html += '<div style="text-align:right;margin-top:.5rem;font-size:.8rem;color:var(--color-muted)">View full profile &rarr;</div>';
