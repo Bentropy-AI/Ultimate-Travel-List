@@ -20,24 +20,24 @@
         <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
       </section>
       <section class="section">
-        <h2 class="section-title">&#127757; Countries &amp; Capitals</h2>
-        <div id="pCountries"><p class="loading-msg">Loading...</p></div>
-      </section>
-      <section class="section">
-        <h2 class="section-title">&#129409; Animals</h2>
-        <div id="pAnimals"><p class="loading-msg">Loading...</p></div>
-      </section>
-      <section class="section">
-        <h2 class="section-title">&#127963; UNESCO World Heritage Sites</h2>
-        <div id="pUnesco"><p class="loading-msg">Loading...</p></div>
-      </section>
-      <section class="section">
         <h2 class="section-title">&#9989; Travel List I</h2>
         <div id="pTL1"><p class="loading-msg">Loading...</p></div>
       </section>
       <section class="section">
         <h2 class="section-title">&#9989; Travel List II</h2>
         <div id="pTL2"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#127757; Countries &amp; Capitals</h2>
+        <div id="pCountries"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#127963; UNESCO World Heritage Sites</h2>
+        <div id="pUnesco"><p class="loading-msg">Loading...</p></div>
+      </section>
+      <section class="section">
+        <h2 class="section-title">&#129409; Animals</h2>
+        <div id="pAnimals"><p class="loading-msg">Loading...</p></div>
       </section>
     </div>
   </main>
@@ -47,6 +47,7 @@
     var app = window.TravelApp;
     var PERSON = "ruth";
     app.renderNav(PERSON);
+
     app.loadAllData().then(function(data) {
       var travellers = data.travellers;
       var countries  = data.countries;
@@ -54,11 +55,22 @@
       var unesco     = data.unesco;
       var tl1        = data.tl1;
       var tl2        = data.tl2;
+
       var t = null;
       for (var i = 0; i < travellers.length; i++) {
         if (travellers[i].id === PERSON) { t = travellers[i]; break; }
       }
       if (!t) t = {};
+
+      /* ---- Summary tiles: TL1 > TL2 > Countries > Capitals > UNESCO > Animals ---- */
+      document.getElementById("pStats").innerHTML =
+        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length      + " Travel List I")   +
+        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length      + " Travel List II")  +
+        app.buildStatCard((t.countries||[]).length,   "/ " + countries.length + " Countries")      +
+        app.buildStatCard((t.capitals||[]).length,    "/ " + countries.length + " Capitals")       +
+        app.buildStatCard((t.unesco||[]).length,      "/ " + unesco.length   + " UNESCO Sites")    +
+        app.buildStatCard((t.animals||[]).length,     "/ " + animals.length  + " Animals");
+
       var continents = [];
       for (var ci = 0; ci < countries.length; ci++) {
         if (continents.indexOf(countries[ci].continent) === -1) continents.push(countries[ci].continent);
@@ -66,6 +78,7 @@
       continents.sort();
       var continentFilters = [];
       for (var cfi = 0; cfi < continents.length; cfi++) continentFilters.push({ label: continents[cfi], key: continents[cfi] });
+
       var aniCats = [];
       for (var ai = 0; ai < animals.length; ai++) {
         if (aniCats.indexOf(animals[ai].category) === -1) aniCats.push(animals[ai].category);
@@ -73,46 +86,49 @@
       aniCats.sort();
       var aniFilters = [];
       for (var afi = 0; afi < aniCats.length; afi++) aniFilters.push({ label: aniCats[afi], key: aniCats[afi] });
-      document.getElementById("pStats").innerHTML =
-        app.buildStatCard((t.countries||[]).length, "/ " + countries.length + " Countries") +
-        app.buildStatCard((t.animals||[]).length, "/ " + animals.length + " Animals") +
-        app.buildStatCard((t.unesco||[]).length, "/ " + unesco.length + " UNESCO Sites") +
-        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length + " Travel List I") +
-        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length + " Travel List II");
+
       app.renderChecklist({
-        container: document.getElementById("pCountries"),
-        masterList: countries, visitedIds: t.countries||[],
-        labelFn: function(i){ return i.name + (i.capital ? " — " + i.capital : ""); },
-        groupFn: function(i){ return i.continent; },
-        filterGroups: continentFilters, travClass: PERSON
+        container:    document.getElementById("pTL1"),
+        masterList:   tl1,
+        visitedIds:   t.travellist1||[],
+        labelFn:      function(i){ return i.name; },
+        travClass:    PERSON
       });
       app.renderChecklist({
-        container: document.getElementById("pAnimals"),
-        masterList: animals, visitedIds: t.animals||[],
-        labelFn: function(i){ return i.name; },
-        groupFn: function(i){ return i.category; },
-        filterGroups: aniFilters, travClass: PERSON
+        container:    document.getElementById("pTL2"),
+        masterList:   tl2,
+        visitedIds:   t.travellist2||[],
+        labelFn:      function(i){ return i.name; },
+        travClass:    PERSON
       });
       app.renderChecklist({
-        container: document.getElementById("pUnesco"),
-        masterList: unesco, visitedIds: t.unesco||[],
-        labelFn: function(i){ return i.name + " (" + i.country + ")"; },
-        groupFn: function(i){ return i.type; },
+        container:    document.getElementById("pCountries"),
+        masterList:   countries,
+        visitedIds:   t.countries||[],
+        labelFn:      function(i){ return i.name + (i.capital ? " — " + i.capital : ""); },
+        groupFn:      function(i){ return i.continent; },
+        filterGroups: continentFilters,
+        travClass:    PERSON
+      });
+      app.renderChecklist({
+        container:    document.getElementById("pUnesco"),
+        masterList:   unesco,
+        visitedIds:   t.unesco||[],
+        labelFn:      function(i){ return i.name + " (" + i.country + ")"; },
+        groupFn:      function(i){ return i.type; },
         filterGroups: [{label:"Cultural",key:"Cultural"},{label:"Natural",key:"Natural"},{label:"Mixed",key:"Mixed"}],
-        travClass: PERSON
+        travClass:    PERSON
       });
       app.renderChecklist({
-        container: document.getElementById("pTL1"),
-        masterList: tl1, visitedIds: t.travellist1||[],
-        labelFn: function(i){ return i.name; },
-        travClass: PERSON
+        container:    document.getElementById("pAnimals"),
+        masterList:   animals,
+        visitedIds:   t.animals||[],
+        labelFn:      function(i){ return i.name; },
+        groupFn:      function(i){ return i.category; },
+        filterGroups: aniFilters,
+        travClass:    PERSON
       });
-      app.renderChecklist({
-        container: document.getElementById("pTL2"),
-        masterList: tl2, visitedIds: t.travellist2||[],
-        labelFn: function(i){ return i.name; },
-        travClass: PERSON
-      });
+
     }).catch(function(err) { console.error(err); });
   </script>
 </body>
