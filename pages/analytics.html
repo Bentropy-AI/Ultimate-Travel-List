@@ -93,7 +93,7 @@
           var p2 = cat2.total ? Math.round((vis / cat2.total) * 100) : 0;
           cardsHtml += "<div style=\"margin-bottom:.6rem\">";
           cardsHtml += "<div style=\"display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem\">";
-          cardsHtml += "<span style=\"color:" + tv.color + "\">" + (tv.emoji || "") + " " + tv.name + "</span>";
+          cardsHtml += "<span style=\"color:" + tv.color + "\">" + tv.name + "</span>";
           cardsHtml += "<span style=\"color:var(--color-muted)\">" + vis + "/" + cat2.total + " (" + p2 + "%)</span>";
           cardsHtml += "</div>";
           cardsHtml += "<div class=\"progress-bar\"><div class=\"progress-fill " + tv.id + "\" style=\"width:" + p2 + "%\"></div></div>";
