@@ -19,9 +19,8 @@
     .cc-check { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:0.7rem; font-weight:700; cursor:pointer; transition:all 0.15s ease; user-select:none; }
     .cc-check:hover { transform:scale(1.2); }
     .cc-check.yes { background:rgba(62,207,142,0.2); color:var(--color-success); border:1px solid var(--color-success); }
-    .cc-check.no { background:rgba(46,51,80,0.4); color:var(--color-muted); border:1px solid var(--color-border); }
+    .cc-check.no  { background:rgba(46,51,80,0.4); color:var(--color-muted); border:1px solid var(--color-border); }
     .cc-check.no:hover { background:rgba(62,207,142,0.1); border-color:var(--color-success); color:var(--color-success); opacity:0.6; }
-    .cc-check.saving { opacity:0.4; pointer-events:none; }
     .traveller-header { text-align:center !important; }
     .sub-col { text-align:center !important; }
     .progress-summary { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
@@ -31,7 +30,7 @@
     .prog-pill .pill-stats span b { font-weight:700; }
     .save-toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:0.6rem 1.2rem; border-radius:var(--radius); font-size:0.8rem; font-weight:600; opacity:0; transform:translateY(10px); transition:all 0.3s ease; pointer-events:none; z-index:999; }
     .save-toast.show { opacity:1; transform:translateY(0); }
-    .save-toast.ok { background:var(--color-success); color:#fff; }
+    .save-toast.ok  { background:var(--color-success); color:#fff; }
     .save-toast.err { background:#e05c5c; color:#fff; }
   </style>
 </head>
@@ -70,201 +69,110 @@
   </main>
   <div class="save-toast ok" id="saveToast">Saved &#10003;</div>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
+
   <script src="../js/travel.js"></script>
   <script>
     var app = window.TravelApp;
-    app.renderNav("travellist1");
+    var Store = app.Store;
+    app.renderNav('travellist1');
 
-    /* ---- JSONBin config ---- */
-    var BIN_ID  = '69cd4cbd36566621a86d74ab';
-    var API_KEY = '$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.';
-    var BIN_URL = 'https://api.jsonbin.io/v3/b/' + BIN_ID;
-
-    /* ---- toast helper ---- */
-    function showToast(msg, type) {
+    /* ---- toast ---- */
+    Store.onSave(function(status, msg) {
       var el = document.getElementById('saveToast');
-      el.textContent = msg || 'Saved ✓';
-      el.className = 'save-toast show ' + (type || 'ok');
+      el.textContent = msg;
+      el.className = 'save-toast show ' + status;
       clearTimeout(window._toastTimer);
       window._toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+    });
+
+    var _travellers, _allPlaces;
+    var currentFilter = 'all';
+    var searchTerm = '';
+
+    function getFiltered() {
+      var result = [];
+      for (var i = 0; i < _allPlaces.length; i++) {
+        var p = _allPlaces[i];
+        var ms = !searchTerm || p.name.toLowerCase().indexOf(searchTerm) !== -1 ||
+                 (p.country && p.country.toLowerCase().indexOf(searchTerm) !== -1);
+        var mf = currentFilter === 'all' || p.region === currentFilter;
+        if (ms && mf) result.push(p);
+      }
+      return result;
     }
 
-    /* ---- JSONBin read ---- */
-    function fetchRemote() {
-      return fetch(BIN_URL + '/latest', {
-        headers: { 'X-Master-Key': API_KEY }
-      })
-      .then(function(r) { return r.json(); })
-      .then(function(d) { return d.record && d.record.visited ? d.record.visited : null; });
+    function renderTable() {
+      var items = getFiltered();
+      var hRow1 = '<tr><th colspan="4"></th>';
+      for (var thi = 0; thi < _travellers.length; thi++) {
+        var tv = _travellers[thi];
+        hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + '</th>';
+      }
+      hRow1 += '</tr>';
+      var hRow2 = '<tr class="subheader"><th>#</th><th>Destination</th><th>Country</th><th>Region</th>';
+      for (var shi = 0; shi < _travellers.length; shi++) {
+        hRow2 += '<th class="sub-col" style="border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
+      }
+      hRow2 += '</tr>';
+      document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
+      var rows = '';
+      for (var ri = 0; ri < items.length; ri++) {
+        var item = items[ri];
+        var rowNum = _allPlaces.indexOf(item) + 1;
+        rows += '<tr>';
+        rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
+        rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + encodeURIComponent(item.name) + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
+        rows += '<td class="place-country">' + (item.country || '') + '</td>';
+        rows += '<td class="region-col">' + (item.region || '') + '</td>';
+        for (var tdi = 0; tdi < _travellers.length; tdi++) {
+          var tdv = _travellers[tdi];
+          var vis = Store.isVisited(tdv.id, 'travellist1', item.id);
+          rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
+          rows += '<span class="cc-check ' + (vis?'yes':'no') + '" data-trav="' + tdv.id + '" data-pid="' + item.id + '">' + (vis?'&#10003;':'') + '</span>';
+          rows += '</td>';
+        }
+        rows += '</tr>';
+      }
+      if (!rows) rows = '<tr><td colspan="' + (4 + _travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
+      document.getElementById('ccBody').innerHTML = rows;
     }
 
-    /* ---- JSONBin write ---- */
-    function pushRemote(visited) {
-      return fetch(BIN_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-        body: JSON.stringify({ visited: visited })
-      })
-      .then(function(r) { return r.json(); });
+    function renderSummary() {
+      var html = '';
+      for (var si = 0; si < _travellers.length; si++) {
+        var sv = _travellers[si];
+        var count = Store.getVisitedCount(sv.id, 'travellist1');
+        var total = _allPlaces.length;
+        var pct = total ? Math.round((count / total) * 100) : 0;
+        html += '<div class="prog-pill">';
+        html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + '</div>';
+        html += '<div class="pill-stats"><span>&#9989; Visited: <b style="color:' + sv.color + '">' + count + '/' + total + ' (' + pct + '%)</b></span></div>';
+        html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + pct + '%"></div></div>';
+        html += '</div>';
+      }
+      document.getElementById('progressSummary').innerHTML = html;
     }
 
-    /* ---- local cache (fast UI, fallback) ---- */
-    var CACHE_KEY = 'utl_jb_visited';
-    function cacheLoad() { try { var r = localStorage.getItem(CACHE_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; } }
-    function cacheSave(v) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(v)); } catch(e) {} }
+    function redraw() { renderSummary(); renderTable(); }
 
-    app.loadAllData().then(function(data) {
-      var travellers = data.travellers;
-      var allPlaces  = data.tl1 || [];
+    Store.load(redraw).then(function(data) {
+      _travellers = data.travellers;
+      _allPlaces  = data.tl1 || [];
+      redraw();
 
-      /* visited sets — keyed by traveller id, value = {placeId: true} */
-      var vSets = {};
-      for (var ti = 0; ti < travellers.length; ti++) vSets[travellers[ti].id] = {};
-
-      /* seed from local cache instantly so page feels fast */
-      var cached = cacheLoad();
-      if (cached) {
-        for (var ti2 = 0; ti2 < travellers.length; ti2++) {
-          var tid = travellers[ti2].id;
-          if (cached[tid] && cached[tid].travellist1) {
-            var arr = cached[tid].travellist1;
-            for (var li = 0; li < arr.length; li++) vSets[tid][arr[li]] = true;
-          }
-        }
-      }
-
-      /* then fetch live data from JSONBin and re-render */
-      fetchRemote().then(function(remote) {
-        if (!remote) return;
-        for (var ti3 = 0; ti3 < travellers.length; ti3++) {
-          var tid3 = travellers[ti3].id;
-          vSets[tid3] = {};
-          if (remote[tid3] && remote[tid3].travellist1) {
-            var arr3 = remote[tid3].travellist1;
-            for (var li3 = 0; li3 < arr3.length; li3++) vSets[tid3][arr3[li3]] = true;
-          }
-        }
-        renderSummary();
-        renderTable();
-      }).catch(function() { /* use cache silently */ });
-
-      var currentFilter = 'all';
-      var searchTerm    = '';
-
-      function getFiltered() {
-        var result = [];
-        for (var i = 0; i < allPlaces.length; i++) {
-          var p = allPlaces[i];
-          var ms = !searchTerm || p.name.toLowerCase().indexOf(searchTerm) !== -1 || (p.country && p.country.toLowerCase().indexOf(searchTerm) !== -1);
-          var mf = currentFilter === 'all' || p.region === currentFilter;
-          if (ms && mf) result.push(p);
-        }
-        return result;
-      }
-
-      /* build visited object for JSONBin from current vSets */
-      function buildVisited() {
-        var v = {};
-        for (var ti = 0; ti < travellers.length; ti++) {
-          var tid = travellers[ti].id;
-          v[tid] = { travellist1: Object.keys(vSets[tid]) };
-        }
-        return v;
-      }
-
-      /* ---- toggle handler ---- */
-      var _saveTimer = null;
-      function handleToggle(travId, placeId) {
-        /* toggle instantly in UI */
-        if (vSets[travId][placeId]) { delete vSets[travId][placeId]; } else { vSets[travId][placeId] = true; }
-        renderSummary();
-        renderTable();
-
-        /* debounce: wait 600ms after last click before writing to JSONBin */
-        clearTimeout(_saveTimer);
-        _saveTimer = setTimeout(function() {
-          var visited = buildVisited();
-          cacheSave(visited);
-          pushRemote(visited)
-            .then(function() { showToast('Saved ✓', 'ok'); })
-            .catch(function() { showToast('Save failed ✕ — check connection', 'err'); });
-        }, 600);
-      }
-
-      function renderTable() {
-        var items = getFiltered();
-        /* header row 1 */
-        var hRow1 = '<tr><th colspan="4"></th>';
-        for (var thi = 0; thi < travellers.length; thi++) {
-          var tv = travellers[thi];
-          hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + '</th>';
-        }
-        hRow1 += '</tr>';
-        /* header row 2 */
-        var hRow2 = '<tr class="subheader"><th>#</th><th>Destination</th><th>Country</th><th>Region</th>';
-        for (var shi = 0; shi < travellers.length; shi++) {
-          hRow2 += '<th class="sub-col" style="border-left:2px solid ' + travellers[shi].color + '33">Visited</th>';
-        }
-        hRow2 += '</tr>';
-        document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
-        /* body */
-        var rows = '';
-        for (var ri = 0; ri < items.length; ri++) {
-          var item = items[ri];
-          var rowNum = allPlaces.indexOf(item) + 1;
-          rows += '<tr>';
-          rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
-          rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + encodeURIComponent(item.name) + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
-          rows += '<td class="place-country">' + (item.country || '') + '</td>';
-          rows += '<td class="region-col">' + (item.region || '') + '</td>';
-          for (var tdi = 0; tdi < travellers.length; tdi++) {
-            var tdv = travellers[tdi];
-            var vis = !!vSets[tdv.id][item.id];
-            rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
-            rows += '<span class="cc-check ' + (vis ? 'yes' : 'no') + '" data-trav="' + tdv.id + '" data-pid="' + item.id + '">' + (vis ? '&#10003;' : '') + '</span>';
-            rows += '</td>';
-          }
-          rows += '</tr>';
-        }
-        if (!rows) rows = '<tr><td colspan="' + (4 + travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
-        document.getElementById('ccBody').innerHTML = rows;
-      }
-
-      function renderSummary() {
-        var html = '';
-        for (var si = 0; si < travellers.length; si++) {
-          var sv = travellers[si];
-          var count = Object.keys(vSets[sv.id]).length;
-          var total = allPlaces.length;
-          var pct = total ? Math.round((count / total) * 100) : 0;
-          html += '<div class="prog-pill">';
-          html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + '</div>';
-          html += '<div class="pill-stats"><span>&#9989; Visited: <b style="color:' + sv.color + '">' + count + '/' + total + ' (' + pct + '%)</b></span></div>';
-          html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + pct + '%"></div></div>';
-          html += '</div>';
-        }
-        document.getElementById('progressSummary').innerHTML = html;
-      }
-
-      renderSummary();
-      renderTable();
-
-      /* click delegate */
       document.getElementById('ccTable').addEventListener('click', function(e) {
         var el = e.target.closest('.cc-check');
         if (!el) return;
         var trav = el.getAttribute('data-trav');
         var pid  = el.getAttribute('data-pid');
-        if (trav && pid) handleToggle(trav, pid);
+        if (trav && pid) { Store.toggle(trav, 'travellist1', pid); redraw(); }
       });
 
-      /* search */
       document.getElementById('searchInput').addEventListener('input', function(e) {
         searchTerm = e.target.value.toLowerCase();
         renderTable();
       });
 
-      /* filter buttons */
       var btns = document.querySelectorAll('#filterBar .filter-btn');
       for (var bi = 0; bi < btns.length; bi++) {
         btns[bi].addEventListener('click', function() {
@@ -275,7 +183,6 @@
           renderTable();
         });
       }
-
     }).catch(function(err) {
       console.error('Failed to load data:', err);
       document.getElementById('progressSummary').innerHTML = '<p style="color:var(--color-muted)">Could not load data.</p>';
