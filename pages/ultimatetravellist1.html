@@ -11,7 +11,7 @@
     .cc-table thead tr:first-child th { background:var(--color-surface2); font-weight:700; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-muted); }
     .cc-table thead tr.subheader th { background:var(--color-surface); font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; border-bottom:2px solid var(--color-border); padding:0.35rem 0.6rem; }
     .cc-table tbody tr:hover td { background:var(--color-surface2); }
-    .cc-table td.place-name { font-weight:600; color:var(--color-text); }
+    .cc-table td.place-name { font-weight:600; color:var(--color-text); }h
     .place-name a { color:inherit; text-decoration:none; }
     .place-name a:hover { color:var(--color-accent, #58a6ff); text-decoration:underline; }
     .cc-table td.place-country { color:var(--color-muted); font-style:italic; }
@@ -121,7 +121,7 @@
         var rowNum = _allPlaces.indexOf(item) + 1;
         rows += '<tr>';
         rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
-        rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + encodeURIComponent(item.name) + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
+        rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + encodeURIComponent(item.name + (item.country ? ", " + item.country : "")) + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
         rows += '<td class="place-country">' + (item.country || '') + '</td>';
         rows += '<td class="region-col">' + (item.region || '') + '</td>';
         for (var tdi = 0; tdi < _travellers.length; tdi++) {
