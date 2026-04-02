@@ -185,17 +185,13 @@
         var cc = cont.countries;
         var tc = cc.length;
         var vc = cc.filter(function(id){ return vis_c[id]; }).length;
-        var vk = cc.filter(function(id){ return vis_k[id]; }).length;
         var pp_c = tc ? Math.round(vc/tc*100) : 0;
-        var pp_k = tc ? Math.round(vk/tc*100) : 0;
         html += '<div class="cont-pill">';
         html += '<div class="pill-name" style="color:'+t.color+'">'+cont.label+'</div>';
         html += '<div class="pill-stats">';
         html += '<span>\uD83C\uDF0D <b style="color:'+t.color+'">'+vc+'/'+tc+'</b></span>';
-        html += '<span>\uD83C\uDFD8 <b style="color:'+t.color+'">'+vk+'/'+tc+'</b></span>';
         html += '</div>';
         html += '<div class="progress-bar" style="height:3px"><div class="progress-fill '+t.id+'" style="width:'+pp_c+'%"></div></div>';
-        html += '<div class="progress-bar" style="height:3px"><div class="progress-fill '+t.id+'" style="width:'+pp_k+'%"></div></div>';
         html += '</div>';
       });
       html += '</div></div>';
