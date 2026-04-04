@@ -1,0 +1,12 @@
+[
+    { "id": "petra", "name": "Petra", "country": "Jordan", "region": "Asia" },
+    { "id": "galapagos-islands", "name": "Galápagos Islands", "country": "Ecuador", "region": "S. America" },
+    { "id": "uluru", "name": "Uluru", "country": "Australia", "region": "Oceania" },
+    { "id": "okavango-delta", "name": "Okavango Delta", "country": "Botswana", "region": "Africa" },
+    { "id": "yellowstone", "name": "Yellowstone National Park", "country": "USA", "region": "N. America" },
+    { "id": "lake-bled", "name": "Lake Bled", "country": "Slovenia", "region": "Europe" },
+    { "id": "iguazu-falls", "name": "Iguazú Falls", "country": "Argentina/Brazil", "region": "S. America" },
+    { "id": "temples-of-angkor", "name": "Temples of Angkor", "country": "Cambodia", "region": "Asia" },
+    { "id": "salar-de-uyuni", "name": "Salar de Uyuni", "country": "Bolivia", "region": "S. America" },
+    { "id": "annapurna-circuit", "name": "Annapurna Circuit", "country": "Nepal", "region": "Asia" }
+]
