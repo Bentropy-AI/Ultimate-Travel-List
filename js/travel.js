@@ -160,9 +160,18 @@ var Store = (function() {
   function _persist() {
     var visited = _buildVisited();
     _cacheSave(visited);
-    _pushRemote(visited)
-      .then(function() { _notify('ok', 'Saved ✓'); })
-      .catch(function() { _notify('err', 'Save failed ✕ - check connection'); });
+         function _tryPush(attemptsLeft) {
+                  _pushRemote(visited).then(function() {
+                             _notify('ok', 'Saved \u2713');
+                  }).catch(function() {
+                             if (attemptsLeft > 0) {
+                                          setTimeout(function() { _tryPush(attemptsLeft - 1); }, 2000);
+                             } else {
+                                          _notify('err', 'Save failed \u2715 - check connection');
+                             }
+                  });
+         }
+         _tryPush(2);
   }
 
   function load(onRemote) {
