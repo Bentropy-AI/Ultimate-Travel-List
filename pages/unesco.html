@@ -37,178 +37,324 @@
           .save-toast.show { opacity:1; transform:translateY(0); }
           .save-toast.ok { background:var(--color-success); color:#fff; }
           .save-toast.err { background:#e05c5c; color:#fff; }
+          /* Info button */
+          .info-btn { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(88,166,255,0.12); border:1px solid rgba(88,166,255,0.35); color:#58a6ff; font-size:0.7rem; font-weight:700; cursor:pointer; transition:all 0.15s ease; user-select:none; font-style:italic; font-family:Georgia,serif; line-height:1; }
+          .info-btn:hover { background:rgba(88,166,255,0.25); border-color:#58a6ff; transform:scale(1.15); }
+          .info-col { text-align:center !important; width:36px; }
+          /* Popover */
+          .site-popover { position:fixed; z-index:1000; width:360px; max-width:calc(100vw - 2rem); background:#1a1d2e; border:1px solid rgba(88,166,255,0.3); border-radius:10px; box-shadow:0 8px 32px rgba(0,0,0,0.5); padding:0; overflow:hidden; opacity:0; transform:scale(0.95) translateY(-6px); transition:opacity 0.18s ease, transform 0.18s ease; pointer-events:none; }
+          .site-popover.visible { opacity:1; transform:scale(1) translateY(0); pointer-events:all; }
+          .popover-header { background:rgba(88,166,255,0.1); border-bottom:1px solid rgba(88,166,255,0.2); padding:0.65rem 0.9rem; display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem; }
+          .popover-title { font-size:0.78rem; font-weight:700; color:#e8eaf0; line-height:1.35; flex:1; }
+          .popover-meta { display:flex; gap:0.5rem; flex-wrap:wrap; padding:0.55rem 0.9rem 0.45rem; border-bottom:1px solid rgba(255,255,255,0.07); }
+          .popover-meta-item { font-size:0.7rem; color:var(--color-muted); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:4px; padding:0.2rem 0.5rem; white-space:nowrap; }
+          .popover-meta-item span { color:#c8cce0; font-weight:600; }
+          .popover-body { padding:0.65rem 0.9rem; max-height:280px; overflow-y:auto; }
+          .popover-body::-webkit-scrollbar { width:4px; }
+          .popover-body::-webkit-scrollbar-track { background:transparent; }
+          .popover-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:2px; }
+          .popover-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#58a6ff; margin-bottom:0.3rem; margin-top:0.6rem; }
+          .popover-section-label:first-child { margin-top:0; }
+          .popover-text { font-size:0.75rem; color:#b0b4cc; line-height:1.55; margin:0 0 0.4rem; }
+          .popover-close { background:none; border:none; color:var(--color-muted); cursor:pointer; font-size:1rem; line-height:1; padding:0.1rem 0.2rem; flex-shrink:0; transition:color 0.15s; }
+          .popover-close:hover { color:#e8eaf0; }
+          .popover-no-info { font-size:0.75rem; color:var(--color-muted); font-style:italic; }
         </style>
   </head>
   <body class="page-wrapper">
-      <nav class="site-nav"><div class="nav-inner"></div></nav>
-      <header class="page-hero">
-            <h1>&#127963; UNESCO World Heritage Sites</h1>
-          <p>Track UNESCO World Heritage Site visits across the whole family</p>
-      </header>
-    <main>
-          <div class="container">
-                  <section class="section">
-                            <h2 class="section-title">Family Progress</h2>
-                            <div class="progress-summary" id="progressSummary"><p class="loading-msg">Loading...</p></div>
-                  </section>
-                  <section class="section">
-                            <h2 class="section-title">UNESCO Tracker</h2>
-                            <div class="filter-bar" id="filterBar">
-                                        <input class="search-input" type="search" id="searchInput" placeholder="Search site, country or region...">
-                                        <button class="filter-btn active" data-filter="all">All</button>
-                                        <button class="filter-btn" data-filter="Cultural">Cultural</button>
-                                        <button class="filter-btn" data-filter="Natural">Natural</button>
-                                        <button class="filter-btn" data-filter="Mixed">Mixed</button>
-                                        <button class="filter-btn" data-filter="Africa">Africa</button>
-                                        <button class="filter-btn" data-filter="Asia">Asia</button>
-                                        <button class="filter-btn" data-filter="Europe">Europe</button>
-                                        <button class="filter-btn" data-filter="N. America">N. America</button>
-                                        <button class="filter-btn" data-filter="S. America">S. America</button>
-                                        <button class="filter-btn" data-filter="Oceania">Oceania</button>
-                            </div>
-                            <div style="overflow-x:auto">
-                                        <table class="cc-table" id="ccTable">
-                                                      <thead id="ccHead"></thead>
-                                                      <tbody id="ccBody"><tr><td colspan="20" style="text-align:center;padding:2rem;color:var(--color-muted)">Loading...</td></tr></tbody>
-                                        </table>
-                            </div>
-                  </section>
-          </div>
-    </main>
-    <div class="save-toast ok" id="saveToast">Saved &#10003;</div>
-    <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
-    <script src="../js/travel.js"></script>
-    <script>
-          var app = window.TravelApp;
-          var Store = app.Store;
-          app.renderNav('unesco');
+    <nav class="site-nav"><div class="nav-inner"></div></nav>
+    <header class="page-hero">
+        <h1>&#127963; UNESCO World Heritage Sites</h1>
+      <p>Track UNESCO World Heritage Site visits across the whole family</p>
+    </header>
+  <main>
+      <div class="container">
+            <section class="section">
+                    <h2 class="section-title">Family Progress</h2>
+                    <div class="progress-summary" id="progressSummary"><p class="loading-msg">Loading...</p></div>
+            </section>
+            <section class="section">
+                    <h2 class="section-title">UNESCO Tracker</h2>
+                    <div class="filter-bar" id="filterBar">
+                              <input class="search-input" type="search" id="searchInput" placeholder="Search site, country or region...">
+                              <button class="filter-btn active" data-filter="all">All</button>
+                              <button class="filter-btn" data-filter="Cultural">Cultural</button>
+                              <button class="filter-btn" data-filter="Natural">Natural</button>
+                              <button class="filter-btn" data-filter="Mixed">Mixed</button>
+                              <button class="filter-btn" data-filter="Africa">Africa</button>
+                              <button class="filter-btn" data-filter="Asia">Asia</button>
+                              <button class="filter-btn" data-filter="Europe">Europe</button>
+                              <button class="filter-btn" data-filter="N. America">N. America</button>
+                              <button class="filter-btn" data-filter="S. America">S. America</button>
+                              <button class="filter-btn" data-filter="Oceania">Oceania</button>
+                    </div>
+                    <div style="overflow-x:auto">
+                              <table class="cc-table" id="ccTable">
+                                          <thead id="ccHead"></thead>
+                                          <tbody id="ccBody"><tr><td colspan="20" style="text-align:center;padding:2rem;color:var(--color-muted)">Loading...</td></tr></tbody>
+                              </table>
+                    </div>
+            </section>
+      </div>
+  </main>
+  <!-- Popover element (single, reused) -->
+  <div class="site-popover" id="sitePopover">
+    <div class="popover-header">
+        <div class="popover-title" id="popoverTitle"></div>
+        <button class="popover-close" id="popoverClose" aria-label="Close">&#10005;</button>
+    </div>
+    <div class="popover-meta" id="popoverMeta"></div>
+    <div class="popover-body" id="popoverBody"></div>
+  </div>
+  <div class="save-toast ok" id="saveToast">Saved &#10003;</div>
+  <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
+  <script src="../js/travel.js"></script>
+  <script>
+      var app = window.TravelApp;
+      var Store = app.Store;
+      app.renderNav('unesco');
 
-          Store.onSave(function(status, msg) {
-                  var el = document.getElementById('saveToast');
-                  el.textContent = msg;
-                  el.className = 'save-toast show ' + status;
-                  clearTimeout(window._toastTimer);
-                  window._toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
-          });
+      Store.onSave(function(status, msg) {
+            var el = document.getElementById('saveToast');
+            el.textContent = msg;
+            el.className = 'save-toast show ' + status;
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+      });
 
-          var _travellers, _allSites;
-          var currentFilter = 'all';
-          var searchTerm = '';
+      var _travellers, _allSites;
+      var currentFilter = 'all';
+      var searchTerm = '';
 
-          function getFiltered() {
-                  var result = [];
-                  for (var i = 0; i < _allSites.length; i++) {
-                            var s = _allSites[i];
-                            var ms = !searchTerm ||
-                                        s.name.toLowerCase().indexOf(searchTerm) !== -1 ||
-                                        (s.country && s.country.toLowerCase().indexOf(searchTerm) !== -1) ||
-                                        (s.region && s.region.toLowerCase().indexOf(searchTerm) !== -1);
-                            var mf = currentFilter === 'all' ||
-                                        s.region === currentFilter ||
-                                        s.type === currentFilter;
-                            if (ms && mf) result.push(s);
-                  }
-                  return result;
-          }
+      /* ---- Popover logic ---- */
+      var _activePopover = null;
 
-          function typeBadge(type) {
-                  var cls = 'type-badge ';
-                  if (type === 'Cultural') cls += 'type-cultural';
-                  else if (type === 'Natural') cls += 'type-natural';
-                  else if (type === 'Mixed') cls += 'type-mixed';
-                  else cls += 'type-cultural';
-                  return '<span class="' + cls + '">' + (type || '') + '</span>';
-          }
-
-          function renderTable() {
-                  var items = getFiltered();
-                  var hRow1 = '<tr><th colspan="5"></th>';
-                  for (var thi = 0; thi < _travellers.length; thi++) {
-                            var tv = _travellers[thi];
-                            hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + '</th>';
-                  }
-                  hRow1 += '</tr>';
-                  var hRow2 = '<tr class="subheader"><th>#</th><th>UNESCO Site</th><th>Country</th><th>Region</th><th>Category</th>';
-                  for (var shi = 0; shi < _travellers.length; shi++) {
-                            hRow2 += '<th class="sub-col" style="border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
-                  }
-                  hRow2 += '</tr>';
-                  document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
-
-                  var rows = '';
-                  for (var ri = 0; ri < items.length; ri++) {
-                            var item = items[ri];
-                            var rowNum = _allSites.indexOf(item) + 1;
-                            var searchQ = encodeURIComponent(item.name + (item.country ? ', ' + item.country : '') + ' UNESCO');
-                            rows += '<tr>';
-                            rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
-                            rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + searchQ + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
-                            rows += '<td class="place-country">' + (item.country || '') + '</td>';
-                            rows += '<td class="region-col">' + (item.region || '') + '</td>';
-                            rows += '<td class="type-col">' + typeBadge(item.type) + '</td>';
-                            for (var tdi = 0; tdi < _travellers.length; tdi++) {
-                                        var tdv = _travellers[tdi];
-                                        var vis = Store.isVisited(tdv.id, 'unesco', item.id);
-                                        rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
-                                        rows += '<span class="cc-check ' + (vis ? 'yes' : 'no') + '" data-trav="' + tdv.id + '" data-pid="' + item.id + '">' + (vis ? '&#10003;' : '') + '</span>';
-                                        rows += '</td>';
-                            }
-                            rows += '</tr>';
+      function positionPopover(btnEl) {
+            var pop = document.getElementById('sitePopover');
+            var rect = btnEl.getBoundingClientRect();
+            var popW = 360;
+            var margin = 8;
+            var left = rect.right + margin;
+            if (left + popW > window.innerWidth - margin) {
+                    left = rect.left - popW - margin;
+            }
+            if (left < margin) { left = margin; }
+            var top = rect.top;
+            var maxTop = window.innerHeight - pop.offsetHeight - margin;
+            if (top > maxTop) { top = maxTop; }
+            if (top < margin) { top = margin; }
+            pop.style.left = left + 'px';
+            pop.style.top = top + 'px';
       }
-                  if (!rows) rows = '<tr><td colspan="' + (5 + _travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
-                  document.getElementById('ccBody').innerHTML = rows;
-          }
 
-          function renderSummary() {
-                  var html = '';
-                  for (var si = 0; si < _travellers.length; si++) {
-                            var sv = _travellers[si];
-                            var count = Store.getVisitedCount(sv.id, 'unesco');
-                            var total = _allSites.length;
-                            var pct = total ? Math.round((count / total) * 100) : 0;
-                            html += '<div class="prog-pill">';
-                            html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + '</div>';
-                            html += '<div class="pill-stats"><span>&#9989; Visited: <b style="color:' + sv.color + '">' + count + '/' + total + ' (' + pct + '%)</b></span></div>';
-                            html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + pct + '%"></div></div>';
-                            html += '</div>';
-                  }
-                  document.getElementById('progressSummary').innerHTML = html;
-          }
+      function openPopover(btnEl, site) {
+            var pop = document.getElementById('sitePopover');
+            document.getElementById('popoverTitle').textContent = site.name;
 
-          function redraw() { renderSummary(); renderTable(); }
+            var meta = '';
+            if (site.inscribed) meta += '<div class="popover-meta-item">&#128197; Inscribed: <span>' + site.inscribed + '</span></div>';
+            if (site.site_id) meta += '<div class="popover-meta-item">ID: <span>' + site.site_id + '</span></div>';
+            if (site.unique_number) meta += '<div class="popover-meta-item">No. <span>' + site.unique_number + '</span></div>';
+            document.getElementById('popoverMeta').innerHTML = meta;
 
-          Store.load(redraw).then(function(data) {
-                  _travellers = data.travellers;
-                  _allSites = data.unesco || [];
-                  redraw();
+            var body = '';
+            if (site.description) {
+                    body += '<div class="popover-section-label">Description</div>';
+                    body += '<p class="popover-text">' + site.description + '</p>';
+            }
+            if (site.justification) {
+                    body += '<div class="popover-section-label">Justification</div>';
+                    var lines = site.justification.split('\n\n');
+                    for (var li = 0; li < lines.length; li++) {
+                              if (lines[li].trim()) {
+                                          body += '<p class="popover-text">' + lines[li].trim() + '</p>';
+                              }
+                    }
+            }
+            if (!body) {
+                    body = '<p class="popover-no-info">No additional information available.</p>';
+            }
+            document.getElementById('popoverBody').innerHTML = body;
 
-                  document.getElementById('ccTable').addEventListener('click', function(e) {
-                            var el = e.target.closest('.cc-check');
-                            if (!el) return;
-                            var trav = el.getAttribute('data-trav');
-                            var pid = el.getAttribute('data-pid');
-                            if (trav && pid) { Store.toggle(trav, 'unesco', pid); redraw(); }
-                  });
+            positionPopover(btnEl);
+            pop.classList.add('visible');
+            _activePopover = btnEl;
+      }
 
-                  document.getElementById('searchInput').addEventListener('input', function(e) {
-                            searchTerm = e.target.value.toLowerCase();
-                            renderTable();
-                  });
+      function closePopover() {
+            var pop = document.getElementById('sitePopover');
+            pop.classList.remove('visible');
+            _activePopover = null;
+      }
 
-                  var btns = document.querySelectorAll('#filterBar .filter-btn');
-                  for (var bi = 0; bi < btns.length; bi++) {
-                            btns[bi].addEventListener('click', function() {
-                                        currentFilter = this.getAttribute('data-filter');
-                                        var allBtns = document.querySelectorAll('#filterBar .filter-btn');
-                                        for (var b = 0; b < allBtns.length; b++) allBtns[b].classList.remove('active');
-                                        this.classList.add('active');
-                                        renderTable();
-                            });
-                  }
-          }).catch(function(err) {
-                  console.error('Failed to load data:', err);
-                  document.getElementById('progressSummary').innerHTML = '<p style="color:var(--color-muted)">Could not load data.</p>';
-          });
-    </script>
+      document.getElementById('popoverClose').addEventListener('click', closePopover);
+
+      document.addEventListener('click', function(e) {
+            var pop = document.getElementById('sitePopover');
+            if (!pop.contains(e.target) && !e.target.classList.contains('info-btn')) {
+                    closePopover();
+            }
+      });
+
+      document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { closePopover(); }
+      });
+
+      window.addEventListener('scroll', function() {
+            if (_activePopover) { positionPopover(_activePopover); }
+      }, true);
+
+      /* ---- Filter / render ---- */
+      function getFiltered() {
+            var result = [];
+            for (var i = 0; i < _allSites.length; i++) {
+                    var s = _allSites[i];
+                    var ms = !searchTerm
+                      || s.name.toLowerCase().indexOf(searchTerm) !== -1
+                      || (s.country && s.country.toLowerCase().indexOf(searchTerm) !== -1)
+                      || (s.region && s.region.toLowerCase().indexOf(searchTerm) !== -1);
+                    var mf = currentFilter === 'all' || s.region === currentFilter || s.type === currentFilter;
+                    if (ms && mf) result.push(s);
+            }
+            return result;
+      }
+
+      function typeBadge(type) {
+            var cls = 'type-badge ';
+            if (type === 'Cultural') cls += 'type-cultural';
+            else if (type === 'Natural') cls += 'type-natural';
+            else if (type === 'Mixed') cls += 'type-mixed';
+            else cls += 'type-cultural';
+            return '<span class="' + cls + '">' + (type || '') + '</span>';
+      }
+
+      function renderTable() {
+            var items = getFiltered();
+            var hasInfo = false;
+            for (var ci = 0; ci < _allSites.length; ci++) {
+                    if (_allSites[ci].description || _allSites[ci].inscribed || _allSites[ci].site_id) { hasInfo = true; break; }
+            }
+
+            var hRow1 = '<tr><th colspan="' + (hasInfo ? 6 : 5) + '"></th>';
+            for (var thi = 0; thi < _travellers.length; thi++) {
+                    var tv = _travellers[thi];
+                    hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + '</th>';
+            }
+            hRow1 += '</tr>';
+
+            var hRow2 = '<tr class="subheader"><th>#</th><th>UNESCO Site</th><th>Country</th><th>Region</th><th>Category</th>';
+            if (hasInfo) { hRow2 += '<th class="info-col">Info</th>'; }
+            for (var shi = 0; shi < _travellers.length; shi++) {
+                    hRow2 += '<th class="sub-col" style="border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
+            }
+            hRow2 += '</tr>';
+            document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
+
+            var rows = '';
+            for (var ri = 0; ri < items.length; ri++) {
+                    var item = items[ri];
+                    var rowNum = _allSites.indexOf(item) + 1;
+                    var searchQ = encodeURIComponent(item.name + (item.country ? ', ' + item.country : '') + ' UNESCO');
+                    rows += '<tr>';
+                    rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
+                    rows += '<td class="place-name"><a href="https://www.google.com/search?q=' + searchQ + '" target="_blank" rel="noopener">' + item.name + '</a></td>';
+                    rows += '<td class="place-country">' + (item.country || '') + '</td>';
+                    rows += '<td class="region-col">' + (item.region || '') + '</td>';
+                    rows += '<td class="type-col">' + typeBadge(item.type) + '</td>';
+                    if (hasInfo) {
+                              var hasDetails = item.description || item.justification || item.inscribed || item.site_id || item.unique_number;
+                              if (hasDetails) {
+                                          rows += '<td class="info-col"><span class="info-btn" data-site-id="' + item.id + '">i</span></td>';
+    } else {
+                                          rows += '<td class="info-col"></td>';
+                              }
+                    }
+                    for (var tdi = 0; tdi < _travellers.length; tdi++) {
+                              var tdv = _travellers[tdi];
+                              var vis = Store.isVisited(tdv.id, 'unesco', item.id);
+                              rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
+                              rows += '<span class="cc-check ' + (vis ? 'yes' : 'no') + '" data-trav="' + tdv.id + '" data-pid="' + item.id + '">' + (vis ? '&#10003;' : '') + '</span>';
+                              rows += '</td>';
+                    }
+                    rows += '</tr>';
+            }
+            if (!rows) rows = '<tr><td colspan="' + (6 + _travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
+            document.getElementById('ccBody').innerHTML = rows;
+      }
+
+      function renderSummary() {
+            var html = '';
+            for (var si = 0; si < _travellers.length; si++) {
+                    var sv = _travellers[si];
+                    var count = Store.getVisitedCount(sv.id, 'unesco');
+                    var total = _allSites.length;
+                    var pct = total ? Math.round((count / total) * 100) : 0;
+                    html += '<div class="prog-pill">';
+                    html += '<div class="pill-name" style="color:' + sv.color + '">' + sv.name + '</div>';
+                    html += '<div class="pill-stats"><span>&#9989; Visited: <b style="color:' + sv.color + '">' + count + '/' + total + ' (' + pct + '%)</b></span></div>';
+                    html += '<div class="progress-bar"><div class="progress-fill ' + sv.id + '" style="width:' + pct + '%"></div></div>';
+                    html += '</div>';
+            }
+            document.getElementById('progressSummary').innerHTML = html;
+      }
+
+      function redraw() { renderSummary(); renderTable(); }
+
+      /* Build a lookup map for quick site retrieval by id */
+      function buildSiteMap() {
+            var map = {};
+            for (var i = 0; i < _allSites.length; i++) { map[_allSites[i].id] = _allSites[i]; }
+            return map;
+      }
+
+      Store.load(redraw).then(function(data) {
+            _travellers = data.travellers;
+            _allSites = data.unesco || [];
+            var siteMap = buildSiteMap();
+            redraw();
+
+            /* Tick clicks */
+            document.getElementById('ccTable').addEventListener('click', function(e) {
+                    var el = e.target.closest('.cc-check');
+                    if (!el) return;
+                    var trav = el.getAttribute('data-trav');
+                    var pid = el.getAttribute('data-pid');
+                    if (trav && pid) { Store.toggle(trav, 'unesco', pid); redraw(); }
+            });
+
+            /* Info button clicks */
+            document.getElementById('ccTable').addEventListener('click', function(e) {
+                    var btn = e.target.closest('.info-btn');
+                    if (!btn) return;
+                    e.stopPropagation();
+                    var sid = btn.getAttribute('data-site-id');
+                    var site = siteMap[sid];
+                    if (!site) return;
+                    if (_activePopover === btn) { closePopover(); return; }
+                    openPopover(btn, site);
+            });
+
+            /* Search */
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                    searchTerm = e.target.value.toLowerCase();
+                    renderTable();
+            });
+
+            /* Filter buttons */
+            var btns = document.querySelectorAll('#filterBar .filter-btn');
+            for (var bi = 0; bi < btns.length; bi++) {
+                    btns[bi].addEventListener('click', function() {
+                              currentFilter = this.getAttribute('data-filter');
+                              var allBtns = document.querySelectorAll('#filterBar .filter-btn');
+                              for (var b = 0; b < allBtns.length; b++) { allBtns[b].classList.remove('active'); }
+                              this.classList.add('active');
+                              renderTable();
+                    });
+            }
+      }).catch(function(err) {
+            console.error('Failed to load data:', err);
+            document.getElementById('progressSummary').innerHTML = '<p style="color:var(--color-muted)">Could not load data.</p>';
+      });
+  </script>
   </body>
 </html>
