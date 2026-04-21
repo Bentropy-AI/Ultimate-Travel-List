@@ -6,15 +6,15 @@
       <title>UNESCO Sites - Ultimate Travel List</title>
     <link rel="stylesheet" href="../css/styles.css">
     <style>
-          .cc-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+          .cc-table { width:100%; border-collapse:collapse; font-size:0.82rem; table-layout:fixed; min-width:860px; }
           .cc-table th, .cc-table td { padding:0.5rem 0.6rem; text-align:left; border-bottom:1px solid var(--color-border); vertical-align:middle; }
           .cc-table thead tr:first-child th { background:var(--color-surface2); font-weight:700; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-muted); }
           .cc-table thead tr.subheader th { background:var(--color-surface); font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; border-bottom:2px solid var(--color-border); padding:0.35rem 0.6rem; }
           .cc-table tbody tr:hover td { background:var(--color-surface2); }
-          .cc-table td.place-name { font-weight:600; color:var(--color-text); }
+          .cc-table td.place-name { font-weight:600; color:var(--color-text); overflow:hidden; }
           .place-name a { color:inherit; text-decoration:none; }
           .place-name a:hover { color:var(--color-accent, #58a6ff); text-decoration:underline; }
-          .cc-table td.place-country { color:var(--color-muted); font-style:italic; }
+          .cc-table td.place-country { color:var(--color-muted); font-style:italic; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
           .cc-table td.region-col { color:var(--color-muted); font-size:0.75rem; }
           .cc-table td.type-col { font-size:0.75rem; }
           .type-badge { display:inline-block; padding:0.15rem 0.45rem; border-radius:3px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
@@ -242,10 +242,10 @@
             }
             hRow1 += '</tr>';
 
-            var hRow2 = '<tr class="subheader"><th>#</th><th>UNESCO Site</th><th>Country</th><th>Region</th><th>Category</th>';
+            var hRow2 = '<tr class="subheader"><th style="width:36px">#</th><th style="width:30%">UNESCO Site</th><th style="width:18%">Country</th><th style="width:80px">Region</th><th style="width:88px">Category</th>';
             if (hasInfo) { hRow2 += '<th class="info-col">Info</th>'; }
             for (var shi = 0; shi < _travellers.length; shi++) {
-                    hRow2 += '<th class="sub-col" style="border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
+                    hRow2 += '<th class="sub-col" style="width:52px;border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
             }
             hRow2 += '</tr>';
             document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
