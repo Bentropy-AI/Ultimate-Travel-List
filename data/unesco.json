@@ -1,3 +1,14 @@
 [
-      { "id": "bamiyan-valley", "name": "Cultural Landscape and Archaeological Remains of the Bamiyan Valley", "country": "Afghanistan", "region": "Asia", "type": "Cultural" }
+        {
+                  "id": "bamiyan-valley",
+                  "name": "Cultural Landscape and Archaeological Remains of the Bamiyan Valley",
+                  "country": "Afghanistan",
+                  "region": "Asia",
+                  "type": "Cultural",
+                  "inscribed": 2003,
+                  "site_id": 208,
+                  "unique_number": 230,
+                  "description": "The cultural landscape and archaeological remains of the Bamiyan Valley represent the artistic and religious developments which from the 1st to the 13th centuries characterized ancient Bakhtria, integrating various cultural influences into the Gandhara school of Buddhist art. The area contains numerous Buddhist monastic ensembles and sanctuaries, as well as fortified edifices from the Islamic period. The site is also testimony to the tragic destruction by the Taliban of the two standing Buddha statues, which shook the world in March 2001.",
+                  "justification": "Criterion (i): The Buddha statues and the cave art in Bamiyan Valley are an outstanding representation of the Gandharan school in Buddhist art in the Central Asian region.\n\nCriterion (ii): The artistic and architectural remains of Bamiyan Valley, and an important Buddhist centre on the Silk Road, are an exceptional testimony to the interchange of Indian, Hellenistic, Roman, Sasanian influences as the basis for the development of a particular artistic expression in the Gandharan school. To this can be added the Islamic influence in a later period.\n\nCriterion (iii): The Bamiyan Valley bears an exceptional testimony to a cultural tradition in the Central Asian region, which has disappeared.\n\nCriterion (iv): The Bamiyan Valley is an outstanding example of a cultural landscape which illustrates a significant period in Buddhism.\n\nCriterion (vi): The Bamiyan Valley is the most monumental expression of the western Buddhism. It was an important centre of pilgrimage over many centuries. Due to their symbolic values, the monuments have suffered at different times of their existence, including the deliberate destruction in 2001, which shook the whole world."
+        }
 ]
