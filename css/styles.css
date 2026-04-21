@@ -436,3 +436,18 @@ main { flex: 1; padding: 2rem 0 4rem; }
      .stats-grid { grid-template-columns: repeat(2, 1fr); }
      .grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* --- Clickable Stat Card Links --- */
+.stat-card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.stat-card-link:hover .stat-card {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.stat-card {
+  transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
