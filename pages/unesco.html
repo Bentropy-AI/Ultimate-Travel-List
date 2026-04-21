@@ -242,13 +242,21 @@
             }
             hRow1 += '</tr>';
 
-            var hRow2 = '<tr class="subheader"><th style="width:36px">#</th><th style="width:30%">UNESCO Site</th><th style="width:18%">Country</th><th style="width:80px">Region</th><th style="width:88px">Category</th>';
+            var hRow2 = '<tr class="subheader"><th>#</th><th>UNESCO Site</th><th>Country</th><th>Region</th><th>Category</th>';
             if (hasInfo) { hRow2 += '<th class="info-col">Info</th>'; }
             for (var shi = 0; shi < _travellers.length; shi++) {
-                    hRow2 += '<th class="sub-col" style="width:52px;border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
+                    hRow2 += '<th class="sub-col" style="border-left:2px solid ' + _travellers[shi].color + '33">Visited</th>';
             }
             hRow2 += '</tr>';
             document.getElementById('ccHead').innerHTML = hRow1 + hRow2;
+            var colg = document.createElement('colgroup');
+            var colDefs = ['36px','30%','18%','80px','88px'];
+            if (hasInfo) colDefs.push('36px');
+            for (var ci2 = 0; ci2 < _travellers.length; ci2++) colDefs.push('52px');
+            for (var cdi = 0; cdi < colDefs.length; cdi++) { var col = document.createElement('col'); col.style.width = colDefs[cdi]; colg.appendChild(col); }
+            var existingColg = document.querySelector('#ccTable colgroup');
+            if (existingColg) existingColg.parentNode.removeChild(existingColg);
+            document.getElementById('ccTable').insertBefore(colg, document.getElementById('ccTable').firstChild);
 
             var rows = '';
             for (var ri = 0; ri < items.length; ri++) {
