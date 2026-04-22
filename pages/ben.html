@@ -172,13 +172,13 @@
           <thead>
             <tr>
               <th data-col="continent">Continent</th>
-              <th data-col="name">Country</th>
+              <th data-col="name" class="sort-asc">Country</th>
               <th data-col="countryVisited" title="Has Ben visited this country?">Visited</th>
               <th data-col="capital">Capital</th>
               <th data-col="capitalVisited" title="Has Ben visited the capital?">Capital ✓</th>
               <th data-col="tl1" title="Travel List I items visited">Travel List I</th>
               <th data-col="tl2" title="Travel List II items visited">Travel List II</th>
-              <th data-col="completion" class="sort-desc">Completion</th>
+              <th data-col="completion">Completion</th>
             </tr>
           </thead>
           <tbody id="cc-tbody"></tbody>
@@ -201,7 +201,7 @@
         'Reunion Island':'RE'
       };
       var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};
-      var sortCol='completion',sortDir='desc',curFilter='all',curSearch='';
+      var sortCol='name',sortDir='asc',curFilter='all',curSearch='';
       var _rows=[];
 
       function resolveISOs(c,byName){
