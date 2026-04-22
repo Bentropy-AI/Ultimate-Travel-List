@@ -91,9 +91,7 @@
         var tt=am5.Tooltip.new(root,{getFillFromSprite:false,autoTextColor:false,background:am5.RoundedRectangle.new(root,{fill:am5.color(0x1a1d27),fillOpacity:.97,stroke:am5.color(0x2e3350),strokeWidth:1,cornerRadiusTL:6,cornerRadiusTR:6,cornerRadiusBL:6,cornerRadiusBR:6})});
         tt.label.setAll({fill:am5.color(0xe8eaf0),fontSize:12});
         series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});
-        series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id'),name=target.dataItem&&target.dataItem.get('name');if(!id)return text;var pct=cm[id];return pct!==undefined?(name||id)+'
-[bold #4f8ef7]'+pct+'% complete[/]':(name||id)+'
-[#7a7f9a]Not yet visited[/]';});
+        series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id'),name=target.dataItem&&target.dataItem.get('name');if(!id)return text;var pct=cm[id];var label=name||id;if(pct!==undefined){return label+' - [bold #4f8ef7]'+pct+'% complete[/]';}return label+' [#7a7f9a](not yet visited)[/]';});
         series.mapPolygons.template.states.create('hover',{strokeWidth:1.5,stroke:am5.color(0xffffff),strokeOpacity:.7});
         series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var pct=cm[id];p.set('fill',am5.color(pct!==undefined?getColor(pct):0x22263a));});});
       }
