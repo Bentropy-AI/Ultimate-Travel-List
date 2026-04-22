@@ -19,6 +19,230 @@
         <h2 class="section-title">Summary</h2>
         <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
       </section>
+
+    <!-- ============================================================
+         COUNTRY COMPLETION TABLE
+         Weightings: Country 35% | Capital 15% | TL1 25% | TL2 25%
+         ============================================================ -->
+    <style>
+      #cc-section{margin-top:0}
+      .cc-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:1.2rem}
+      .cc-search{flex:1;min-width:180px;max-width:300px;padding:8px 14px;background:var(--color-surface2);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text);font-size:.9rem;outline:none;transition:border-color var(--transition)}
+      .cc-search:focus{border-color:var(--color-primary)}
+      .cc-filters{display:flex;flex-wrap:wrap;gap:6px}
+      .cc-table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--color-border)}
+      .cc-table{width:100%;border-collapse:collapse;font-size:.875rem;min-width:760px}
+      .cc-table thead tr{background:var(--color-surface2)}
+      .cc-table th{padding:11px 14px;text-align:left;color:var(--color-muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid var(--color-border);transition:color var(--transition)}
+      .cc-table th:hover{color:var(--color-text)}
+      .cc-table th.sort-asc::after{content:' ▲';color:var(--color-primary)}
+      .cc-table th.sort-desc::after{content:' ▼';color:var(--color-primary)}
+      .cc-table tbody tr{border-bottom:1px solid var(--color-border);transition:background var(--transition)}
+      .cc-table tbody tr:last-child{border-bottom:none}
+      .cc-table tbody tr:hover{background:var(--color-surface2)}
+      .cc-table td{padding:10px 14px;color:var(--color-text);white-space:nowrap}
+      .cc-table td.cc-cname{font-weight:500}
+      .cc-tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:.75rem;font-weight:700}
+      .cc-tick.yes{background:rgba(62,207,142,.15);color:var(--color-success)}
+      .cc-tick.no{background:rgba(122,127,154,.12);color:var(--color-muted)}
+      .cc-frac{font-variant-numeric:tabular-nums}
+      .cc-frac.zero{color:var(--color-muted)}
+      .cc-frac.partial{color:var(--color-warning)}
+      .cc-frac.complete{color:var(--color-success)}
+      .cc-bar-cell{min-width:160px}
+      .cc-bar-wrap{display:flex;align-items:center;gap:10px}
+      .cc-bar-track{flex:1;height:8px;background:var(--color-border);border-radius:4px;overflow:hidden}
+      .cc-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#2563c4,var(--color-ben));transition:width .4s ease}
+      .cc-bar-fill.high{background:linear-gradient(90deg,#1a7a4a,var(--color-success))}
+      .cc-bar-fill.medium{background:linear-gradient(90deg,#b07a10,var(--color-warning))}
+      .cc-bar-fill.low{background:linear-gradient(90deg,#8a2a2a,var(--color-danger))}
+      .cc-pct{font-size:.8rem;font-weight:600;font-variant-numeric:tabular-nums;width:36px;text-align:right}
+      .cc-cont-badge{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);font-size:.75rem;font-weight:500;background:var(--color-surface2);color:var(--color-muted);border:1px solid var(--color-border)}
+      .cc-summary-line{font-size:.82rem;color:var(--color-muted);margin-bottom:1rem}
+      .cc-no-results{text-align:center;padding:2rem;color:var(--color-muted)}
+    </style>
+
+    <section class="section" id="cc-section">
+      <h2 class="section-title">🗺️ Country Completion</h2>
+      <p class="cc-summary-line" id="cc-summary-line"></p>
+      <div class="cc-controls">
+        <input class="cc-search search-input" type="search" placeholder="Search country…" id="cc-search">
+        <div class="cc-filters" id="cc-filter-btns">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="visited">Visited</button>
+          <button class="filter-btn" data-filter="unvisited">Not Yet</button>
+          <button class="filter-btn" data-filter="Africa">Africa</button>
+          <button class="filter-btn" data-filter="Asia">Asia</button>
+          <button class="filter-btn" data-filter="Europe">Europe</button>
+          <button class="filter-btn" data-filter="North America">North America</button>
+          <button class="filter-btn" data-filter="Oceania">Oceania</button>
+          <button class="filter-btn" data-filter="South America">South America</button>
+        </div>
+      </div>
+      <div class="cc-table-wrap">
+        <table class="cc-table" id="cc-table">
+          <thead>
+            <tr>
+              <th data-col="continent">Continent</th>
+              <th data-col="name">Country</th>
+              <th data-col="countryVisited" title="Has Ben visited this country?">Visited</th>
+              <th data-col="capital">Capital</th>
+              <th data-col="capitalVisited" title="Has Ben visited the capital?">Capital ✓</th>
+              <th data-col="tl1" title="Travel List I items visited">Travel List I</th>
+              <th data-col="tl2" title="Travel List II items visited">Travel List II</th>
+              <th data-col="completion" class="sort-desc">Completion</th>
+            </tr>
+          </thead>
+          <tbody id="cc-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <script>
+    (function(){
+      var NAME_MAP={
+        'Bosnia':'BA','UAE':'AE','UK':'GB','USA':'US','Wales':'GB',
+        'St Lucia':'LC','Trinidad':'TT','French Polynesia':'PF','Hong Kong':'HK',
+        'Cayman Islands':'KY','New Caledonia':'NC','Puerto Rico':'PR',
+        'Réunion':'RE','Antarctica':null,
+        'Argentina/Brazil':['AR','BR'],'Canada/USA':['CA','US'],
+        'France/Italy':['FR','IT'],'Israel/Jordan':['IL','JO'],
+        'Zimbabwe/Zambia':['ZW','ZM'],
+        'Abu Dhabi':'AE','England':'GB','Northern Ireland':'GB','Scotland':'GB',
+        'Bosnia-Herzegovina':'BA','Aruba':'AW','Republic of Congo':'CG',
+        'Reunion Island':'RE'
+      };
+      var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};
+      var sortCol='completion',sortDir='desc',curFilter='all',curSearch='';
+      var _rows=[];
+
+      function resolveISOs(c,byName){
+        if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}
+        return byName[c]?[byName[c]]:[];
+      }
+
+      function buildRows(tl1Items,tl2Items,countries,benData){
+        var vC={},vCap={},vT1={},vT2={};
+        (benData.countries||[]).forEach(function(x){vC[x]=1;});
+        (benData.capitals||[]).forEach(function(x){vCap[x]=1;});
+        (benData.travellist1||[]).forEach(function(x){vT1[x]=1;});
+        (benData.travellist2||[]).forEach(function(x){vT2[x]=1;});
+        var byName={};
+        countries.forEach(function(c){byName[c.name]=c.id;});
+        var m1={},m2={};
+        tl1Items.forEach(function(item){
+          resolveISOs(item.country,byName).forEach(function(iso){
+            if(!m1[iso])m1[iso]={total:0,visited:0};
+            m1[iso].total++;if(vT1[item.id])m1[iso].visited++;
+          });
+        });
+        tl2Items.forEach(function(item){
+          resolveISOs(item.country,byName).forEach(function(iso){
+            if(!m2[iso])m2[iso]={total:0,visited:0};
+            m2[iso].total++;if(vT2[item.id])m2[iso].visited++;
+          });
+        });
+        var rows=[];
+        countries.forEach(function(c){
+          var iso=c.id,cv=!!vC[iso],cap=!!vCap[iso];
+          var t1=m1[iso]||{total:0,visited:0},t2=m2[iso]||{total:0,visited:0};
+          if(!cv&&!cap&&!t1.total&&!t2.total)return;
+          var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};
+          if(!t1.total&&!t2.total){w={country:0.70,capital:0.30,tl1:0,tl2:0};}
+          else if(!t1.total){w={country:0.47,capital:0.20,tl1:0,tl2:0.33};}
+          else if(!t2.total){w={country:0.47,capital:0.20,tl1:0.33,tl2:0};}
+          var pct=Math.round(((cv?w.country:0)+(cap?w.capital:0)+(t1.total?(t1.visited/t1.total)*w.tl1:0)+(t2.total?(t2.visited/t2.total)*w.tl2:0))*100);
+          rows.push({continent:c.continent,name:c.name,iso:iso,countryVisited:cv,capitalVisited:cap,capital:c.capital,tl1Visited:t1.visited,tl1Total:t1.total,tl2Visited:t2.visited,tl2Total:t2.total,completion:pct});
+        });
+        return rows;
+      }
+
+      function barClass(p){return p>=75?'high':p>=40?'medium':'low';}
+      function pctColor(p){return p>=75?'var(--color-success)':p>=40?'var(--color-warning)':'var(--color-danger)';}
+      function fracClass(v,t){if(!t)return'zero';if(v===t)return'complete';return v?'partial':'zero';}
+
+      function render(){
+        var s=curSearch.toLowerCase();
+        var filtered=_rows.filter(function(r){
+          var ms=!s||r.name.toLowerCase().indexOf(s)!==-1||r.capital.toLowerCase().indexOf(s)!==-1;
+          var mf=curFilter==='all'?true:curFilter==='visited'?r.countryVisited:curFilter==='unvisited'?!r.countryVisited:r.continent===curFilter;
+          return ms&&mf;
+        });
+        var sorted=filtered.slice().sort(function(a,b){
+          var va,vb;
+          if(sortCol==='continent'){va=a.continent;vb=b.continent;}
+          else if(sortCol==='name'){va=a.name;vb=b.name;}
+          else if(sortCol==='capital'){va=a.capital;vb=b.capital;}
+          else if(sortCol==='countryVisited'){va=a.countryVisited?1:0;vb=b.countryVisited?1:0;}
+          else if(sortCol==='capitalVisited'){va=a.capitalVisited?1:0;vb=b.capitalVisited?1:0;}
+          else if(sortCol==='tl1'){va=a.tl1Total?(a.tl1Visited/a.tl1Total):-1;vb=b.tl1Total?(b.tl1Visited/b.tl1Total):-1;}
+          else if(sortCol==='tl2'){va=a.tl2Total?(a.tl2Visited/a.tl2Total):-1;vb=b.tl2Total?(b.tl2Visited/b.tl2Total):-1;}
+          else{va=a.completion;vb=b.completion;}
+          if(typeof va==='string')return sortDir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
+          return sortDir==='asc'?va-vb:vb-va;
+        });
+        var vc=filtered.filter(function(r){return r.countryVisited;}).length;
+        var avg=filtered.length?Math.round(filtered.reduce(function(s,r){return s+r.completion;},0)/filtered.length):0;
+        document.getElementById('cc-summary-line').textContent='Showing '+filtered.length+' countries · '+vc+' visited · Avg completion '+avg+'%';
+        document.querySelectorAll('.cc-table th').forEach(function(th){
+          th.classList.remove('sort-asc','sort-desc');
+          if(th.dataset.col===sortCol)th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');
+        });
+        var tbody=document.getElementById('cc-tbody');
+        if(!sorted.length){tbody.innerHTML='<tr><td colspan="8" class="cc-no-results">No countries match.</td></tr>';return;}
+        tbody.innerHTML=sorted.map(function(r){
+          var t1f=r.tl1Total?r.tl1Visited+'/'+r.tl1Total:'&mdash;';
+          var t2f=r.tl2Total?r.tl2Visited+'/'+r.tl2Total:'&mdash;';
+          var bc=barClass(r.completion);
+          return '<tr>'+
+            '<td><span class="cc-cont-badge">'+r.continent+'</span></td>'+
+            '<td class="cc-cname">'+r.name+'</td>'+
+            '<td><span class="cc-tick '+(r.countryVisited?'yes':'no')+'">'+(r.countryVisited?'&#10003;':'&#10007;')+'</span></td>'+
+            '<td style="color:var(--color-muted);font-size:.85rem">'+r.capital+'</td>'+
+            '<td><span class="cc-tick '+(r.capitalVisited?'yes':'no')+'">'+(r.capitalVisited?'&#10003;':'&#10007;')+'</span></td>'+
+            '<td><span class="cc-frac '+fracClass(r.tl1Visited,r.tl1Total)+'" title="'+r.tl1Visited+' of '+r.tl1Total+' TL1 items">'+t1f+'</span></td>'+
+            '<td><span class="cc-frac '+fracClass(r.tl2Visited,r.tl2Total)+'" title="'+r.tl2Visited+' of '+r.tl2Total+' TL2 items">'+t2f+'</span></td>'+
+            '<td class="cc-bar-cell"><div class="cc-bar-wrap"><div class="cc-bar-track"><div class="cc-bar-fill '+bc+'" style="width:'+r.completion+'%"></div></div><span class="cc-pct" style="color:'+pctColor(r.completion)+'">'+r.completion+'%</span></div></td>'+
+          '</tr>';
+        }).join('');
+      }
+
+      document.getElementById('cc-search').addEventListener('input',function(){curSearch=this.value;render();});
+      document.getElementById('cc-filter-btns').addEventListener('click',function(e){
+        var btn=e.target.closest('.filter-btn');if(!btn)return;
+        curFilter=btn.dataset.filter;
+        document.querySelectorAll('#cc-filter-btns .filter-btn').forEach(function(b){b.classList.remove('active');});
+        btn.classList.add('active');render();
+      });
+      document.querySelector('#cc-table thead').addEventListener('click',function(e){
+        var th=e.target.closest('th[data-col]');if(!th)return;
+        var col=th.dataset.col;
+        if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';}
+        else{sortCol=col;sortDir=(col==='name'||col==='continent'||col==='capital')?'asc':'desc';}
+        render();
+      });
+
+      var root=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';
+      function fj(f){return fetch(root+'data/'+f).then(function(r){return r.json();});}
+
+      Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json')]).then(function(res){
+        var tl1=res[0],tl2=res[1],countries=res[2];
+        var benData={};
+        var cached=localStorage.getItem('utl_store_v2');
+        if(cached){try{benData=JSON.parse(cached).ben||{};}catch(e){}}
+        _rows=buildRows(tl1,tl2,countries,benData);
+        render();
+        if(window.TravelApp&&window.TravelApp.Store){
+          window.TravelApp.Store.onSave(function(){
+            var c2=localStorage.getItem('utl_store_v2');
+            if(c2){try{benData=JSON.parse(c2).ben||{};}catch(e){}}
+            _rows=buildRows(tl1,tl2,countries,benData);
+            render();
+          });
+        }
+      });
+    }());
+    </script>
       <section class="section">
         <h2 class="section-title">&#9989; Travel List I</h2>
         <div id="pTL1"><p class="loading-msg">Loading...</p></div>
