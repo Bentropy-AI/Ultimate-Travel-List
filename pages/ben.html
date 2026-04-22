@@ -234,7 +234,6 @@
         countries.forEach(function(c){
           var iso=c.id,cv=!!vC[iso],cap=!!vCap[iso];
           var t1=m1[iso]||{total:0,visited:0},t2=m2[iso]||{total:0,visited:0};
-          if(!cv&&!cap&&!t1.total&&!t2.total)return;
           var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};
           if(!t1.total&&!t2.total){w={country:0.70,capital:0.30,tl1:0,tl2:0};}
           else if(!t1.total){w={country:0.47,capital:0.20,tl1:0,tl2:0.33};}
