@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paul - Travel Progress</title>
   <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    #pStats .stat-number { color: var(--color-paul); }
+  </style>
 </head>
 <body class="page-wrapper">
   <nav class="site-nav"><div class="nav-inner"></div></nav>
@@ -19,26 +22,118 @@
         <h2 class="section-title">Summary</h2>
         <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
       </section>
-      <section class="section">
-        <h2 class="section-title">&#9989; Travel List I</h2>
-        <div id="pTL1"><p class="loading-msg">Loading...</p></div>
+      <style>
+        #map-section{margin-top:0}
+        #map-wrap{width:100%;height:460px;border-radius:var(--radius);overflow:hidden;background:var(--color-bg);border:1px solid var(--color-border)}
+        .map-legend{display:flex;align-items:center;gap:14px;margin-top:.75rem;font-size:.78rem;color:var(--color-muted);flex-wrap:wrap}
+        .map-legend-scale{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}
+        .map-legend-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#132a1c 0%,#1a6b3a 33%,#28a060 66%,#3ecf8e 100%)}
+        .map-legend-label{white-space:nowrap}
+        .map-legend-note{display:flex;align-items:center;gap:6px}
+        .map-legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+      </style>
+      <section class="section" id="map-section">
+        <h2 class="section-title">&#127757; Travel Map</h2>
+        <div id="map-wrap"></div>
+        <div class="map-legend">
+          <div class="map-legend-scale">
+            <span class="map-legend-label">0%</span>
+            <div class="map-legend-bar"></div>
+            <span class="map-legend-label">100%</span>
+          </div>
+          <div class="map-legend-note">
+            <div class="map-legend-swatch" style="background:#132a1c"></div>
+            <span>Not yet visited</span>
+          </div>
+          <div class="map-legend-note">
+            <div class="map-legend-swatch" style="background:#3ecf8e"></div>
+            <span>Fully explored</span>
+          </div>
+        </div>
       </section>
-      <section class="section">
-        <h2 class="section-title">&#9989; Travel List II</h2>
-        <div id="pTL2"><p class="loading-msg">Loading...</p></div>
+      <script>
+      (function(){var SCRIPTS=['https://cdn.amcharts.com/lib/5/index.js','https://cdn.amcharts.com/lib/5/map.js','https://cdn.amcharts.com/lib/5/geodata/worldLow.js'];var NAME_MAP={'Bosnia':'BA','UAE':'AE','UK':'GB','USA':'US','Wales':'GB','St Lucia':'LC','Trinidad':'TT','French Polynesia':'PF','Hong Kong':'HK','Cayman Islands':'KY','New Caledonia':'NC','Puerto Rico':'PR','Reunion':'RE','Antarctica':null,'Argentina/Brazil':['AR','BR'],'Canada/USA':['CA','US'],'France/Italy':['FR','IT'],'Israel/Jordan':['IL','JO'],'Zimbabwe/Zambia':['ZW','ZM'],'Abu Dhabi':'AE','England':'GB','Northern Ireland':'GB','Scotland':'GB','Bosnia-Herzegovina':'BA','Aruba':'AW','Republic of Congo':'CG','Reunion Island':'RE'};var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};function resolveISOs(c,bn){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return bn[c]?[bn[c]]:[]; }function lerp(c1,c2,t){var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255,r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;return(Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);}function getColor(p){var C0=0x132a1c,C1=0x1a6b3a,C2=0x28a060,C3=0x3ecf8e;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}function buildMap(t1,t2,countries,unescoItems,person){var bn={};countries.forEach(function(c){bn[c.name]=c.id;});var vU={};(person.unesco||[]).forEach(function(x){vU[x]=1;});var uByISO={};(unescoItems||[]).forEach(function(item){var cns=item.country.split(',');cns.forEach(function(cn){cn=cn.trim();var iso=bn[cn];if(iso){if(!uByISO[iso])uByISO[iso]={total:0,visited:0};uByISO[iso].total++;if(vU[item.id])uByISO[iso].visited++;}});});var vC={},vCap={},vT1={},vT2={};(person.countries||[]).forEach(function(x){vC[x]=1;});(person.capitals||[]).forEach(function(x){vCap[x]=1;});(person.travellist1||[]).forEach(function(x){vT1[x]=1;});(person.travellist2||[]).forEach(function(x){vT2[x]=1;});var m1={},m2={};t1.forEach(function(i){resolveISOs(i.country,bn).forEach(function(iso){if(!m1[iso])m1[iso]={total:0,visited:0};m1[iso].total++;if(vT1[i.id])m1[iso].visited++;});});t2.forEach(function(i){resolveISOs(i.country,bn).forEach(function(iso){if(!m2[iso])m2[iso]={total:0,visited:0};m2[iso].total++;if(vT2[i.id])m2[iso].visited++;});});var result={};countries.forEach(function(c){var iso=c.id,cv=!!vC[iso],cap=!!vCap[iso],t1c=m1[iso]||{total:0,visited:0},t2c=m2[iso]||{total:0,visited:0};var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};if(!t1c.total&&!t2c.total){w={country:.70,capital:.30,tl1:0,tl2:0};}else if(!t1c.total){w={country:.47,capital:.20,tl1:0,tl2:.33};}else if(!t2c.total){w={country:.47,capital:.20,tl1:.33,tl2:0};}var pct=Math.round(((cv?w.country:0)+(cap?w.capital:0)+(t1c.total?(t1c.visited/t1c.total)*w.tl1:0)+(t2c.total?(t2c.visited/t2c.total)*w.tl2:0))*100);result[iso]={pct:pct,cv:cv,cap:cap,t1v:t1c.visited,t1t:t1c.total,t2v:t2c.visited,t2t:t2c.total,uv:(uByISO[iso]||{}).visited||0,ut:(uByISO[iso]||{}).total||0,name:c.name,capital:c.capital};});return result;}function renderMap(cm){var am5=window.am5,am5map=window.am5map,geo=window.am5geodata_worldLow;if(!am5||!am5map||!geo)return;if(window._paulMapRoot){window._paulMapRoot.dispose();}var root=am5.Root.new('map-wrap');window._paulMapRoot=root;root.setThemes([]);var chart=root.container.children.push(am5map.MapChart.new(root,{panX:'rotateX',panY:'translateY',projection:am5map.geoNaturalEarth1(),paddingLeft:0,paddingRight:0,paddingTop:0,paddingBottom:0}));chart.chartContainer.set('background',am5.Rectangle.new(root,{fill:am5.color(0x0f1117),fillOpacity:1}));var series=chart.series.push(am5map.MapPolygonSeries.new(root,{geoJSON:geo,exclude:['AQ']}));var tt=am5.Tooltip.new(root,{getFillFromSprite:false,autoTextColor:false,background:am5.RoundedRectangle.new(root,{fill:am5.color(0x1a1d27),fillOpacity:.97,stroke:am5.color(0x2e3350),strokeWidth:1,cornerRadiusTL:6,cornerRadiusTR:6,cornerRadiusBL:6,cornerRadiusBR:6})});tt.label.setAll({fill:am5.color(0xe8eaf0),fontSize:12});series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id');if(!id)return text;var d=cm[id];var label=d?d.name:(target.dataItem.get('name')||id);if(!d){return '[bold]'+label+'[/] [#7a7f9a]not yet visited[/]';}var pct=d.pct;var pc=pct>=75?'#3ecf8e':pct>=40?'#f59e0b':'#3ecf8e';var ck=function(v){return v?'[#3ecf8e]✔[/]':'[#7a7f9a]✘[/]';};var fr=function(v,t){return t?('[bold]'+v+'/'+t+'[/]'):'[#7a7f9a]-[/]';};var sep='[#2e3350] | [/]';return '[bold #e8eaf0 fontSize:13]'+label+'[/][#7a7f9a fontSize:11] • '+d.capital+'[/]'+'
+'+'[#555a7a]——————————[/]'+'
+'+'[#7a7f9a fontSize:11]Completion [/][bold '+pc+' fontSize:12]'+pct+'%[/]'+'
+'+'[#7a7f9a fontSize:11]Visited [/]'+ck(d.cv)+sep+'[#7a7f9a fontSize:11]Capital [/]'+ck(d.cap)+'
+'+'[#7a7f9a fontSize:11]TL I [/]'+fr(d.t1v,d.t1t)+sep+'[#7a7f9a fontSize:11]TL II [/]'+fr(d.t2v,d.t2t)+'
+'+'[#7a7f9a fontSize:11]UNESCO [/]'+fr(d.uv,d.ut);});series.mapPolygons.template.states.create('hover',{strokeWidth:1.5,stroke:am5.color(0xffffff),strokeOpacity:.7});series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var d=cm[id];var pct=d?d.pct:undefined;p.set('fill',am5.color(getColor(pct!==undefined?pct:0)));});});}function loadScripts(urls,cb){if(!urls.length){cb();return;}var s=document.createElement('script');s.src=urls[0];s.onload=function(){loadScripts(urls.slice(1),cb);};s.onerror=function(){console.error('Failed: '+urls[0]);};document.head.appendChild(s);}var rp=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';function fj(f){return fetch(rp+'data/'+f).then(function(r){return r.json();});}loadScripts(SCRIPTS,function(){Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){var person={};var cached=localStorage.getItem('utl_store_v2');if(cached){try{person=JSON.parse(cached).paul||{};}catch(e){}}var cm=buildMap(res[0],res[1],res[2],res[3],person);renderMap(cm);if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{person=JSON.parse(c2).paul||{};}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],person);renderMap(cm);});}});});}());
+      </script>
+      <style>
+        #cc-section{margin-top:0}
+        .cc-controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:1.2rem}
+        .cc-search{flex:1;min-width:180px;max-width:300px;padding:8px 14px;background:var(--color-surface2);border:1px solid var(--color-border);border-radius:var(--radius-sm);color:var(--color-text);font-size:.9rem;outline:none;transition:border-color var(--transition)}
+        .cc-search:focus{border-color:var(--color-paul)}
+        .cc-filters{display:flex;flex-wrap:wrap;gap:6px}
+        .cc-table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--color-border)}
+        .cc-table{width:100%;border-collapse:collapse;font-size:.875rem;min-width:760px}
+        .cc-table thead tr{background:var(--color-surface2)}
+        .cc-table th{padding:11px 14px;text-align:left;color:var(--color-muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid var(--color-border);transition:color var(--transition)}
+        .cc-table th:hover{color:var(--color-text)}
+        .cc-table th.sort-asc::after{content:' ▲';color:var(--color-paul)}
+        .cc-table th.sort-desc::after{content:' ▼';color:var(--color-paul)}
+        .cc-table tbody tr{border-bottom:1px solid var(--color-border);transition:background var(--transition)}
+        .cc-table tbody tr:last-child{border-bottom:none}
+        .cc-table tbody tr:hover{background:var(--color-surface2)}
+        .cc-table td{padding:10px 14px;color:var(--color-text);white-space:nowrap}
+        .cc-table td.cc-cname{font-weight:500}
+        .cc-tick{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:.75rem;font-weight:700}
+        .cc-tick.yes{background:rgba(62,207,142,.15);color:var(--color-success)}
+        .cc-tick.no{background:rgba(122,127,154,.12);color:var(--color-muted)}
+        .cc-frac{font-variant-numeric:tabular-nums}
+        .cc-frac.zero{color:var(--color-muted)}
+        .cc-frac.partial{color:var(--color-warning)}
+        .cc-frac.complete{color:var(--color-success)}
+        .cc-bar-cell{min-width:120px}
+        .cc-bar-wrap{display:flex;flex-direction:column;gap:3px}
+        .cc-bar-track{width:100%;height:8px;background:var(--color-border);border-radius:4px;overflow:hidden}
+        .cc-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#1a6b3a,var(--color-paul));transition:width .4s ease}
+        .cc-bar-fill.high{background:linear-gradient(90deg,#1a7a4a,var(--color-success))}
+        .cc-bar-fill.medium{background:linear-gradient(90deg,#b07a10,var(--color-warning))}
+        .cc-bar-fill.low{background:linear-gradient(90deg,#8a2a2a,var(--color-danger))}
+        .cc-pct{font-size:.8rem;font-weight:600;font-variant-numeric:tabular-nums;text-align:left}
+        .cc-cont-badge{display:inline-block;padding:2px 8px;border-radius:var(--radius-sm);font-size:.75rem;font-weight:500;background:var(--color-surface2);color:var(--color-muted);border:1px solid var(--color-border)}
+        .cc-summary-line{font-size:.82rem;color:var(--color-muted);margin-bottom:1rem}
+        .cc-no-results{text-align:center;padding:2rem;color:var(--color-muted)}
+      </style>
+      <section class="section" id="cc-section">
+        <h2 class="section-title">&#128506; Country Completion</h2>
+        <p class="cc-summary-line" id="cc-summary-line"></p>
+        <div class="cc-controls">
+          <input class="cc-search search-input" type="search" placeholder="Search country..." id="cc-search">
+          <div class="cc-filters" id="cc-filter-btns">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="visited">Visited</button>
+            <button class="filter-btn" data-filter="unvisited">Not Yet</button>
+            <button class="filter-btn" data-filter="Africa">Africa</button>
+            <button class="filter-btn" data-filter="Asia">Asia</button>
+            <button class="filter-btn" data-filter="Europe">Europe</button>
+            <button class="filter-btn" data-filter="North America">North America</button>
+            <button class="filter-btn" data-filter="Oceania">Oceania</button>
+            <button class="filter-btn" data-filter="South America">South America</button>
+          </div>
+        </div>
+        <div class="cc-table-wrap">
+          <table class="cc-table" id="cc-table">
+            <thead>
+              <tr>
+                <th data-col="continent">Continent</th>
+                <th data-col="name" class="sort-asc">Country</th>
+                <th data-col="countryVisited" title="Has Paul visited this country?">Visited</th>
+                <th data-col="capital">Capital</th>
+                <th data-col="capitalVisited" title="Has Paul visited the capital?">Capital &#10003;</th>
+                <th data-col="tl1" title="Travel List I items visited">Travel List I</th>
+                <th data-col="tl2" title="Travel List II items visited">Travel List II</th>
+                <th data-col="completion">Completion</th>
+              </tr>
+            </thead>
+            <tbody id="cc-tbody"></tbody>
+          </table>
+        </div>
       </section>
-      <section class="section">
-        <h2 class="section-title">&#127757; Countries &amp; Capitals</h2>
-        <div id="pCountries"><p class="loading-msg">Loading...</p></div>
-      </section>
-      <section class="section">
-        <h2 class="section-title">&#127963; UNESCO World Heritage Sites</h2>
-        <div id="pUnesco"><p class="loading-msg">Loading...</p></div>
-      </section>
-      <section class="section">
-        <h2 class="section-title">&#129409; Animals</h2>
-        <div id="pAnimals"><p class="loading-msg">Loading...</p></div>
-      </section>
+      <script>
+      (function(){var NAME_MAP={'Bosnia':'BA','UAE':'AE','UK':'GB','USA':'US','Wales':'GB','St Lucia':'LC','Trinidad':'TT','French Polynesia':'PF','Hong Kong':'HK','Cayman Islands':'KY','New Caledonia':'NC','Puerto Rico':'PR','Reunion':'RE','Antarctica':null,'Argentina/Brazil':['AR','BR'],'Canada/USA':['CA','US'],'France/Italy':['FR','IT'],'Israel/Jordan':['IL','JO'],'Zimbabwe/Zambia':['ZW','ZM'],'Abu Dhabi':'AE','England':'GB','Northern Ireland':'GB','Scotland':'GB','Bosnia-Herzegovina':'BA','Aruba':'AW','Republic of Congo':'CG','Reunion Island':'RE'};var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};var sortCol='name',sortDir='asc',curFilter='all',curSearch='';var _rows=[];function resolveISOs(c,byName){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return byName[c]?[byName[c]]:[]; }function buildRows(tl1Items,tl2Items,countries,personData){var vC={},vCap={},vT1={},vT2={};(personData.countries||[]).forEach(function(x){vC[x]=1;});(personData.capitals||[]).forEach(function(x){vCap[x]=1;});(personData.travellist1||[]).forEach(function(x){vT1[x]=1;});(personData.travellist2||[]).forEach(function(x){vT2[x]=1;});var byName={};countries.forEach(function(c){byName[c.name]=c.id;});var m1={},m2={};tl1Items.forEach(function(item){resolveISOs(item.country,byName).forEach(function(iso){if(!m1[iso])m1[iso]={total:0,visited:0};m1[iso].total++;if(vT1[item.id])m1[iso].visited++;});});tl2Items.forEach(function(item){resolveISOs(item.country,byName).forEach(function(iso){if(!m2[iso])m2[iso]={total:0,visited:0};m2[iso].total++;if(vT2[item.id])m2[iso].visited++;});});var rows=[];countries.forEach(function(c){var iso=c.id,cv=!!vC[iso],cap=!!vCap[iso];var t1=m1[iso]||{total:0,visited:0},t2=m2[iso]||{total:0,visited:0};var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};if(!t1.total&&!t2.total){w={country:0.70,capital:0.30,tl1:0,tl2:0};}else if(!t1.total){w={country:0.47,capital:0.20,tl1:0,tl2:0.33};}else if(!t2.total){w={country:0.47,capital:0.20,tl1:0.33,tl2:0};}var pct=Math.round(((cv?w.country:0)+(cap?w.capital:0)+(t1.total?(t1.visited/t1.total)*w.tl1:0)+(t2.total?(t2.visited/t2.total)*w.tl2:0))*100);rows.push({continent:c.continent,name:c.name,iso:iso,countryVisited:cv,capitalVisited:cap,capital:c.capital,tl1Visited:t1.visited,tl1Total:t1.total,tl2Visited:t2.visited,tl2Total:t2.total,completion:pct});});return rows;}function barClass(p){return p>=75?'high':p>=40?'medium':'low';}function pctColor(p){return p>=75?'var(--color-success)':p>=40?'var(--color-warning)':'var(--color-danger)';}function fracClass(v,t){if(!t)return'zero';if(v===t)return'complete';return v?'partial':'zero';}function render(){var s=curSearch.toLowerCase();var filtered=_rows.filter(function(r){var ms=!s||r.name.toLowerCase().indexOf(s)!==-1||r.capital.toLowerCase().indexOf(s)!==-1;var mf=curFilter==='all'?true:curFilter==='visited'?r.countryVisited:curFilter==='unvisited'?!r.countryVisited:r.continent===curFilter;return ms&&mf;});var sorted=filtered.slice().sort(function(a,b){var va,vb;if(sortCol==='continent'){va=a.continent;vb=b.continent;}else if(sortCol==='name'){va=a.name;vb=b.name;}else if(sortCol==='capital'){va=a.capital;vb=b.capital;}else if(sortCol==='countryVisited'){va=a.countryVisited?1:0;vb=b.countryVisited?1:0;}else if(sortCol==='capitalVisited'){va=a.capitalVisited?1:0;vb=b.capitalVisited?1:0;}else if(sortCol==='tl1'){va=a.tl1Total?(a.tl1Visited/a.tl1Total):-1;vb=b.tl1Total?(b.tl1Visited/b.tl1Total):-1;}else if(sortCol==='tl2'){va=a.tl2Total?(a.tl2Visited/a.tl2Total):-1;vb=b.tl2Total?(b.tl2Visited/b.tl2Total):-1;}else{va=a.completion;vb=b.completion;}if(typeof va==='string')return sortDir==='asc'?va.localeCompare(vb):vb.localeCompare(va);return sortDir==='asc'?va-vb:vb-va;});var vc=filtered.filter(function(r){return r.countryVisited;}).length;var avg=filtered.length?Math.round(filtered.reduce(function(s,r){return s+r.completion;},0)/filtered.length):0;document.getElementById('cc-summary-line').textContent='Showing '+filtered.length+' countries · '+vc+' visited · Avg completion '+avg+'%';document.querySelectorAll('.cc-table th').forEach(function(th){th.classList.remove('sort-asc','sort-desc');if(th.dataset.col===sortCol)th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');});var tbody=document.getElementById('cc-tbody');if(!sorted.length){tbody.innerHTML='<tr><td colspan="8" class="cc-no-results">No countries match.</td></tr>';return;}tbody.innerHTML=sorted.map(function(r){var t1f=r.tl1Total?r.tl1Visited+'/'+r.tl1Total:'&mdash;';var t2f=r.tl2Total?r.tl2Visited+'/'+r.tl2Total:'&mdash;';var bc=barClass(r.completion);return '<tr>'+'<td><span class="cc-cont-badge">'+r.continent+'</span></td>'+'<td class="cc-cname">'+r.name+'</td>'+'<td><span class="cc-tick '+(r.countryVisited?'yes':'no')+'">'+(r.countryVisited?'&#10003;':'&#10007;')+'</span></td>'+'<td style="color:var(--color-muted);font-size:.85rem">'+r.capital+'</td>'+'<td><span class="cc-tick '+(r.capitalVisited?'yes':'no')+'">'+(r.capitalVisited?'&#10003;':'&#10007;')+'</span></td>'+'<td><span class="cc-frac '+fracClass(r.tl1Visited,r.tl1Total)+'" title="'+r.tl1Visited+' of '+r.tl1Total+' TL1 items">'+t1f+'</span></td>'+'<td><span class="cc-frac '+fracClass(r.tl2Visited,r.tl2Total)+'" title="'+r.tl2Visited+' of '+r.tl2Total+' TL2 items">'+t2f+'</span></td>'+'<td class="cc-bar-cell"><div class="cc-bar-wrap"><span class="cc-pct" style="color:'+pctColor(r.completion)+'">'+r.completion+'%</span><div class="cc-bar-track"><div class="cc-bar-fill '+bc+'" style="width:'+r.completion+'%"></div></div></div></td>'+'</tr>';}).join('');}document.getElementById('cc-search').addEventListener('input',function(){curSearch=this.value;render();});document.getElementById('cc-filter-btns').addEventListener('click',function(e){var btn=e.target.closest('.filter-btn');if(!btn)return;curFilter=btn.dataset.filter;document.querySelectorAll('#cc-filter-btns .filter-btn').forEach(function(b){b.classList.remove('active');});btn.classList.add('active');render();});document.querySelector('#cc-table thead').addEventListener('click',function(e){var th=e.target.closest('th[data-col]');if(!th)return;var col=th.dataset.col;if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';}else{sortCol=col;sortDir=(col==='name'||col==='continent'||col==='capital')?'asc':'desc';}render();});var root=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';function fj(f){return fetch(root+'data/'+f).then(function(r){return r.json();});}Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json')]).then(function(res){var tl1=res[0],tl2=res[1],countries=res[2];var personData={};var cached=localStorage.getItem('utl_store_v2');if(cached){try{personData=JSON.parse(cached).paul||{};}catch(e){}}_rows=buildRows(tl1,tl2,countries,personData);render();if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).paul||{};}catch(e){}}_rows=buildRows(tl1,tl2,countries,personData);render();});}});}());
+      </script>
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
@@ -47,88 +142,25 @@
     var app = window.TravelApp;
     var PERSON = "paul";
     app.renderNav(PERSON);
-
     app.loadAllData().then(function(data) {
       var travellers = data.travellers;
-      var countries  = data.countries;
-      var animals    = data.animals;
-      var unesco     = data.unesco;
-      var tl1        = data.tl1;
-      var tl2        = data.tl2;
-
+      var countries = data.countries;
+      var animals = data.animals;
+      var unesco = data.unesco;
+      var tl1 = data.tl1;
+      var tl2 = data.tl2;
       var t = null;
       for (var i = 0; i < travellers.length; i++) {
         if (travellers[i].id === PERSON) { t = travellers[i]; break; }
       }
       if (!t) t = {};
-
-      /* ---- Summary tiles: TL1 > TL2 > Countries > Capitals > UNESCO > Animals ---- */
       document.getElementById("pStats").innerHTML =
-        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length      + " Travel List I")   +
-        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length      + " Travel List II")  +
-        app.buildStatCard((t.countries||[]).length,   "/ " + countries.length + " Countries")      +
-        app.buildStatCard((t.capitals||[]).length,    "/ " + countries.length + " Capitals")       +
-        app.buildStatCard((t.unesco||[]).length,      "/ " + unesco.length   + " UNESCO Sites")    +
-        app.buildStatCard((t.animals||[]).length,     "/ " + animals.length  + " Animals");
-
-      var continents = [];
-      for (var ci = 0; ci < countries.length; ci++) {
-        if (continents.indexOf(countries[ci].continent) === -1) continents.push(countries[ci].continent);
-      }
-      continents.sort();
-      var continentFilters = [];
-      for (var cfi = 0; cfi < continents.length; cfi++) continentFilters.push({ label: continents[cfi], key: continents[cfi] });
-
-      var aniCats = [];
-      for (var ai = 0; ai < animals.length; ai++) {
-        if (aniCats.indexOf(animals[ai].category) === -1) aniCats.push(animals[ai].category);
-      }
-      aniCats.sort();
-      var aniFilters = [];
-      for (var afi = 0; afi < aniCats.length; afi++) aniFilters.push({ label: aniCats[afi], key: aniCats[afi] });
-
-      app.renderChecklist({
-        container:    document.getElementById("pTL1"),
-        masterList:   tl1,
-        visitedIds:   t.travellist1||[],
-        labelFn:      function(i){ return i.name; },
-        travClass:    PERSON
-      });
-      app.renderChecklist({
-        container:    document.getElementById("pTL2"),
-        masterList:   tl2,
-        visitedIds:   t.travellist2||[],
-        labelFn:      function(i){ return i.name; },
-        travClass:    PERSON
-      });
-      app.renderChecklist({
-        container:    document.getElementById("pCountries"),
-        masterList:   countries,
-        visitedIds:   t.countries||[],
-        labelFn:      function(i){ return i.name + (i.capital ? " — " + i.capital : ""); },
-        groupFn:      function(i){ return i.continent; },
-        filterGroups: continentFilters,
-        travClass:    PERSON
-      });
-      app.renderChecklist({
-        container:    document.getElementById("pUnesco"),
-        masterList:   unesco,
-        visitedIds:   t.unesco||[],
-        labelFn:      function(i){ return i.name + " (" + i.country + ")"; },
-        groupFn:      function(i){ return i.type; },
-        filterGroups: [{label:"Cultural",key:"Cultural"},{label:"Natural",key:"Natural"},{label:"Mixed",key:"Mixed"}],
-        travClass:    PERSON
-      });
-      app.renderChecklist({
-        container:    document.getElementById("pAnimals"),
-        masterList:   animals,
-        visitedIds:   t.animals||[],
-        labelFn:      function(i){ return i.name; },
-        groupFn:      function(i){ return i.category; },
-        filterGroups: aniFilters,
-        travClass:    PERSON
-      });
-
+        app.buildStatCard((t.travellist1||[]).length, "/ " + tl1.length + " Travel List I") +
+        app.buildStatCard((t.travellist2||[]).length, "/ " + tl2.length + " Travel List II") +
+        app.buildStatCard((t.countries||[]).length, "/ " + countries.length + " Countries") +
+        app.buildStatCard((t.capitals||[]).length, "/ " + countries.length + " Capitals") +
+        app.buildStatCard((t.unesco||[]).length, "/ " + unesco.length + " UNESCO Sites") +
+        app.buildStatCard((t.animals||[]).length, "/ " + animals.length + " Animals");
     }).catch(function(err) { console.error(err); });
   </script>
 </body>
