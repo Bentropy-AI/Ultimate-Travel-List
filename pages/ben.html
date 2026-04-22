@@ -28,7 +28,7 @@
       #map-wrap{width:100%;height:460px;border-radius:var(--radius);overflow:hidden;background:var(--color-bg);border:1px solid var(--color-border)}
       .map-legend{display:flex;align-items:center;gap:14px;margin-top:.75rem;font-size:.78rem;color:var(--color-muted);flex-wrap:wrap}
       .map-legend-scale{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}
-      .map-legend-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#1e3a5f 0%,#2a5298 33%,#3a78d4 66%,#4f8ef7 100%)}
+      .map-legend-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#22263a 0%,#2a5298 33%,#3a78d4 66%,#4f8ef7 100%)}
       .map-legend-label{white-space:nowrap}
       .map-legend-note{display:flex;align-items:center;gap:6px}
       .map-legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
@@ -61,7 +61,7 @@
       var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};
       function resolveISOs(c,bn){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return bn[c]?[bn[c]]:[];}
       function lerp(c1,c2,t){var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255,r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;return(Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);}
-      function getColor(p){var C0=0x1e3a5f,C1=0x2a5298,C2=0x3a78d4,C3=0x4f8ef7;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}
+      function getColor(p){var C0=0x22263a,C1=0x2a5298,C2=0x3a78d4,C3=0x4f8ef7;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}
       function buildMap(t1,t2,countries,ben){
         var bn={};countries.forEach(function(c){bn[c.name]=c.id;});
         var vC={},vCap={},vT1={},vT2={};
@@ -72,8 +72,7 @@
         var result={};
         countries.forEach(function(c){
           var iso=c.id,cv=!!vC[iso],cap=!!vCap[iso],t1c=m1[iso]||{total:0,visited:0},t2c=m2[iso]||{total:0,visited:0};
-          if(!cv&&!cap&&!t1c.total&&!t2c.total)return;
-          var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};
+            var w={country:W.country,capital:W.capital,tl1:W.tl1,tl2:W.tl2};
           if(!t1c.total&&!t2c.total){w={country:.70,capital:.30,tl1:0,tl2:0};}else if(!t1c.total){w={country:.47,capital:.20,tl1:0,tl2:.33};}else if(!t2c.total){w={country:.47,capital:.20,tl1:.33,tl2:0};}
           result[iso]=Math.round(((cv?w.country:0)+(cap?w.capital:0)+(t1c.total?(t1c.visited/t1c.total)*w.tl1:0)+(t2c.total?(t2c.visited/t2c.total)*w.tl2:0))*100);
         });
@@ -92,7 +91,7 @@
         series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});
         series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id'),name=target.dataItem&&target.dataItem.get('name');if(!id)return text;var pct=cm[id];var label=name||id;if(pct!==undefined){return label+' - [bold #4f8ef7]'+pct+'% complete[/]';}return label+' [#7a7f9a](not yet visited)[/]';});
         series.mapPolygons.template.states.create('hover',{strokeWidth:1.5,stroke:am5.color(0xffffff),strokeOpacity:.7});
-        series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var pct=cm[id];p.set('fill',am5.color(pct!==undefined?getColor(pct):0x22263a));});});
+        series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var pct=cm[id];p.set('fill',am5.color(getColor(pct!==undefined?pct:0)));});});
       }
       function loadScripts(urls,cb){if(!urls.length){cb();return;}var s=document.createElement('script');s.src=urls[0];s.onload=function(){loadScripts(urls.slice(1),cb);};s.onerror=function(){console.error('Failed: '+urls[0]);};document.head.appendChild(s);}
       var rp=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';
