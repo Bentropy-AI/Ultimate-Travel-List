@@ -86,8 +86,7 @@
         var root=am5.Root.new('map-wrap');window._benMapRoot=root;root.setThemes([]);
         var chart=root.container.children.push(am5map.MapChart.new(root,{panX:'rotateX',panY:'translateY',projection:am5map.geoNaturalEarth1(),paddingLeft:0,paddingRight:0,paddingTop:0,paddingBottom:0}));
         chart.chartContainer.set('background',am5.Rectangle.new(root,{fill:am5.color(0x0f1117),fillOpacity:1}));
-        chart.series.push(am5map.MapPolygonSeries.new(root,{geoJSON:am5map.backgroundGeoJSON(),fill:am5.color(0x0f1117),stroke:am5.color(0x0f1117)}));
-        var series=chart.series.push(am5map.MapPolygonSeries.new(root,{geoJSON:geo,exclude:['AQ']}));
+                var series=chart.series.push(am5map.MapPolygonSeries.new(root,{geoJSON:geo,exclude:['AQ']}));
         var tt=am5.Tooltip.new(root,{getFillFromSprite:false,autoTextColor:false,background:am5.RoundedRectangle.new(root,{fill:am5.color(0x1a1d27),fillOpacity:.97,stroke:am5.color(0x2e3350),strokeWidth:1,cornerRadiusTL:6,cornerRadiusTR:6,cornerRadiusBL:6,cornerRadiusBR:6})});
         tt.label.setAll({fill:am5.color(0xe8eaf0),fontSize:12});
         series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});
