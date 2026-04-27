@@ -644,14 +644,14 @@
           _countries = res[0]; _tl1Items = res[1]; _tl2Items = res[2];
           /* load trips from shared store, then render */
           if (window.TravelApp && window.TravelApp.TripStore) {
-            window.TravelApp.TripStore.load(TRAV_ID).then(function(){ render(); }).catch(function(){ render(); });
+            window.TravelApp.TripStore.load(TRAV_ID).then(function(){ render(); if(window._vtRender) window._vtRender(); }).catch(function(){ render(); });
           } else {
             /* fallback: wait for TravelApp to be ready */
             var tries = 0;
             var poll = setInterval(function(){
               if (window.TravelApp && window.TravelApp.TripStore) {
                 clearInterval(poll);
-                window.TravelApp.TripStore.load(TRAV_ID).then(function(){ render(); }).catch(function(){ render(); });
+                window.TravelApp.TripStore.load(TRAV_ID).then(function(){ render(); if(window._vtRender) window._vtRender(); }).catch(function(){ render(); });
               }
               if (++tries > 30) { clearInterval(poll); render(); }
             }, 200);
@@ -951,16 +951,13 @@
             window.TravelApp.TripStore.onSave(function(){ render(); });
           }
 
-          /* Initial render - wait for TripStore to be loaded */
-          function tryRender(){
-            if(window.TravelApp&&window.TravelApp.TripStore&&window.TravelApp.TripStore.getTrips(TRAV_ID).length>=0){
-              render();
-            } else {
-              setTimeout(tryRender, 150);
-            }
+          /* Initial render - called by TL script after TripStore.load, and on saves */
+          window._vtRender = render;   /* allow TL script to trigger after load */
+          if(window.TravelApp&&window.TravelApp.TripStore){
+            window.TravelApp.TripStore.onSave(function(){ render(); });
           }
-          tryRender();
-        }());
+          /* Also attempt render now in case TripStore already has data from cache */
+          setTimeout(function(){ render(); }, 100);        }());
         </script>
 </div><!-- end tab-panel#timeline -->
     </div>
