@@ -12,7 +12,7 @@
   { "id": "fez-medina", "name": "Fez medina", "country": "Morocco", "region": "Africa" },
   { "id": "twelve-apostles", "name": "Twelve Apostles", "country": "Australia", "region": "Oceania" },
   { "id": "petra", "name": "Petra", "country": "Jordan", "region": "Asia" },
-  { "id": "tikal", "name": "Tikal", "country": "Guatemala", "region": "N. America" },h
+  { "id": "tikal", "name": "Tikal", "country": "Guatemala", "region": "N. America" },
   { "id": "british-museum", "name": "British Museum", "country": "UK", "region": "Europe" },
   { "id": "sagrada-familia", "name": "Sagrada Familia", "country": "Spain", "region": "Europe" },
   { "id": "fiordland-national-park", "name": "Fiordland National Park", "country": "New Zealand", "region": "Oceania" },
