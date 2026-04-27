@@ -13,9 +13,19 @@
       <div class="person-hero">
         <div class="person-avatar avatar-ben">B</div>
         <h1 style="color:var(--color-ben)">Ben</h1>
-        <p style="color:var(--color-muted)">Travel Progress</p>
+        <p style="color:var(--color-muted)" id="traveller-subtitle">Travel Progress</p>
       </div>
-      <section class="section">
+      <!-- ============================================================
+           TRAVELLER SUB-NAVIGATION TABS
+      ============================================================ -->
+      <nav class="traveller-tabs tabs-ben" id="traveller-tabs">
+        <button class="traveller-tab active" data-tab="progress">📊 Progress</button>
+        <button class="traveller-tab" data-tab="timeline">🗓️ Timeline</button>
+      </nav>
+
+      <!-- TAB PANEL: PROGRESS (existing content) -->
+      <div class="tab-panel active" id="tab-progress">
+    <section class="section">
         <h2 class="section-title">Summary</h2>
         <div class="stats-grid" id="pStats"><p class="loading-msg">Loading...</p></div>
       </section>
@@ -330,6 +340,18 @@
       });
     }());
     </script>
+      </div><!-- end tab-panel#progress -->
+
+      <!-- TAB PANEL: TIMELINE -->
+      <div class="tab-panel" id="tab-timeline">
+        <section class="section">
+          <div class="timeline-empty">
+            <div class="timeline-icon">🗓️</div>
+            <h3>Timeline Coming Soon</h3>
+            <p>Ben's travel timeline will show trips in chronological order, with dates, destinations, and highlights.</p>
+          </div>
+        </section>
+      </div><!-- end tab-panel#timeline -->
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
@@ -361,3 +383,34 @@
   </script>
 </body>
 </html>
+  <!-- Traveller tab switching -->
+  <script>
+    (function () {
+      var tabs = document.querySelectorAll('#traveller-tabs .traveller-tab');
+      var panels = document.querySelectorAll('.tab-panel');
+      var subtitle = document.getElementById('traveller-subtitle');
+      var tabLabels = { progress: 'Travel Progress', timeline: 'Travel Timeline' };
+
+      function activateTab(targetId) {
+        tabs.forEach(function (t) {
+          t.classList.toggle('active', t.dataset.tab === targetId);
+        });
+        panels.forEach(function (p) {
+          p.classList.toggle('active', p.id === 'tab-' + targetId);
+        });
+        if (subtitle) subtitle.textContent = tabLabels[targetId] || '';
+        history.replaceState(null, '', '#' + targetId);
+      }
+
+      tabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          activateTab(this.dataset.tab);
+        });
+      });
+
+      var hash = window.location.hash.replace('#', '');
+      if (hash && document.getElementById('tab-' + hash)) {
+        activateTab(hash);
+      }
+    }());
+  </script>
