@@ -345,14 +345,61 @@
       <!-- TAB PANEL: TIMELINE -->
     <div class="tab-panel" id="tab-timeline">
 
-      <!-- SECTION 1: VISUAL TIMELINE placeholder -->
+      <!-- SECTION 1: VISUAL TIMELINE -->
       <section class="section" id="tl-visual-section">
-        <h2 class="section-title">🗺️ Visual Timeline</h2>
-        <div class="timeline-empty">
-          <div class="timeline-icon">🗺️</div>
-          <h3>Visual Timeline Coming Soon</h3>
-          <p>A visual representation of Ben's trips will appear here once travel data has been added below.</p>
+        <h2 class="section-title">📅 Visual Timeline</h2>
+
+        <style>
+          #tl-vt-wrap{display:flex;flex-direction:column;gap:0}
+          .tl-vt-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+          .tl-vt-zoom-label{font-size:.78rem;color:var(--color-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+          .tl-vt-zoom-btns{display:flex;gap:4px}
+          .tl-vt-zoom-btn{padding:5px 13px;border:1px solid var(--color-border);background:var(--color-surface2);color:var(--color-muted);border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;cursor:pointer;transition:all var(--transition)}
+          .tl-vt-zoom-btn:hover{color:var(--color-text);border-color:var(--color-muted)}
+          .tl-vt-zoom-btn.active{background:var(--color-ben);color:#fff;border-color:var(--color-ben)}
+          .tl-vt-legend{display:flex;gap:14px;flex-wrap:wrap;margin-left:auto}
+          .tl-vt-leg-item{display:flex;align-items:center;gap:5px;font-size:.76rem;color:var(--color-muted)}
+          .tl-vt-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+          #tl-vt-canvas-wrap{position:relative;overflow-x:auto;overflow-y:hidden;border:1px solid var(--color-border);border-radius:var(--radius);background:var(--color-surface2,#131520);cursor:grab;min-height:80px}
+          #tl-vt-canvas-wrap:active{cursor:grabbing}
+          #tl-vt-canvas-wrap.vt-empty{display:flex;align-items:center;justify-content:center;min-height:140px;border:2px dashed var(--color-border)}
+          #tl-vt-svg{display:block}
+          #tl-vt-tip{position:fixed;pointer-events:none;z-index:9999;background:var(--color-surface,#1a1d27);border:1px solid var(--color-border);border-radius:var(--radius-sm);padding:10px 14px;font-size:.82rem;color:var(--color-text);max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;transition:opacity .15s;line-height:1.5}
+          #tl-vt-tip.show{opacity:1}
+          .tl-vt-tip-title{font-weight:700;font-size:.9rem;margin-bottom:4px}
+          .tl-vt-tip-row{color:var(--color-muted);font-size:.78rem}
+          .tl-vt-tip-row span{color:var(--color-text)}
+          .tl-vt-nav{display:flex;align-items:center;gap:8px;margin-top:8px}
+          .tl-vt-nav-btn{padding:4px 12px;border:1px solid var(--color-border);background:var(--color-surface2);color:var(--color-muted);border-radius:var(--radius-sm);font-size:.78rem;cursor:pointer;transition:all var(--transition)}
+          .tl-vt-nav-btn:hover{color:var(--color-text);border-color:var(--color-muted)}
+          .tl-vt-range-info{font-size:.78rem;color:var(--color-muted);margin-left:auto}
+        </style>
+
+        <div id="tl-vt-wrap">
+          <div class="tl-vt-toolbar">
+            <span class="tl-vt-zoom-label">Scale:</span>
+            <div class="tl-vt-zoom-btns">
+              <button class="tl-vt-zoom-btn" data-scale="decade">Decade</button>
+              <button class="tl-vt-zoom-btn active" data-scale="year">Year</button>
+              <button class="tl-vt-zoom-btn" data-scale="month">Month</button>
+            </div>
+            <div class="tl-vt-legend">
+              <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#4f8ef7"></div>Travel</div>
+              <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#f59e0b"></div>Work</div>
+              <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#3ecf8e"></div>Friends</div>
+              <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#a855f7"></div>Family</div>
+            </div>
+          </div>
+          <div id="tl-vt-canvas-wrap" class="vt-empty">
+            <svg id="tl-vt-svg" xmlns="http://www.w3.org/2000/svg" width="400" height="80"></svg>
+          </div>
+          <div class="tl-vt-nav">
+            <button class="tl-vt-nav-btn" id="tl-vt-prev">&#9664; Earlier</button>
+            <button class="tl-vt-nav-btn" id="tl-vt-next">Later &#9654;</button>
+            <span class="tl-vt-range-info" id="tl-vt-range-info"></span>
+          </div>
         </div>
+        <div id="tl-vt-tip"></div>
       </section>
 
       <!-- SECTION 2: TRAVEL LOG TABLE -->
@@ -901,7 +948,405 @@
       }());
       </script>
 
-    </div><!-- end tab-panel#timeline -->
+    
+        <script>
+        /* ══════════════════════════════════════════════════════
+           VISUAL TIMELINE ENGINE  (Ben's Timeline Tab, Section 1)
+           ══════════════════════════════════════════════════════ */
+        (function(){
+          var STORAGE_KEY = 'utl_trips_ben';
+          var TYPE_COLORS  = {Travel:'#4f8ef7',Work:'#f59e0b',Friends:'#3ecf8e',Family:'#a855f7'};
+
+          /* px per day at each zoom level */
+          var PPD = {decade: 0.35, year: 3.2, month: 24};
+
+          var AXIS_H  = 38;   /* axis + label row height */
+          var LANE_H  = 28;   /* trip-bar height */
+          var LANE_GAP = 8;   /* gap between lanes */
+          var TRIP_R  = 4;    /* bar border-radius */
+          var PAD_H   = 10;   /* vertical pad below last lane */
+          var PAD_L   = 8;    /* left padding */
+          var MIN_BAR = 5;    /* minimum rendered bar width */
+
+          var scale      = 'year';
+          var viewStart  = null;  /* pan state for month view */
+          var viewEnd    = null;
+
+          /* ── DOM refs ── */
+          var wrap  = document.getElementById('tl-vt-canvas-wrap');
+          var svgEl = document.getElementById('tl-vt-svg');
+          var tipEl = document.getElementById('tl-vt-tip');
+          var infoEl = document.getElementById('tl-vt-range-info');
+          var NS = 'http://www.w3.org/2000/svg';
+
+          /* ── Helpers ── */
+          function loadTrips(){
+            try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); }
+            catch(e){ return []; }
+          }
+
+          function parseDate(s){
+            if(!s) return null;
+            var d = new Date(s + 'T00:00:00');
+            return isNaN(d.getTime()) ? null : d;
+          }
+
+          function daysBetween(a,b){ return (b-a)/86400000; }
+
+          function addDays(d,n){
+            var r = new Date(d.getTime());
+            r.setDate(r.getDate()+n);
+            return r;
+          }
+
+          function fmtShort(d){
+            if(!d) return '';
+            return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+          }
+
+          function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+          function tripColor(t){ return TYPE_COLORS[t]||'#7a7f9a'; }
+
+          function dateToX(d, vs, ppd){ return PAD_L + daysBetween(vs,d)*ppd; }
+
+          /* ── Lane assignment (greedy, prevents overlaps) ── */
+          function assignLanes(trips){
+            var laneEnds = [];
+            return trips.map(function(t){
+              var s = parseDate(t.start);
+              var e = parseDate(t.finish) || (s ? addDays(s,1) : null);
+              if(!s){ e=null; }
+              var lane = -1;
+              for(var i=0;i<laneEnds.length;i++){
+                if(!laneEnds[i] || !s || laneEnds[i]<=s){ lane=i; laneEnds[i]=e||addDays(s||new Date(),1); break; }
+              }
+              if(lane===-1){ lane=laneEnds.length; laneEnds.push(e||addDays(s||new Date(),1)); }
+              return Object.assign({},t,{_s:s,_e:e||addDays(s||new Date(),1),_lane:lane});
+            });
+          }
+
+          /* ── Full data extent ── */
+          function dataBounds(trips){
+            var lo=Infinity,hi=-Infinity;
+            trips.forEach(function(t){
+              if(t._s && t._s.getTime()<lo) lo=t._s.getTime();
+              if(t._e && t._e.getTime()>hi) hi=t._e.getTime();
+            });
+            if(!isFinite(lo)) return null;
+            return {lo: addDays(new Date(lo),-45), hi: addDays(new Date(hi),45)};
+          }
+
+          /* ── Compute view window for current scale ── */
+          function viewWindow(bounds){
+            if(!bounds) return null;
+            if(scale==='decade'){
+              return {s:bounds.lo, e:bounds.hi};
+            }
+            if(scale==='year'){
+              return {s:bounds.lo, e:bounds.hi};  /* show full span, pixel density does the zoom */
+            }
+            /* month: use stored pan or default to first trip area */
+            var s = viewStart || bounds.lo;
+            var e = viewEnd   || addDays(s,120);
+            return {s:s, e:e};
+          }
+
+          /* ── Axis tick generation ── */
+          function buildTicks(vs, ve, ppd){
+            var ticks = [];
+            if(scale==='decade'){
+              var y=vs.getFullYear();
+              while(true){
+                var d=new Date(y,0,1); if(d>ve) break;
+                var x=dateToX(d,vs,ppd);
+                ticks.push({x:x,lbl:String(y),major:true});
+                /* half-year minor */
+                var dh=new Date(y,6,1);
+                if(dh>vs&&dh<ve) ticks.push({x:dateToX(dh,vs,ppd),lbl:'',major:false});
+                y++; if(y>2150) break;
+              }
+            } else if(scale==='year'){
+              var cy=vs.getFullYear(),cm=vs.getMonth();
+              while(true){
+                var d2=new Date(cy,cm,1); if(d2>ve) break;
+                var isMaj=(cm===0);
+                var lbl=isMaj?String(cy):d2.toLocaleDateString('en-GB',{month:'short'});
+                ticks.push({x:dateToX(d2,vs,ppd),lbl:lbl,major:isMaj});
+                cm++; if(cm===12){cm=0;cy++;} if(cy>2150) break;
+              }
+            } else {
+              /* month scale – daily ticks, labelled weekly */
+              var cur=new Date(vs); cur.setHours(0,0,0,0);
+              while(cur<=ve){
+                var x=dateToX(cur,vs,ppd);
+                if(x>12000) break;
+                var dow=cur.getDay();
+                var isMon=(dow===1);
+                var lbl3=isMon?cur.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}):'';
+                ticks.push({x:x,lbl:lbl3,major:isMon});
+                cur=addDays(cur,1);
+              }
+            }
+            return ticks;
+          }
+
+          /* ─────── MAIN RENDER ─────── */
+          function render(){
+            var raw = loadTrips();
+            var trips = assignLanes(raw.filter(function(t){return t.start;}));
+            trips.sort(function(a,b){return (a._s||new Date(0))-(b._s||new Date(0));});
+
+            /* empty state */
+            if(!trips.length){
+              wrap.classList.add('vt-empty');
+              svgEl.setAttribute('width','400');
+              svgEl.setAttribute('height','100');
+              svgEl.innerHTML='';
+              var emtxt=document.createElementNS(NS,'text');
+              emtxt.setAttribute('x','50%'); emtxt.setAttribute('y','52%');
+              emtxt.setAttribute('text-anchor','middle');
+              emtxt.setAttribute('fill','#6a7090'); emtxt.setAttribute('font-size','13');
+              emtxt.textContent='Add trips in the Travel Log below to see them here';
+              svgEl.appendChild(emtxt);
+              if(infoEl) infoEl.textContent='';
+              return;
+            }
+            wrap.classList.remove('vt-empty');
+
+            var ppd = PPD[scale];
+            var bounds = dataBounds(trips);
+            var vw = viewWindow(bounds);
+            if(!vw){ return; }
+            var vs=vw.s, ve=vw.e;
+
+            var totalDays = daysBetween(vs,ve);
+            var totalW = Math.max(PAD_L*2 + totalDays*ppd, (wrap.clientWidth||900)-2);
+
+            var laneCount=0;
+            trips.forEach(function(t){if(t._lane>=laneCount) laneCount=t._lane+1;});
+            var svgH = AXIS_H + laneCount*(LANE_H+LANE_GAP) + PAD_H;
+
+            svgEl.setAttribute('width',  Math.ceil(totalW));
+            svgEl.setAttribute('height', svgH);
+            svgEl.innerHTML='';
+
+            /* ── alternate year stripe bg ── */
+            var stripeG=document.createElementNS(NS,'g');
+            if(scale!=='month'){
+              var sy=vs.getFullYear();
+              while(true){
+                var sd=new Date(sy,0,1), ed=new Date(sy+1,0,1);
+                if(sd>ve) break;
+                if(ed>vs){
+                  var sx=dateToX(sd,vs,ppd), sw=dateToX(ed,vs,ppd)-sx;
+                  if(sy%2===0){
+                    var srect=document.createElementNS(NS,'rect');
+                    srect.setAttribute('x',sx); srect.setAttribute('y',AXIS_H);
+                    srect.setAttribute('width',sw); srect.setAttribute('height',svgH-AXIS_H);
+                    srect.setAttribute('fill','#ffffff'); srect.setAttribute('fill-opacity','0.025');
+                    stripeG.appendChild(srect);
+                  }
+                }
+                sy++; if(sy>2150) break;
+              }
+            }
+            svgEl.appendChild(stripeG);
+
+            /* ── axis baseline ── */
+            var axLine=document.createElementNS(NS,'line');
+            axLine.setAttribute('x1',0); axLine.setAttribute('y1',AXIS_H-1);
+            axLine.setAttribute('x2',Math.ceil(totalW)); axLine.setAttribute('y2',AXIS_H-1);
+            axLine.setAttribute('stroke','#2e3350'); axLine.setAttribute('stroke-width','1');
+            svgEl.appendChild(axLine);
+
+            /* ── ticks ── */
+            var ticks=buildTicks(vs,ve,ppd);
+            ticks.forEach(function(tk){
+              if(tk.x<-20||tk.x>totalW+20) return;
+              var tl=document.createElementNS(NS,'line');
+              tl.setAttribute('x1',tk.x); tl.setAttribute('y1',tk.major?AXIS_H-14:AXIS_H-6);
+              tl.setAttribute('x2',tk.x); tl.setAttribute('y2',AXIS_H-1);
+              tl.setAttribute('stroke',tk.major?'#4a5070':'#2e3350');
+              tl.setAttribute('stroke-width',tk.major?'1':'0.5');
+              svgEl.appendChild(tl);
+              if(tk.major){
+                var gl=document.createElementNS(NS,'line');
+                gl.setAttribute('x1',tk.x); gl.setAttribute('y1',AXIS_H);
+                gl.setAttribute('x2',tk.x); gl.setAttribute('y2',svgH);
+                gl.setAttribute('stroke','#2e3350'); gl.setAttribute('stroke-width','0.5');
+                gl.setAttribute('stroke-dasharray','3,5');
+                svgEl.appendChild(gl);
+              }
+              if(tk.lbl){
+                var txte=document.createElementNS(NS,'text');
+                txte.setAttribute('x',tk.x+(tk.major?3:2));
+                txte.setAttribute('y',tk.major?AXIS_H-17:AXIS_H-8);
+                txte.setAttribute('fill',tk.major?'#a0a5c0':'#5a6080');
+                txte.setAttribute('font-size',tk.major?'11':'9');
+                txte.setAttribute('font-weight',tk.major?'600':'400');
+                txte.textContent=tk.lbl;
+                svgEl.appendChild(txte);
+              }
+            });
+
+            /* ── today marker ── */
+            var today=new Date(); today.setHours(0,0,0,0);
+            if(today>=vs&&today<=ve){
+              var tx=dateToX(today,vs,ppd);
+              var todayL=document.createElementNS(NS,'line');
+              todayL.setAttribute('x1',tx); todayL.setAttribute('y1',AXIS_H);
+              todayL.setAttribute('x2',tx); todayL.setAttribute('y2',svgH);
+              todayL.setAttribute('stroke','#ef4444'); todayL.setAttribute('stroke-width','1.5');
+              todayL.setAttribute('stroke-dasharray','4,3');
+              svgEl.appendChild(todayL);
+              var todayT=document.createElementNS(NS,'text');
+              todayT.setAttribute('x',tx+3); todayT.setAttribute('y',AXIS_H+11);
+              todayT.setAttribute('fill','#ef4444'); todayT.setAttribute('font-size','9');
+              todayT.textContent='Today';
+              svgEl.appendChild(todayT);
+            }
+
+            /* ── trip bars ── */
+            var barsG=document.createElementNS(NS,'g');
+            trips.forEach(function(t){
+              if(!t._s) return;
+              var x1=dateToX(t._s,vs,ppd);
+              var x2=dateToX(t._e,vs,ppd);
+              var bw=Math.max(x2-x1, MIN_BAR);
+              var ly=AXIS_H + t._lane*(LANE_H+LANE_GAP) + LANE_GAP/2;
+              var col=tripColor(t.type);
+
+              if(x1>totalW+20||x2<-20) return;
+
+              var g=document.createElementNS(NS,'g');
+              g.style.cursor='pointer';
+
+              var bar=document.createElementNS(NS,'rect');
+              bar.setAttribute('x',x1); bar.setAttribute('y',ly);
+              bar.setAttribute('width',bw); bar.setAttribute('height',LANE_H);
+              bar.setAttribute('rx',TRIP_R); bar.setAttribute('ry',TRIP_R);
+              bar.setAttribute('fill',col); bar.setAttribute('fill-opacity','0.82');
+              g.appendChild(bar);
+
+              /* inner shine */
+              var shine=document.createElementNS(NS,'rect');
+              shine.setAttribute('x',x1); shine.setAttribute('y',ly);
+              shine.setAttribute('width',bw); shine.setAttribute('height',LANE_H/2);
+              shine.setAttribute('rx',TRIP_R); shine.setAttribute('ry',TRIP_R);
+              shine.setAttribute('fill','#ffffff'); shine.setAttribute('fill-opacity','0.06');
+              shine.setAttribute('pointer-events','none');
+              g.appendChild(shine);
+
+              /* label */
+              if(bw>34){
+                var lbl=document.createElementNS(NS,'text');
+                lbl.setAttribute('x',x1+6); lbl.setAttribute('y',ly+LANE_H/2+4);
+                lbl.setAttribute('fill','#ffffff'); lbl.setAttribute('font-size','10');
+                lbl.setAttribute('font-weight','600'); lbl.setAttribute('pointer-events','none');
+                var mc=Math.floor(bw/7);
+                var nm=t.country||'';
+                lbl.textContent=nm.length>mc?nm.substring(0,mc-1)+'…':nm;
+                g.appendChild(lbl);
+              }
+
+              g.addEventListener('mouseenter',function(ev){showTip(ev,t);});
+              g.addEventListener('mousemove', function(ev){moveTip(ev);});
+              g.addEventListener('mouseleave',function(){hideTip();});
+
+              barsG.appendChild(g);
+            });
+            svgEl.appendChild(barsG);
+
+            /* ── range info ── */
+            if(infoEl){
+              var fm=function(d){return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});};
+              infoEl.textContent=fm(vs)+' – '+fm(ve)+' · '+trips.length+' trip'+(trips.length!==1?'s':'');
+            }
+          }
+
+          /* ── Tooltip ── */
+          function showTip(ev,t){
+            var html='<div class="tl-vt-tip-title">'+esc(t.country||'Unknown')+'</div>';
+            if(t.continent) html+='<div class="tl-vt-tip-row">Continent: <span>'+esc(t.continent)+'</span></div>';
+            if(t.type)      html+='<div class="tl-vt-tip-row">Type: <span>'+esc(t.type)+'</span></div>';
+            if(t.start)     html+='<div class="tl-vt-tip-row">Start: <span>'+fmtDS(t.start)+'</span></div>';
+            if(t.finish)    html+='<div class="tl-vt-tip-row">End: <span>'+fmtDS(t.finish)+'</span></div>';
+            if(t.start&&t.finish){
+              var ds=parseDate(t.start),df=parseDate(t.finish);
+              if(ds&&df){var dd=Math.round(daysBetween(ds,df)); html+='<div class="tl-vt-tip-row">Duration: <span>'+dd+' day'+(dd!==1?'s':'')+'</span></div>';}
+            }
+            if(t.locations) html+='<div class="tl-vt-tip-row">Locations: <span>'+esc(t.locations)+'</span></div>';
+            tipEl.innerHTML=html;
+            tipEl.classList.add('show');
+            moveTip(ev);
+          }
+          function moveTip(ev){
+            var tx=ev.clientX+16,ty=ev.clientY-10;
+            if(tx+270>window.innerWidth) tx=ev.clientX-280;
+            if(ty+180>window.innerHeight) ty=ev.clientY-190;
+            tipEl.style.left=tx+'px'; tipEl.style.top=ty+'px';
+          }
+          function hideTip(){ tipEl.classList.remove('show'); }
+          function fmtDS(s){var d=parseDate(s);return d?fmtShort(d):s;}
+
+          /* ── Zoom buttons ── */
+          document.querySelector('.tl-vt-zoom-btns').addEventListener('click',function(e){
+            var btn=e.target.closest('.tl-vt-zoom-btn'); if(!btn) return;
+            scale=btn.dataset.scale;
+            viewStart=null; viewEnd=null;
+            document.querySelectorAll('.tl-vt-zoom-btn').forEach(function(b){b.classList.remove('active');});
+            btn.classList.add('active');
+            render();
+          });
+
+          /* ── Prev / Next buttons ── */
+          document.getElementById('tl-vt-prev').addEventListener('click',function(){
+            panView(-1);
+          });
+          document.getElementById('tl-vt-next').addEventListener('click',function(){
+            panView(1);
+          });
+
+          function panView(dir){
+            var raw=loadTrips();
+            var trips=assignLanes(raw.filter(function(t){return t.start;}));
+            var bounds=dataBounds(trips);
+            if(!bounds) return;
+            var shift=scale==='decade'?1825:scale==='year'?365:60;
+            if(scale==='decade'||scale==='year'){
+              var span=daysBetween(bounds.lo,bounds.hi);
+              var newLo=addDays(bounds.lo,dir*shift);
+              var newHi=addDays(newLo,span);
+              /* update bounds by temporarily overriding viewStart/End */
+              viewStart=newLo; viewEnd=newHi;
+            } else {
+              var vs2=viewStart||bounds.lo;
+              viewStart=addDays(vs2,dir*shift);
+              viewEnd=addDays(viewStart,120);
+            }
+            render();
+          }
+
+          /* ── Drag to scroll ── */
+          var drag=false,dragX=0,scrollX=0;
+          wrap.addEventListener('mousedown',function(e){drag=true;dragX=e.clientX;scrollX=wrap.scrollLeft;e.preventDefault();});
+          window.addEventListener('mousemove',function(e){if(!drag)return;wrap.scrollLeft=scrollX-(e.clientX-dragX);});
+          window.addEventListener('mouseup',function(){drag=false;});
+
+          /* ── Live update: intercept localStorage.setItem ── */
+          var _origSet=Storage.prototype.setItem;
+          Storage.prototype.setItem=function(k,v){
+            _origSet.call(this,k,v);
+            if(k===STORAGE_KEY){ try{render();}catch(ex){} }
+          };
+          window.addEventListener('storage',function(e){if(e.key===STORAGE_KEY) render();});
+
+          /* ── Initial render ── */
+          render();
+        }());
+        </script>
+</div><!-- end tab-panel#timeline -->
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
