@@ -343,15 +343,221 @@
       </div><!-- end tab-panel#progress -->
 
       <!-- TAB PANEL: TIMELINE -->
-      <div class="tab-panel" id="tab-timeline">
-        <section class="section">
-          <div class="timeline-empty">
-            <div class="timeline-icon">🗓️</div>
-            <h3>Timeline Coming Soon</h3>
-            <p>Ben's travel timeline will show trips in chronological order, with dates, destinations, and highlights.</p>
+    <div class="tab-panel" id="tab-timeline">
+
+      <!-- ============================================================
+           SECTION 1: VISUAL TIMELINE (placeholder for future build)
+           ============================================================ -->
+      <section class="section" id="tl-visual-section">
+        <h2 class="section-title">🗺️ Visual Timeline</h2>
+        <div class="timeline-empty">
+          <div class="timeline-icon">🗺️</div>
+          <h3>Visual Timeline Coming Soon</h3>
+          <p>A visual representation of Ben's trips will appear here once travel data has been added below.</p>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SECTION 2: TRAVEL LOG TABLE
+           ============================================================ -->
+      <style>
+        #tl-log-section { margin-top: 0; }
+        .tl-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:1.2rem; }
+        .tl-search { flex:1; min-width:180px; max-width:300px; padding:8px 14px; background:var(--color-surface2); border:1px solid var(--color-border); border-radius:var(--radius-sm); color:var(--color-text); font-size:.9rem; outline:none; transition:border-color var(--transition); }
+        .tl-search:focus { border-color:var(--color-primary); }
+        .tl-filters { display:flex; flex-wrap:wrap; gap:6px; }
+        .tl-table-wrap { overflow-x:auto; border-radius:var(--radius); border:1px solid var(--color-border); }
+        .tl-table { width:100%; border-collapse:collapse; font-size:.875rem; min-width:900px; }
+        .tl-table thead tr { background:var(--color-surface2); }
+        .tl-table th { padding:11px 14px; text-align:left; color:var(--color-muted); font-weight:600; font-size:.78rem; text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; cursor:pointer; user-select:none; border-bottom:2px solid var(--color-border); transition:color var(--transition); }
+        .tl-table th:hover { color:var(--color-text); }
+        .tl-table th.sort-asc::after { content:' ▲'; color:var(--color-primary); }
+        .tl-table th.sort-desc::after { content:' ▼'; color:var(--color-primary); }
+        .tl-table tbody tr { border-bottom:1px solid var(--color-border); transition:background var(--transition); }
+        .tl-table tbody tr:last-child { border-bottom:none; }
+        .tl-table tbody tr:hover { background:var(--color-surface2); }
+        .tl-table td { padding:10px 14px; color:var(--color-text); white-space:nowrap; }
+        .tl-date-col { font-weight:600; color:var(--color-ben) !important; font-size:.85rem; }
+        .tl-country-col { font-weight:500; }
+        .tl-cont-badge { display:inline-block; padding:2px 8px; border-radius:var(--radius-sm); font-size:.75rem; font-weight:500; background:var(--color-surface2); color:var(--color-muted); border:1px solid var(--color-border); }
+        .tl-type-badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.75rem; font-weight:600; white-space:nowrap; }
+        .tl-type-travel { background:rgba(79,142,247,.15); color:#4f8ef7; }
+        .tl-type-work { background:rgba(245,158,11,.15); color:#f59e0b; }
+        .tl-type-friends { background:rgba(62,207,142,.15); color:#3ecf8e; }
+        .tl-type-other { background:rgba(122,127,154,.15); color:var(--color-muted); }
+        .tl-summary-line { font-size:.82rem; color:var(--color-muted); margin-bottom:1rem; }
+        .tl-no-results { text-align:center; padding:2rem; color:var(--color-muted); }
+        .tl-empty-state { text-align:center; padding:3rem 2rem; color:var(--color-muted); }
+        .tl-empty-state .tl-empty-icon { font-size:2.5rem; margin-bottom:.75rem; }
+        .tl-add-btn { display:inline-flex; align-items:center; gap:8px; padding:9px 18px; background:var(--color-ben); color:#fff; border:none; border-radius:var(--radius-sm); font-size:.9rem; font-weight:600; cursor:pointer; transition:opacity var(--transition); }
+        .tl-add-btn:hover { opacity:.85; }
+      </style>
+
+      <section class="section" id="tl-log-section">
+        <h2 class="section-title">📋 Travel Log</h2>
+        <p class="tl-summary-line" id="tl-summary-line">No trips logged yet.</p>
+
+        <div class="tl-controls">
+          <input class="tl-search search-input" type="search" placeholder="Search country, continent…" id="tl-search">
+          <div class="tl-filters" id="tl-filter-btns">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="Travel">Travel</button>
+            <button class="filter-btn" data-filter="Work">Work</button>
+            <button class="filter-btn" data-filter="Trip with Friends">Friends</button>
           </div>
-        </section>
-      </div><!-- end tab-panel#timeline -->
+        </div>
+
+        <div class="tl-table-wrap">
+          <table class="tl-table" id="tl-table">
+            <thead>
+              <tr>
+                <th data-col="date" class="sort-desc">Date</th>
+                <th data-col="country">Country</th>
+                <th data-col="continent">Continent</th>
+                <th data-col="utl1">UTL I</th>
+                <th data-col="utl2">UTL II</th>
+                <th data-col="start">Start</th>
+                <th data-col="finish">Finish</th>
+                <th data-col="type">Type of Travel</th>
+              </tr>
+            </thead>
+            <tbody id="tl-tbody">
+              <tr>
+                <td colspan="8" class="tl-empty-state">
+                  <div class="tl-empty-icon">✈️</div>
+                  <p>No trips logged yet. Use the <strong>Add Trip</strong> button to record your first trip!</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <script>
+      (function () {
+        var STORAGE_KEY = 'utl_trips_ben';
+        var sortCol = 'date', sortDir = 'desc', curFilter = 'all', curSearch = '';
+
+        function loadTrips() {
+          try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; }
+        }
+        function saveTrips(trips) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(trips));
+        }
+
+        function typeClass(type) {
+          if (!type) return 'tl-type-other';
+          var t = type.toLowerCase();
+          if (t === 'travel') return 'tl-type-travel';
+          if (t === 'work') return 'tl-type-work';
+          if (t.indexOf('friend') !== -1) return 'tl-type-friends';
+          return 'tl-type-other';
+        }
+
+        function formatDisplayDate(isoDate) {
+          if (!isoDate) return '—';
+          var d = new Date(isoDate + 'T00:00:00');
+          return d.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function formatMonthYear(isoDate) {
+          if (!isoDate) return '—';
+          var d = new Date(isoDate + 'T00:00:00');
+          return d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit' }).replace(' ', '-');
+        }
+
+        function render() {
+          var trips = loadTrips();
+          var s = curSearch.toLowerCase();
+
+          var filtered = trips.filter(function (r) {
+            var ms = !s || (r.country || '').toLowerCase().indexOf(s) !== -1 || (r.continent || '').toLowerCase().indexOf(s) !== -1;
+            var mf = curFilter === 'all' ? true : r.type === curFilter;
+            return ms && mf;
+          });
+
+          var sorted = filtered.slice().sort(function (a, b) {
+            var va, vb;
+            if (sortCol === 'date' || sortCol === 'start') { va = a.start || ''; vb = b.start || ''; }
+            else if (sortCol === 'finish') { va = a.finish || ''; vb = b.finish || ''; }
+            else if (sortCol === 'country') { va = a.country || ''; vb = b.country || ''; }
+            else if (sortCol === 'continent') { va = a.continent || ''; vb = b.continent || ''; }
+            else if (sortCol === 'type') { va = a.type || ''; vb = b.type || ''; }
+            else if (sortCol === 'utl1') { va = a.utl1 || ''; vb = b.utl1 || ''; }
+            else if (sortCol === 'utl2') { va = a.utl2 || ''; vb = b.utl2 || ''; }
+            else { va = a.start || ''; vb = b.start || ''; }
+            if (typeof va === 'string') return sortDir === 'asc' ? va.localeCompare(vb) : vb.localeCompare(va);
+            return sortDir === 'asc' ? va - vb : vb - va;
+          });
+
+          var summaryEl = document.getElementById('tl-summary-line');
+          if (summaryEl) {
+            summaryEl.textContent = trips.length
+              ? 'Showing ' + filtered.length + ' of ' + trips.length + ' trip' + (trips.length !== 1 ? 's' : '')
+              : 'No trips logged yet.';
+          }
+
+          document.querySelectorAll('.tl-table th').forEach(function (th) {
+            th.classList.remove('sort-asc', 'sort-desc');
+            if (th.dataset.col === sortCol) th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+          });
+
+          var tbody = document.getElementById('tl-tbody');
+          if (!tbody) return;
+
+          if (!sorted.length) {
+            tbody.innerHTML = trips.length
+              ? '<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>'
+              : '<tr><td colspan="8" class="tl-empty-state"><div class="tl-empty-icon">✈️<\/div><p>No trips logged yet. Use the <strong>Add Trip<\/strong> button to record your first trip!<\/p><\/td><\/tr>';
+            return;
+          }
+
+          tbody.innerHTML = sorted.map(function (r, idx) {
+            var origIdx = trips.indexOf(r);
+            return '<tr data-idx="' + origIdx + '">' +
+              '<td class="tl-date-col">' + formatMonthYear(r.start) + '<\/td>' +
+              '<td class="tl-country-col">' + (r.country || '—') + '<\/td>' +
+              '<td><span class="tl-cont-badge">' + (r.continent || '—') + '<\/span><\/td>' +
+              '<td>' + (r.utl1 || '—') + '<\/td>' +
+              '<td>' + (r.utl2 || '—') + '<\/td>' +
+              '<td>' + formatDisplayDate(r.start) + '<\/td>' +
+              '<td>' + formatDisplayDate(r.finish) + '<\/td>' +
+              '<td><span class="tl-type-badge ' + typeClass(r.type) + '">' + (r.type || '—') + '<\/span><\/td>' +
+              '<\/tr>';
+          }).join('');
+        }
+
+        // Search
+        var searchEl = document.getElementById('tl-search');
+        if (searchEl) searchEl.addEventListener('input', function () { curSearch = this.value; render(); });
+
+        // Filter buttons
+        var filterBtns = document.getElementById('tl-filter-btns');
+        if (filterBtns) filterBtns.addEventListener('click', function (e) {
+          var btn = e.target.closest('.filter-btn');
+          if (!btn) return;
+          curFilter = btn.dataset.filter;
+          document.querySelectorAll('#tl-filter-btns .filter-btn').forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          render();
+        });
+
+        // Sort headers
+        var thead = document.querySelector('#tl-table thead');
+        if (thead) thead.addEventListener('click', function (e) {
+          var th = e.target.closest('th[data-col]');
+          if (!th) return;
+          var col = th.dataset.col;
+          if (sortCol === col) { sortDir = sortDir === 'asc' ? 'desc' : 'asc'; }
+          else { sortCol = col; sortDir = (col === 'country' || col === 'continent' || col === 'type') ? 'asc' : 'desc'; }
+          render();
+        });
+
+        render();
+      }());
+      </script>
+
+    </div><!-- end tab-panel#timeline -->
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
