@@ -411,7 +411,7 @@
         .tl-search:focus{border-color:var(--color-primary)}
         .tl-filters{display:flex;flex-wrap:wrap;gap:6px}
         .tl-table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--color-border)}
-        .tl-table{width:100%;border-collapse:collapse;font-size:.875rem;min-width:1100px}
+        .tl-table{width:100%;border-collapse:collapse;font-size:.875rem;min-width:760px}
         .tl-table thead tr{background:var(--color-surface2)}
         .tl-table th{padding:11px 14px;text-align:left;color:var(--color-muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid var(--color-border);transition:color var(--transition)}
         .tl-table th:hover{color:var(--color-text)}
@@ -518,8 +518,6 @@
                 <th data-col="locations">Locations</th>
                 <th data-col="utl1">UTL I</th>
                 <th data-col="utl2">UTL II</th>
-                <th data-col="start">Start</th>
-                <th data-col="finish">Finish</th>
                 <th data-col="type">Type</th>
                 <th class="no-sort" style="width:90px"></th>
               </tr>
@@ -539,11 +537,6 @@
           <div class="tl-modal-body">
             <div class="tl-form-row">
               <div class="tl-form-group">
-                <label class="tl-form-label" for="tf-month">Date (Month) <span class="req">*</span></label>
-                <input type="month" class="tl-form-input" id="tf-month" placeholder="YYYY-MM">
-                <span class="tl-error-msg" id="tf-month-err"></span>
-              </div>
-              <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-type">Type of Travel <span class="req">*</span></label>
                 <select class="tl-form-select" id="tf-type">
                   <option value="">Select type…</option>
@@ -553,6 +546,17 @@
                   <option value="Family">Family</option>
                 </select>
                 <span class="tl-error-msg" id="tf-type-err"></span>
+              </div>
+            </div>
+            <div class="tl-form-row">
+              <div class="tl-form-group">
+                <label class="tl-form-label" for="tf-start">Start Date <span class="req">*</span></label>
+                <input type="date" class="tl-form-input" id="tf-start">
+                <span class="tl-error-msg" id="tf-start-err"></span>
+              </div>
+              <div class="tl-form-group">
+                <label class="tl-form-label" for="tf-finish">Finish Date</label>
+                <input type="date" class="tl-form-input" id="tf-finish">
               </div>
             </div>
             <div class="tl-form-row">
@@ -573,16 +577,6 @@
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-locations">Locations <span style="font-weight:400;text-transform:none;letter-spacing:0">(areas visited)</span></label>
                 <textarea class="tl-form-textarea" id="tf-locations" placeholder="e.g. Manila, Sagada, Banaue, Bohol, Panglao, Boracay, El Nido"></textarea>
-              </div>
-            </div>
-            <div class="tl-form-row">
-              <div class="tl-form-group">
-                <label class="tl-form-label" for="tf-start">Start Date</label>
-                <input type="date" class="tl-form-input" id="tf-start">
-              </div>
-              <div class="tl-form-group">
-                <label class="tl-form-label" for="tf-finish">Finish Date</label>
-                <input type="date" class="tl-form-input" id="tf-finish">
               </div>
             </div>
             <div class="tl-form-row full">
@@ -688,7 +682,7 @@
           if(sumEl) sumEl.textContent=trips.length?'Showing '+filtered.length+' of '+trips.length+' trip'+(trips.length!==1?'s':''):'No trips logged yet.';
           document.querySelectorAll('.tl-table th[data-col]').forEach(function(th){th.classList.remove('sort-asc','sort-desc');if(th.dataset.col===sortCol)th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');});
           var tbody=document.getElementById('tl-tbody'); if(!tbody)return;
-          if(!sorted.length){tbody.innerHTML=trips.length?'<tr><td colspan="10" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="10" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>';return;}
+          if(!sorted.length){tbody.innerHTML=trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>';return;}
           tbody.innerHTML=sorted.map(function(r){
             var oi=trips.indexOf(r);
             var utl1txt=Array.isArray(r.utl1)?r.utl1.join(', '):(r.utl1||'');
@@ -700,8 +694,6 @@
               +'<td class="tl-loc-cell" title="'+esc(r.locations||'')+'">'+esc(r.locations||'—')+'</td>'
               +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'—')+'</td>'
               +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
-              +'<td>'+fmtDate(r.start)+'</td>'
-              +'<td>'+fmtDate(r.finish)+'</td>'
               +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
               +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
               +'</tr>';
@@ -733,9 +725,8 @@
           editIdx=idx; clearErrors(); _utl1Selected=[]; _utl2Selected=[];
           renderTags('utl1'); renderTags('utl2');
           document.getElementById('tl-modal-title').textContent=idx===-1?'Add Trip':'Edit Trip';
-          var f={month:'',country:'',continent:'',locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
-          if(idx!==-1){var t=loadTrips()[idx];if(t){f.month=t.start?t.start.substring(0,7):'';f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
-          document.getElementById('tf-month').value=f.month;
+          var f={country:'',continent:'',locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
+          if(idx!==-1){var t=loadTrips()[idx];if(t){f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
           document.getElementById('tf-country-input').value=f.country;
           document.getElementById('tf-continent').value=f.continent;
           document.getElementById('tf-locations').value=f.locations;
@@ -744,25 +735,24 @@
           document.getElementById('tf-type').value=f.type;
           renderTags('utl1'); renderTags('utl2');
           backdrop.classList.add('open');
-          document.getElementById('tf-month').focus();
+          document.getElementById('tf-start').focus();
         }
         function closeModal(){backdrop.classList.remove('open');editIdx=-1;}
-        function clearErrors(){['tf-month-err','tf-country-err','tf-type-err'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='';});['tf-month','tf-country-input','tf-type'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});}
+        function clearErrors(){['tf-start-err','tf-country-err','tf-type-err'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='';});['tf-start','tf-country-input','tf-type'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});}
 
         document.getElementById('tl-modal-save').addEventListener('click',function(){
           clearErrors();
-          var month=document.getElementById('tf-month').value.trim();
           var country=document.getElementById('tf-country-input').value.trim();
           var type=document.getElementById('tf-type').value;
+          var start=document.getElementById('tf-start').value||'';
           var ok=true;
-          if(!month){document.getElementById('tf-month-err').textContent='Required';document.getElementById('tf-month').classList.add('error');ok=false;}
+          if(!start){document.getElementById('tf-start-err').textContent='Required';document.getElementById('tf-start').classList.add('error');ok=false;}
           if(!country){document.getElementById('tf-country-err').textContent='Required';document.getElementById('tf-country-input').classList.add('error');ok=false;}
           if(!type){document.getElementById('tf-type-err').textContent='Required';document.getElementById('tf-type').classList.add('error');ok=false;}
           if(!ok)return;
           var continent='';
           var found=_countries.find(function(c){return c.name.toLowerCase()===country.toLowerCase();});
           if(found)continent=found.continent||'';
-          var start=document.getElementById('tf-start').value||month+'-01';
           var finish=document.getElementById('tf-finish').value||'';
           var trip={country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice()};
           var trips=loadTrips();
@@ -792,7 +782,6 @@
         document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
         document.getElementById('tf-utl2-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl2Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl2');});
         document.getElementById('tf-country-input').addEventListener('change',function(){var val=this.value.trim();var found=_countries.find(function(c){return c.name.toLowerCase()===val.toLowerCase();});document.getElementById('tf-continent').value=found?(found.continent||''):'';});
-        document.getElementById('tf-month').addEventListener('change',function(){var startEl=document.getElementById('tf-start');if(!startEl.value&&this.value){startEl.value=this.value+'-01';}});
 
       }());
       </script>
