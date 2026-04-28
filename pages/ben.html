@@ -685,8 +685,9 @@
           if(!sorted.length){tbody.innerHTML=trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>';return;}
           tbody.innerHTML=sorted.map(function(r){
             var oi=trips.indexOf(r);
-            var utl1txt=Array.isArray(r.utl1)?r.utl1.join(', '):(r.utl1||'');
-            var utl2txt=Array.isArray(r.utl2)?r.utl2.join(', '):(r.utl2||'');
+            function idToName(id,items){var found=items.find(function(i){return i.id===id;});if(found)return found.name||found.title||id;return id.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}
+            var utl1txt=Array.isArray(r.utl1)?r.utl1.map(function(id){return idToName(id,_tl1Items);}).join(', '):(r.utl1?idToName(r.utl1,_tl1Items):'');
+            var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
             return '<tr data-idx="'+oi+'">'
               +'<td class="tl-date-col">'+fmtMonth(r.start)+'</td>'
               +'<td class="tl-country-col">'+esc(r.country||'—')+'</td>'
