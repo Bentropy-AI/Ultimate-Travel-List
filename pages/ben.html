@@ -744,15 +744,14 @@
           renderTags('utl1'); renderTags('utl2'); renderTags('companions');
           document.getElementById('tl-modal-title').textContent=idx===-1?'Add Trip':'Edit Trip';
           var f={country:'',continent:'',locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
-          if(idx!==-1){var t=loadTrips()[idx];if(t){f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
+          if(idx!==-1){var t=loadTrips()[idx];if(t){f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);_companionsSelected=Array.isArray(t.companions)?t.companions.slice():[];}}
           document.getElementById('tf-country-input').value=f.country;
           document.getElementById('tf-continent').value=f.continent;
-      _companionsSelected=(f.companions||[]).slice(); renderTags('companions');
           document.getElementById('tf-locations').value=f.locations;
           document.getElementById('tf-start').value=f.start;
           document.getElementById('tf-finish').value=f.finish;
           document.getElementById('tf-type').value=f.type;
-          renderTags('utl1'); renderTags('utl2');
+          renderTags('utl1'); renderTags('utl2'); renderTags('companions');
           backdrop.classList.add('open');
           document.getElementById('tf-start').focus();
         }
