@@ -611,7 +611,7 @@
                 <input type="text" class="tl-form-input tl-combo-input" id="tf-companion-input" placeholder="Search and add companions…" autocomplete="off">
                 <div class="tl-combo-list" id="tf-companion-list"></div>
               </div>
-              <div class="tl-multi-selected" id="tf-companion-tags"></div>
+              <div class="tl-multi-selected" id="tf-companions-tags"></div>
             </div>
           </div>
           <div class="tl-modal-footer">
@@ -813,7 +813,7 @@
       }
               document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
         document.getElementById('tf-utl2-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl2Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl2');});
-        document.getElementById('tf-companion-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_companionsSelected.splice(parseInt(btn.dataset.i,10),1);renderTags('companions');});
+        document.getElementById('tf-companions-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_companionsSelected.splice(parseInt(btn.dataset.i,10),1);renderTags('companions');});
         document.getElementById('tf-country-input').addEventListener('change',function(){var val=this.value.trim();var found=_countries.find(function(c){return c.name.toLowerCase()===val.toLowerCase();});document.getElementById('tf-continent').value=found?(found.continent||''):'';});
 
       }());
