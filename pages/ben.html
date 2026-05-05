@@ -117,6 +117,7 @@
           var cm=buildMap(res[0],res[1],res[2],res[3],ben);
           renderMap(cm);
           if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{ben=JSON.parse(c2).ben||{};}catch(e){}}var tc2=localStorage.getItem('utl_trips_v1');if(tc2){try{_trips=(JSON.parse(tc2).ben||[]);}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
+        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3).ben||[]);}catch(e){}}});}
         });
       });
     }());
