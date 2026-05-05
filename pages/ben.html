@@ -19,8 +19,8 @@
            TRAVELLER SUB-NAVIGATION TABS
       ============================================================ -->
       <nav class="traveller-tabs tabs-ben" id="traveller-tabs">
-        <button class="traveller-tab active" data-tab="progress">📊 Progress</button>
-        <button class="traveller-tab" data-tab="timeline">🗓️ Timeline</button>
+        <button class="traveller-tab active" data-tab="progress">ð Progress</button>
+        <button class="traveller-tab" data-tab="timeline">ðï¸ Timeline</button>
       </nav>
 
       <!-- TAB PANEL: PROGRESS (existing content) -->
@@ -45,7 +45,7 @@
     </style>
 
     <section class="section" id="map-section">
-      <h2 class="section-title">🌍 Travel Map</h2>
+      <h2 class="section-title">ð Travel Map</h2>
       <div id="map-wrap"></div>
       <div class="map-legend">
         <div class="map-legend-scale">
@@ -67,8 +67,8 @@
     <script>
     (function(){
       var SCRIPTS=['https://cdn.amcharts.com/lib/5/index.js','https://cdn.amcharts.com/lib/5/map.js','https://cdn.amcharts.com/lib/5/geodata/worldLow.js'];
-      var NAME_MAP={'Bosnia':'BA','UAE':'AE','UK':'GB','USA':'US','Wales':'GB','St Lucia':'LC','Trinidad':'TT','French Polynesia':'PF','Hong Kong':'HK','Cayman Islands':'KY','New Caledonia':'NC','Puerto Rico':'PR','Réunion':'RE','Antarctica':null,'Argentina/Brazil':['AR','BR'],'Canada/USA':['CA','US'],'France/Italy':['FR','IT'],'Israel/Jordan':['IL','JO'],'Zimbabwe/Zambia':['ZW','ZM'],'Abu Dhabi':'AE','England':'GB','Northern Ireland':'GB','Scotland':'GB','Bosnia-Herzegovina':'BA','Aruba':'AW','Republic of Congo':'CG','Reunion Island':'RE'};
-    var UNESCO_NM={'Bolivia (Plurinational State of)':'BO','Côte d\'Ivoire':'CI','Democratic People\'s Republic of Korea':'KP','Democratic Republic of the Congo':'CD','Gambia (the)':'GM','Holy See':'VA','Iran (Islamic Republic of)':'IR','Jerusalem (Site proposed by Jordan)':'JO','Lao People\'s Democratic Republic':'LA','Micronesia (Federated States of)':'FM','Palestine':'PS','Republic of Korea':'KR','Russian Federation':'RU','Syrian Arab Republic':'SY','United Kingdom of Great Britain and Northern Ireland':'GB','United Republic of Tanzania':'TZ','United States of America':'US','Venezuela (Bolivarian Republic of)':'VE','Viet Nam':'VN','the former Yugoslav Republic of Macedonia':'MK'};
+      var NAME_MAP={'Bosnia':'BA','UAE':'AE','UK':'GB','USA':'US','Wales':'GB','St Lucia':'LC','Trinidad':'TT','French Polynesia':'PF','Hong Kong':'HK','Cayman Islands':'KY','New Caledonia':'NC','Puerto Rico':'PR','RÃ©union':'RE','Antarctica':null,'Argentina/Brazil':['AR','BR'],'Canada/USA':['CA','US'],'France/Italy':['FR','IT'],'Israel/Jordan':['IL','JO'],'Zimbabwe/Zambia':['ZW','ZM'],'Abu Dhabi':'AE','England':'GB','Northern Ireland':'GB','Scotland':'GB','Bosnia-Herzegovina':'BA','Aruba':'AW','Republic of Congo':'CG','Reunion Island':'RE'};
+    var UNESCO_NM={'Bolivia (Plurinational State of)':'BO','CÃ´te d\'Ivoire':'CI','Democratic People\'s Republic of Korea':'KP','Democratic Republic of the Congo':'CD','Gambia (the)':'GM','Holy See':'VA','Iran (Islamic Republic of)':'IR','Jerusalem (Site proposed by Jordan)':'JO','Lao People\'s Democratic Republic':'LA','Micronesia (Federated States of)':'FM','Palestine':'PS','Republic of Korea':'KR','Russian Federation':'RU','Syrian Arab Republic':'SY','United Kingdom of Great Britain and Northern Ireland':'GB','United Republic of Tanzania':'TZ','United States of America':'US','Venezuela (Bolivarian Republic of)':'VE','Viet Nam':'VN','the former Yugoslav Republic of Macedonia':'MK'};
       var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};
       function resolveISOs(c,bn){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return bn[c]?[bn[c]]:[];}
       function lerp(c1,c2,t){var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255,r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;return(Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);}
@@ -100,7 +100,7 @@
         var tt=am5.Tooltip.new(root,{getFillFromSprite:false,autoTextColor:false,background:am5.RoundedRectangle.new(root,{fill:am5.color(0x1a1d27),fillOpacity:.97,stroke:am5.color(0x2e3350),strokeWidth:1,cornerRadiusTL:6,cornerRadiusTR:6,cornerRadiusBL:6,cornerRadiusBR:6})});
         tt.label.setAll({fill:am5.color(0xe8eaf0),fontSize:12});
         series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});
-        series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id');if(!id)return text;var d=cm[id];var label=d?d.name:(target.dataItem.get('name')||id);if(!d){return '[bold]'+label+'[/] [#7a7f9a]not yet visited[/]';}var pct=d.pct;var pc=pct>=75?'#3ecf8e':pct>=40?'#f59e0b':'#4f8ef7';var ck=function(v){return v?'[#3ecf8e]✔[/]':'[#7a7f9a]✘[/]';};var fr=function(v,t){return t?('[bold]'+v+'/'+t+'[/]'):'[#7a7f9a]-[/]';};var sep='[#2e3350]  |  [/]';return '[bold #e8eaf0 fontSize:13]'+label+'[/][#7a7f9a fontSize:11]  •  '+d.capital+'[/]'+'\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#7a7f9a fontSize:11]Completion  [/][bold '+pc+' fontSize:12]'+pct+'%[/]'+'\n'+'[#7a7f9a fontSize:11]Visited [/]'+ck(d.cv)+sep+'[#7a7f9a fontSize:11]Capital [/]'+ck(d.cap)+'\n'+'[#7a7f9a fontSize:11]TL I [/]'+fr(d.t1v,d.t1t)+sep+'[#7a7f9a fontSize:11]TL II [/]'+fr(d.t2v,d.t2t)+'\n'+'[#7a7f9a fontSize:11]UNESCO [/]'+fr(d.uv,d.ut);});
+        series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id');if(!id)return text;var d=cm[id];var label=d?d.name:(target.dataItem.get('name')||id);if(!d){return '[bold]'+label+'[/] [#7a7f9a]not yet visited[/]';}var pct=d.pct;var pc=pct>=75?'#3ecf8e':pct>=40?'#f59e0b':'#4f8ef7';var ck=function(v){return v?'[#3ecf8e]â[/]':'[#7a7f9a]â[/]';};var fr=function(v,t){return t?('[bold]'+v+'/'+t+'[/]'):'[#7a7f9a]-[/]';};var sep='[#2e3350]  |  [/]';return '[bold #e8eaf0 fontSize:13]'+label+'[/][#7a7f9a fontSize:11]  â¢  '+d.capital+'[/]'+'\n'+'[#555a7a]ââââââââââââââââââââ[/]'+'\n'+'[#7a7f9a fontSize:11]Completion  [/][bold '+pc+' fontSize:12]'+pct+'%[/]'+'\n'+'[#7a7f9a fontSize:11]Visited [/]'+ck(d.cv)+sep+'[#7a7f9a fontSize:11]Capital [/]'+ck(d.cap)+'\n'+'[#7a7f9a fontSize:11]TL I [/]'+fr(d.t1v,d.t1t)+sep+'[#7a7f9a fontSize:11]TL II [/]'+fr(d.t2v,d.t2t)+'\n'+'[#7a7f9a fontSize:11]UNESCO [/]'+fr(d.uv,d.ut);});
         series.mapPolygons.template.states.create('hover',{strokeWidth:1.5,stroke:am5.color(0xffffff),strokeOpacity:.7});
         series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var d=cm[id];var pct=d?d.pct:undefined;p.set('fill',am5.color(getColor(pct!==undefined?pct:0)));});});
       }
@@ -133,8 +133,8 @@
       .cc-table thead tr{background:var(--color-surface2)}
       .cc-table th{padding:11px 14px;text-align:left;color:var(--color-muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid var(--color-border);transition:color var(--transition)}
       .cc-table th:hover{color:var(--color-text)}
-      .cc-table th.sort-asc::after{content:' ▲';color:var(--color-primary)}
-      .cc-table th.sort-desc::after{content:' ▼';color:var(--color-primary)}
+      .cc-table th.sort-asc::after{content:' â²';color:var(--color-primary)}
+      .cc-table th.sort-desc::after{content:' â¼';color:var(--color-primary)}
       .cc-table tbody tr{border-bottom:1px solid var(--color-border);transition:background var(--transition)}
       .cc-table tbody tr:last-child{border-bottom:none}
       .cc-table tbody tr:hover{background:var(--color-surface2)}
@@ -161,10 +161,10 @@
     </style>
 
     <section class="section" id="cc-section">
-      <h2 class="section-title">🗺️ Country Completion</h2>
+      <h2 class="section-title">ðºï¸ Country Completion</h2>
       <p class="cc-summary-line" id="cc-summary-line"></p>
       <div class="cc-controls">
-        <input class="cc-search search-input" type="search" placeholder="Search country…" id="cc-search">
+        <input class="cc-search search-input" type="search" placeholder="Search countryâ¦" id="cc-search">
         <div class="cc-filters" id="cc-filter-btns">
           <button class="filter-btn active" data-filter="all">All</button>
           <button class="filter-btn" data-filter="visited">Visited</button>
@@ -185,7 +185,7 @@
               <th data-col="name" class="sort-asc">Country</th>
               <th data-col="countryVisited" title="Has Ben visited this country?">Visited</th>
               <th data-col="capital">Capital</th>
-              <th data-col="capitalVisited" title="Has Ben visited the capital?">Capital ✓</th>
+              <th data-col="capitalVisited" title="Has Ben visited the capital?">Capital â</th>
               <th data-col="tl1" title="Travel List I items visited">Travel List I</th>
               <th data-col="tl2" title="Travel List II items visited">Travel List II</th>
               <th data-col="completion">Completion</th>
@@ -347,7 +347,7 @@
 
       <!-- SECTION 1: VISUAL TIMELINE -->
       <section class="section" id="tl-visual-section">
-        <h2 class="section-title">📅 Visual Timeline</h2>
+        <h2 class="section-title">ð Visual Timeline</h2>
 
         <style>
           #tl-vt-wrap{display:flex;flex-direction:column;gap:0}
@@ -415,8 +415,8 @@
         .tl-table thead tr{background:var(--color-surface2)}
         .tl-table th{padding:11px 14px;text-align:left;color:var(--color-muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;cursor:pointer;user-select:none;border-bottom:2px solid var(--color-border);transition:color var(--transition)}
         .tl-table th:hover{color:var(--color-text)}
-        .tl-table th.sort-asc::after{content:' ▲';color:var(--color-primary)}
-        .tl-table th.sort-desc::after{content:' ▼';color:var(--color-primary)}
+        .tl-table th.sort-asc::after{content:' â²';color:var(--color-primary)}
+        .tl-table th.sort-desc::after{content:' â¼';color:var(--color-primary)}
         .tl-table th.no-sort{cursor:default}
         .tl-table tbody tr{border-bottom:1px solid var(--color-border);transition:background var(--transition)}
         .tl-table tbody tr:last-child{border-bottom:none}
@@ -445,7 +445,7 @@
         .tl-btn-del{background:rgba(239,68,68,.15);color:#ef4444}
         .tl-btn-edit:hover,.tl-btn-del:hover{opacity:.75}
 
-        /* ── MODAL ── */
+        /* ââ MODAL ââ */
         #tl-modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:16px}
         #tl-modal-backdrop.open{display:flex}
         #tl-modal{background:var(--color-surface,#1a1d27);border:1px solid var(--color-border,#2e3350);border-radius:var(--radius,10px);width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.6)}
@@ -494,14 +494,14 @@
       <section class="section" id="tl-log-section">
         <div class="tl-log-header">
           <div>
-            <h2 class="section-title" style="margin-bottom:.25rem">📋 Travel Log</h2>
+            <h2 class="section-title" style="margin-bottom:.25rem">ð Travel Log</h2>
             <p class="tl-summary-line" id="tl-summary-line">No trips logged yet.</p>
           </div>
-          <button class="tl-add-btn" id="tl-add-btn">✈️ Add Trip</button>
+          <button class="tl-add-btn" id="tl-add-btn">âï¸ Add Trip</button>
         </div>
 
         <div class="tl-controls">
-          <input class="tl-search search-input" type="search" placeholder="Search country, continent, locations…" id="tl-search">
+          <input class="tl-search search-input" type="search" placeholder="Search country, continent, locationsâ¦" id="tl-search">
           <div class="tl-filters" id="tl-filter-btns">
             <button class="filter-btn active" data-filter="all">All</button>
             <button class="filter-btn" data-filter="Travel">Travel</button>
@@ -551,6 +551,14 @@
                 </select>
                 <span class="tl-error-msg" id="tf-type-err"></span>
               </div>
+              <div class="tl-form-group">
+                <label class="tl-form-label" for="tf-companion-input">Travel Companions</label>
+                <div class="tl-combo" id="tf-companion-combo">
+                  <input type="text" class="tl-form-input tl-combo-input" id="tf-companion-input" placeholder="Search and add companions…" autocomplete="off">
+                  <div class="tl-combo-list" id="tf-companion-list"></div>
+                </div>
+                <div class="tl-multi-selected" id="tf-companions-tags"></div>
+              </div>
             </div>
             <div class="tl-form-row">
               <div class="tl-form-group">
@@ -567,7 +575,7 @@
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-country-input">Country <span class="req">*</span></label>
                 <div class="tl-combo" id="tf-country-combo">
-                  <input type="text" class="tl-form-input tl-combo-input" id="tf-country-input" placeholder="Search country…" autocomplete="off">
+                  <input type="text" class="tl-form-input tl-combo-input" id="tf-country-input" placeholder="Search countryâ¦" autocomplete="off">
                   <div class="tl-combo-list" id="tf-country-list"></div>
                 </div>
                 <span class="tl-error-msg" id="tf-country-err"></span>
@@ -587,7 +595,7 @@
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-utl1-input">UTL I items visited</label>
                 <div class="tl-combo" id="tf-utl1-combo">
-                  <input type="text" class="tl-form-input tl-combo-input" id="tf-utl1-input" placeholder="Search and add UTL I items…" autocomplete="off">
+                  <input type="text" class="tl-form-input tl-combo-input" id="tf-utl1-input" placeholder="Search and add UTL I itemsâ¦" autocomplete="off">
                   <div class="tl-combo-list" id="tf-utl1-list"></div>
                 </div>
                 <div class="tl-multi-selected" id="tf-utl1-tags"></div>
@@ -597,21 +605,11 @@
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-utl2-input">UTL II items visited</label>
                 <div class="tl-combo" id="tf-utl2-combo">
-                  <input type="text" class="tl-form-input tl-combo-input" id="tf-utl2-input" placeholder="Search and add UTL II items…" autocomplete="off">
+                  <input type="text" class="tl-form-input tl-combo-input" id="tf-utl2-input" placeholder="Search and add UTL II itemsâ¦" autocomplete="off">
                   <div class="tl-combo-list" id="tf-utl2-list"></div>
                 </div>
                 <div class="tl-multi-selected" id="tf-utl2-tags"></div>
               </div>
-            </div>
-          </div>
-          <div class="tl-form-row full">
-            <div class="tl-form-group">
-              <label class="tl-form-label" for="tf-companion-input">Travel Companions</label>
-              <div class="tl-combo" id="tf-companion-combo">
-                <input type="text" class="tl-form-input tl-combo-input" id="tf-companion-input" placeholder="Search and add companions…" autocomplete="off">
-                <div class="tl-combo-list" id="tf-companion-list"></div>
-              </div>
-              <div class="tl-multi-selected" id="tf-companions-tags"></div>
             </div>
           </div>
           <div class="tl-modal-footer">
@@ -629,7 +627,7 @@
       (function () {
         var TRAV_ID = 'ben';
 
-        /* ── helpers to get/set trips via shared TripStore ── */
+        /* ââ helpers to get/set trips via shared TripStore ââ */
         function loadTrips(){
           return (window.TravelApp && window.TravelApp.TripStore)
             ? window.TravelApp.TripStore.getTrips(TRAV_ID)
@@ -668,13 +666,13 @@
           }
         }).catch(function(){ render(); });
 
-        /* ── HELPERS ── */
+        /* ââ HELPERS ââ */
         function typeClass(t){if(!t)return'tl-type-other';if(t==='Travel')return'tl-type-Travel';if(t==='Work')return'tl-type-Work';if(t==='Friends')return'tl-type-Friends';if(t==='Family')return'tl-type-Family';return'tl-type-other';}
-        function fmtDate(d){if(!d)return'—';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
-        function fmtMonth(d){if(!d)return'—';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}).replace(' ','-');}
+        function fmtDate(d){if(!d)return'â';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
+        function fmtMonth(d){if(!d)return'â';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}).replace(' ','-');}
         function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-        /* ── RENDER TABLE ── */
+        /* ââ RENDER TABLE ââ */
         function render(){
           var trips = loadTrips();
           var s = curSearch.toLowerCase();
@@ -706,19 +704,19 @@
             var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
             return '<tr data-idx="'+oi+'">'
               +'<td class="tl-date-col">'+fmtMonth(r.start)+'</td>'
-              +'<td class="tl-country-col">'+esc(r.country||'—')+'</td>'
-              +'<td><span class="tl-cont-badge">'+esc(r.continent||'—')+'</span></td>'
-              +'<td class="tl-loc-cell" title="'+esc(r.locations||'')+'">'+esc(r.locations||'—')+'</td>'
-              +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'—')+'</td>'
-              +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
-              +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
-              +'<td class="tl-companions-cell">'+(r.companions&&r.companions.length?r.companions.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>')+'</td>'
+              +'<td class="tl-country-col">'+esc(r.country||'â')+'</td>'
+              +'<td><span class="tl-cont-badge">'+esc(r.continent||'â')+'</span></td>'
+              +'<td class="tl-loc-cell" title="'+esc(r.locations||'')+'">'+esc(r.locations||'â')+'</td>'
+              +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'â')+'</td>'
+              +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'â')+'</td>'
+              +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'â')+'</span></td>'
+              +'<td class="tl-companions-cell">'+(r.companions&&r.companions.length?r.companions.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">â</span>')+'</td>'
               +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
               +'</tr>';
           }).join('');
         }
 
-        /* ── TABLE EVENTS ── */
+        /* ââ TABLE EVENTS ââ */
         var searchEl=document.getElementById('tl-search');
         if(searchEl)searchEl.addEventListener('input',function(){curSearch=this.value;render();});
         var filterBtns=document.getElementById('tl-filter-btns');
@@ -728,10 +726,10 @@
         var tbody2=document.getElementById('tl-tbody');
         if(tbody2)tbody2.addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;var idx=parseInt(btn.dataset.idx,10);if(btn.classList.contains('tl-btn-edit')){openModal(idx);}if(btn.classList.contains('tl-btn-del')){deleteTrip(idx);}});
 
-        /* ── DELETE ── */
+        /* ââ DELETE ââ */
         function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var trips=loadTrips();trips.splice(idx,1);saveTrips(trips);render();}
 
-        /* ── MODAL ── */
+        /* ââ MODAL ââ */
         var backdrop=document.getElementById('tl-modal-backdrop');
         document.getElementById('tl-add-btn').addEventListener('click',function(){openModal(-1);});
         document.getElementById('tl-modal-close').addEventListener('click',closeModal);
@@ -779,7 +777,7 @@
           closeModal(); render();
         });
 
-        /* ── COMBO BOXES ── */
+        /* ââ COMBO BOXES ââ */
         function makeCombo(inputId,listId,getItems,onSelect){
           var input=document.getElementById(inputId),list=document.getElementById(listId),highlighted=-1,_sel=null;
           function getFiltered(q){var items=getItems();if(!q)return items.slice(0,80);q=q.toLowerCase();return items.filter(function(i){return i.toLowerCase().indexOf(q)!==-1;}).slice(0,80);}
@@ -805,9 +803,9 @@
         el.innerHTML=arr.map(function(v,i){
           if(isComp){
             var cn=_TRAVELLERS.find(function(t){return t.id===v;});
-            return'<span class="tl-companion-tag">'+(cn?esc(cn.name):esc(v))+'<button type="button" data-which="companions" data-i="'+i+'">×</button></span>';
+            return'<span class="tl-companion-tag">'+(cn?esc(cn.name):esc(v))+'<button type="button" data-which="companions" data-i="'+i+'">Ã</button></span>';
           }
-          return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
+          return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">Ã</button></span>';
         }).join('');
       }
               document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
@@ -820,10 +818,10 @@
 
 
         <script>
-        /* ══════════════════════════════════════════════════════
+        /* ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
            VISUAL TIMELINE ENGINE  (Ben's Timeline Tab, Section 1)
            Reads from TravelApp.TripStore - single source of truth
-           ══════════════════════════════════════════════════════ */
+           ââââââââââââââââââââââââââââââââââââââââââââââââââââââ */
         (function(){
           var TRAV_ID = 'ben';
           var TYPE_COLORS = {Travel:'#4f8ef7',Work:'#f59e0b',Friends:'#3ecf8e',Family:'#a855f7'};
