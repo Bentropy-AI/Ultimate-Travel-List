@@ -244,7 +244,7 @@ The **Country Completion table** is Ben-specific (only in `ben.html`) and calcul
 - TL2 items: 25%
 - (Weights adjusted if a country has no TL1 or TL2 entries)
 
-The **amCharts 5 world map** uses a `NAME_MAP` to resolve non-ISO country names from TL1/TL2 data to ISO2 codes. The map colours countries by completion % using a lerp between `#22263a` → `#2a5298` → `#3a78d4` → `#4f8ef7`.
+The **amCharts 5 world map** uses a `NAME_MAP` to resolve non-ISO country names from TL1/TL2 data to ISO2 codes. The map colours countries by completion % using a lerp between `#22263a` → `#2a5298` → `#3a78d4` → `#4f8ef7`. The hover tooltip shows: country name + capital, a separator, completion %, visited/capital checkmarks, TL1/TL2 fractions, UNESCO fraction, and — when trip log entries exist — a **Timeline section** listing all visit months (`MMM-YY` format, latest first, separated by ` | `). Trip data is read from `utl_trips_v1` localStorage (filtered by `trip.country === countryName`).
 
 ### 6.4 Home Page (index.html)
 
@@ -338,6 +338,7 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 | ~2026-04 | amCharts 5 world map added to `ben.html` with completion colour gradient |
 | ~2026-03 | `travellist2.json` and TL2 tracker page added |
 | ~2026-03 | Analytics / Family Dashboard page added |
+| 2026-05-05 | Map hover tooltip extended with **Timeline section** on all 4 traveller pages — shows visit months (e.g. `Jul-22`) from trip log, latest first. New helpers `_trips`, `getTripDates(countryName)`, `fmtTripDate(s)` added inside each page's map IIFE. Trips loaded from `utl_trips_v1` localStorage on initial render and on `Store.onSave` refresh. |
 
 ---
 
