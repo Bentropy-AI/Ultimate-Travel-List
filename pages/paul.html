@@ -734,7 +734,7 @@
               +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
               +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
               +'<td class="tl-companions-cell">'+(function(){var travs=(r.travellers||r.companions||[]).filter(function(id){return id!==TRAV_ID;});return travs.length?travs.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag" data-trav="'+cid+'">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>';})()+'</td>'
-              +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
+              +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'" title="Edit">&#9998;</button><button class="tl-btn-del" data-idx="'+oi+'" title="Delete">&#128465;</button></div></td>'
               +'</tr>';
           }).join('');
         }
