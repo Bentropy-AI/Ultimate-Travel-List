@@ -270,6 +270,7 @@ var TripStore = (function() {
   }
 
   /* Get trips for a traveller from cache (synchronous, use after load()) */
+  /* Get all trips a traveller appears on (owned or shared) */
   function getTrips(travId) {
     var result = [];
     for (var i = 0; i < _tripsCache.length; i++) {
@@ -280,17 +281,15 @@ var TripStore = (function() {
     return result;
   }
 
-  /* Save a full updated set of trips for travId.
-   * Replaces all trips that include travId, preserving trips that don't. */
+  /* Save trips for travId — only replaces trips OWNED by travId.
+   * Trips owned by others that travId appears on are never touched. */
   function saveTrips(travId, trips) {
-    /* Remove all trips that belong to this traveller */
     var others = [];
     for (var i = 0; i < _tripsCache.length; i++) {
       var t = _tripsCache[i];
-      var travs = t.travellers || t.companions || [];
-      if (travs.indexOf(travId) === -1) { others.push(t); }
+      var owner = t.owner || (t.travellers ? t.travellers[0] : null) || travId;
+      if (owner !== travId) { others.push(t); }
     }
-    /* Merge in the updated trips for this traveller */
     _tripsCache = others.concat(trips);
     _cacheSave(_tripsCache);
     _remoteRecord.trips = _tripsCache;
