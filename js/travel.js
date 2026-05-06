@@ -213,7 +213,10 @@ var Store = (function() {
    SECTION 5 - TRIP STORE  (new - single source of truth for trip log)
    ============================================================ */
 var TripStore = (function() {
-  var _tripsCache = {};   /* { ben: [...], shaz: [...], ... } */
+  /* Unified flat trips array - each trip has a 'travellers' field (array of IDs).
+   * _tripsCache is the raw value stored in JSONBin under the 'trips' key.
+   * Legacy: if trips is an object (per-traveller arrays), it is migrated on load. */
+  var _tripsCache = [];   /* flat Array of trip objects */
   var _loaded = false;
   var _callbacks = [];
 
@@ -224,31 +227,73 @@ var TripStore = (function() {
     try { localStorage.setItem(_TRIPS_CACHE_KEY, JSON.stringify(trips)); } catch(e) {}
   }
 
+  /* Migrate legacy per-traveller object to flat array if needed */
+  function _normalise(raw) {
+    if (!raw) return [];
+    if (Array.isArray(raw)) return raw;
+    /* Legacy: { ben:[...], shaz:[...], ... } - merge into flat array */
+    var flat = [];
+    var keys = Object.keys(raw);
+    for (var ki = 0; ki < keys.length; ki++) {
+      var travId = keys[ki];
+      var arr = raw[travId] || [];
+      for (var ai = 0; ai < arr.length; ai++) {
+        var t = arr[ai];
+        /* Convert companions field to travellers field if not already present */
+        if (!t.travellers) {
+          var travs = [travId];
+          if (t.companions) {
+            for (var ci = 0; ci < t.companions.length; ci++) {
+              if (travs.indexOf(t.companions[ci]) === -1) { travs.push(t.companions[ci]); }
+            }
+          }
+          t.travellers = travs;
+        }
+        flat.push(t);
+      }
+    }
+    return flat;
+  }
+
   /* Load trips from remote (or cache on failure). Returns Promise<trips_for_traveller[]> */
   function load(travId) {
-    /* try cache first for instant render */
     var cached = _cacheLoad();
-    if (cached && cached[travId]) { _tripsCache = cached; }
+    if (cached) { _tripsCache = _normalise(cached); }
 
     return _fetchFullRecord().then(function(rec) {
-      _tripsCache = rec.trips || {};
+      _tripsCache = _normalise(rec.trips || []);
       _cacheSave(_tripsCache);
       _loaded = true;
-      return _tripsCache[travId] || [];
+      return getTrips(travId);
     }).catch(function() {
       _loaded = true;
-      return (_tripsCache[travId] || []);
+      return getTrips(travId);
     });
   }
 
   /* Get trips for a traveller from cache (synchronous, use after load()) */
   function getTrips(travId) {
-    return (_tripsCache[travId] || []).slice();
+    var result = [];
+    for (var i = 0; i < _tripsCache.length; i++) {
+      var t = _tripsCache[i];
+      var travs = t.travellers || t.companions || [];
+      if (travs.indexOf(travId) !== -1) { result.push(t); }
+    }
+    return result;
   }
 
-  /* Replace the trips array for a traveller and push to remote */
+  /* Save a full updated set of trips for travId.
+   * Replaces all trips that include travId, preserving trips that don't. */
   function saveTrips(travId, trips) {
-    _tripsCache[travId] = trips;
+    /* Remove all trips that belong to this traveller */
+    var others = [];
+    for (var i = 0; i < _tripsCache.length; i++) {
+      var t = _tripsCache[i];
+      var travs = t.travellers || t.companions || [];
+      if (travs.indexOf(travId) === -1) { others.push(t); }
+    }
+    /* Merge in the updated trips for this traveller */
+    _tripsCache = others.concat(trips);
     _cacheSave(_tripsCache);
     _remoteRecord.trips = _tripsCache;
     _schedulePush(function(status) {
