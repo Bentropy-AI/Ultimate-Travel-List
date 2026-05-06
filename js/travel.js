@@ -247,7 +247,17 @@ var TripStore = (function() {
   var _callbacks = [];
 
   function _cacheLoad() {
-    try { var r = localStorage.getItem(_TRIPS_CACHE_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
+    try {
+      var r = localStorage.getItem(_TRIPS_CACHE_KEY);
+      if (!r) return null;
+      var parsed = JSON.parse(r);
+      /* Discard legacy per-traveller object — force re-fetch so flat array gets cached */
+      if (parsed && !Array.isArray(parsed)) {
+        localStorage.removeItem(_TRIPS_CACHE_KEY);
+        return null;
+      }
+      return parsed;
+    } catch(e) { return null; }
   }
   function _cacheSave(trips) {
     try { localStorage.setItem(_TRIPS_CACHE_KEY, JSON.stringify(trips)); } catch(e) {}
