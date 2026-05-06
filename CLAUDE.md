@@ -330,7 +330,6 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
-| 2026-05-06 | Visited ticks on `ultimatetravellist1.html` now coloured per traveller (Ben=#4f8ef7, Shaz=#9b59f5, Paul=#3ecf8e, Ruth=#e05c8e) via `data-trav` CSS attribute selectors replacing fixed green. |
 | 2026-05-06 | Travel Log summary line in `ben.html` extended to show UTL I and UTL II visit counts from filtered trips (e.g. "Showing 5 of 5 trips · 7 UTL I visits · 3 UTL II visits"). Counts are filter-aware and only shown if non-zero. |
 | 2026-05-05 | `CLAUDE.md` created from full repo analysis |
 | ~2026-04 | Timeline tab added to traveller pages (Visual Timeline + Travel Log + modal) |
