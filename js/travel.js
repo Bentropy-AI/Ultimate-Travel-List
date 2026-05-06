@@ -55,7 +55,7 @@ function fetchJSON(file) {
    Reads and writes the FULL JSONBin record so visited and trips
    are never clobbered by each other.
    ============================================================ */
-var _remoteRecord = { visited: {}, trips: { ben:[], shaz:[], paul:[], ruth:[] } };
+var _remoteRecord = { visited: {}, trips: [] };
 var _remoteLoaded  = false;
 var _pendingFlush  = null;
 var _flushCallbacks = [];
@@ -69,7 +69,7 @@ function _fetchFullRecord() {
   }).then(function(d) {
     var rec = d.record || {};
     _remoteRecord.visited = rec.visited || {};
-    _remoteRecord.trips   = rec.trips   || { ben:[], shaz:[], paul:[], ruth:[] };
+    _remoteRecord.trips   = _normalise(rec.trips || []);
     _remoteLoaded = true;
     return _remoteRecord;
   });
@@ -209,6 +209,32 @@ var Store = (function() {
            getVisitedArray:getVisitedArray, getVisitedCount:getVisitedCount, onSave:onSave };
 }());
 
+/* Migrate legacy per-traveller trips object to flat array if needed */
+function _normalise(raw) {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  var flat = [];
+  var keys = Object.keys(raw);
+  for (var ki = 0; ki < keys.length; ki++) {
+    var travId = keys[ki];
+    var arr = raw[travId] || [];
+    for (var ai = 0; ai < arr.length; ai++) {
+      var t = arr[ai];
+      if (!t.travellers) {
+        var travs = [travId];
+        if (t.companions) {
+          for (var ci = 0; ci < t.companions.length; ci++) {
+            if (travs.indexOf(t.companions[ci]) === -1) { travs.push(t.companions[ci]); }
+          }
+        }
+        t.travellers = travs;
+      }
+      flat.push(t);
+    }
+  }
+  return flat;
+}
+
 /* ============================================================
    SECTION 5 - TRIP STORE  (new - single source of truth for trip log)
    ============================================================ */
@@ -225,34 +251,6 @@ var TripStore = (function() {
   }
   function _cacheSave(trips) {
     try { localStorage.setItem(_TRIPS_CACHE_KEY, JSON.stringify(trips)); } catch(e) {}
-  }
-
-  /* Migrate legacy per-traveller object to flat array if needed */
-  function _normalise(raw) {
-    if (!raw) return [];
-    if (Array.isArray(raw)) return raw;
-    /* Legacy: { ben:[...], shaz:[...], ... } - merge into flat array */
-    var flat = [];
-    var keys = Object.keys(raw);
-    for (var ki = 0; ki < keys.length; ki++) {
-      var travId = keys[ki];
-      var arr = raw[travId] || [];
-      for (var ai = 0; ai < arr.length; ai++) {
-        var t = arr[ai];
-        /* Convert companions field to travellers field if not already present */
-        if (!t.travellers) {
-          var travs = [travId];
-          if (t.companions) {
-            for (var ci = 0; ci < t.companions.length; ci++) {
-              if (travs.indexOf(t.companions[ci]) === -1) { travs.push(t.companions[ci]); }
-            }
-          }
-          t.travellers = travs;
-        }
-        flat.push(t);
-      }
-    }
-    return flat;
   }
 
   /* Load trips from remote (or cache on failure). Returns Promise<trips_for_traveller[]> */
