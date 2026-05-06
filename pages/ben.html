@@ -635,7 +635,7 @@
         /* ── helpers to get/set trips via shared TripStore ── */
         function loadTrips(){
           return (window.TravelApp && window.TravelApp.TripStore)
-            ? window.TravelApp.TripStore.getTrips(TRAV_ID)
+            ? window.TravelApp.TripStore.getAllTrips()
             : [];
         }
         function saveTrips(trips){
@@ -717,7 +717,7 @@
           var tbody=document.getElementById('tl-tbody'); if(!tbody)return;
           if(!sorted.length){tbody.innerHTML=trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>';return;}
           tbody.innerHTML=sorted.map(function(r){
-            var oi=trips.indexOf(r);
+            var oi=loadTrips().indexOf(r);
             function idToName(id,items){var found=items.find(function(i){return i.id===id;});if(found)return found.name||found.title||id;return id.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}
             var utl1txt=Array.isArray(r.utl1)?r.utl1.map(function(id){return idToName(id,_tl1Items);}).join(', '):(r.utl1?idToName(r.utl1,_tl1Items):'');
             var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
@@ -730,7 +730,7 @@
               +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
               +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
               +'<td class="tl-companions-cell">'+(function(){var travs=(r.travellers||r.companions||[]).filter(function(id){return id!==TRAV_ID;});return travs.length?travs.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>';})()+'</td>'
-              +((!r.owner||r.owner===TRAV_ID)?'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>':'<td><span style="font-size:.75rem;color:var(--color-muted);font-style:italic">logged by '+(r.owner)+'</span></td>')
+              +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
               +'</tr>';
           }).join('');
         }
@@ -746,7 +746,7 @@
         if(tbody2)tbody2.addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;var idx=parseInt(btn.dataset.idx,10);if(btn.classList.contains('tl-btn-edit')){openModal(idx);}if(btn.classList.contains('tl-btn-del')){deleteTrip(idx);}});
 
         /* ── DELETE ── */
-        function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var trips=loadTrips();var t=trips[idx];if(t&&t.owner&&t.owner!==TRAV_ID){alert('This trip was logged by '+t.owner+' and can only be deleted from their page.');return;}trips.splice(idx,1);saveTrips(trips);render();}
+        function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var all=loadTrips();all.splice(idx,1);saveTrips(all);render();}
 
         /* ── MODAL ── */
         var backdrop=document.getElementById('tl-modal-backdrop');
@@ -790,7 +790,7 @@
           var found=_countries.find(function(c){return c.name.toLowerCase()===country.toLowerCase();});
           if(found)continent=found.continent||'';
           var finish=document.getElementById('tf-finish').value||'';
-          var trip={owner:TRAV_ID,country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
+          var trip={country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
           var trips=loadTrips();
           if(editIdx===-1){trips.push(trip);}else{trips[editIdx]=trip;}
           saveTrips(trips);
