@@ -113,11 +113,11 @@
       loadScripts(SCRIPTS,function(){
         Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
           var personData={};var cached=localStorage.getItem('utl_store_v2');if(cached){try{personData=JSON.parse(cached).ruth||{};}catch(e){}}
-          var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc).ruth||[]);}catch(e){}}
+          var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ruth')!==-1;});}catch(e){}}
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
           renderMap(cm);
-          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).ruth||{};}catch(e){}}var tc2=localStorage.getItem('utl_trips_v1');if(tc2){try{_trips=(JSON.parse(tc2).ruth||[]);}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
-        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3).ruth||[]);}catch(e){}}});}
+          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).ruth||{};}catch(e){}}var tc2=localStorage.getItem('utl_trips_v1');if(tc2){try{_trips=(JSON.parse(tc2)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ruth')!==-1;});}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
+        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ruth')!==-1;});}catch(e){}}});}
         });
       });
     }());
