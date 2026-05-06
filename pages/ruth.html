@@ -764,7 +764,7 @@
           if(idx!==-1){var t=loadTrips()[idx];if(t){f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
           document.getElementById('tf-country-input').value=f.country;
           document.getElementById('tf-continent').value=f.continent;
-      _travellersSelected=(f.companions||[]).slice(); renderTags('travellers');
+      _travellersSelected=(f.travellers||f.companions||[TRAV_ID]).slice(); if(_travellersSelected.indexOf(TRAV_ID)===-1){_travellersSelected.unshift(TRAV_ID);} renderTags('travellers');
           document.getElementById('tf-locations').value=f.locations;
           document.getElementById('tf-start').value=f.start;
           document.getElementById('tf-finish').value=f.finish;
@@ -816,15 +816,16 @@
         makeCombo('tf-companion-input','tf-companion-list',function(){return _TRAVELLERS.map(function(t){return t.name;});},function(name){var t=_TRAVELLERS.find(function(x){return x.name===name;});var val=t?t.id:name.toLowerCase();if(_travellersSelected.indexOf(val)===-1){_travellersSelected.push(val);document.getElementById('tf-companion-input').value='';renderTags('travellers');}});
 
         function renderTags(which){
-        var isComp=which==='companions';
+        var isTrav=which==='travellers';
         var arr=which==='utl1'?_utl1Selected:which==='utl2'?_utl2Selected:_travellersSelected;
         var el=document.getElementById('tf-'+which+'-tags');
         if(!el)return;
         el.innerHTML=arr.map(function(v,i){
-          if(isComp){
+          if(isTrav){
             var _allT=_TRAVELLERS.concat([{id:TRAV_ID,name:'Me'}]);
             var cn=_allT.find(function(t){return t.id===v;});
-            return'<span class="tl-companion-tag">'+(cn?esc(cn.name):esc(v))+'<button type="button" data-which="companions" data-i="'+i+'">×</button></span>';
+            var canRemove=v!==TRAV_ID;
+            return'<span class="tl-companion-tag">'+(cn?esc(cn.name):esc(v))+(canRemove?'<button type="button" data-which="travellers" data-i="'+i+'">×</button>':'')+'</span>';
           }
           return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
         }).join('');
