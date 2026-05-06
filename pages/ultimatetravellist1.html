@@ -18,9 +18,12 @@
     .cc-table td.region-col { color:var(--color-muted); font-size:0.75rem; }
     .cc-check { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:0.7rem; font-weight:700; cursor:pointer; transition:all 0.15s ease; user-select:none; }
     .cc-check:hover { transform:scale(1.2); }
-    .cc-check.yes { background:rgba(62,207,142,0.2); color:var(--color-success); border:1px solid var(--color-success); }
     .cc-check.no  { background:rgba(46,51,80,0.4); color:var(--color-muted); border:1px solid var(--color-border); }
-    .cc-check.no:hover { background:rgba(62,207,142,0.1); border-color:var(--color-success); color:var(--color-success); opacity:0.6; }
+    .cc-check.no:hover { opacity:0.6; }
+    .cc-check.yes[data-trav="ben"]  { background:rgba(79,142,247,0.2);  color:#4f8ef7; border:1px solid #4f8ef7; }
+    .cc-check.yes[data-trav="shaz"] { background:rgba(155,89,245,0.2);  color:#9b59f5; border:1px solid #9b59f5; }
+    .cc-check.yes[data-trav="paul"] { background:rgba(62,207,142,0.2);  color:#3ecf8e; border:1px solid #3ecf8e; }
+    .cc-check.yes[data-trav="ruth"] { background:rgba(224,92,142,0.2);  color:#e05c8e; border:1px solid #e05c8e; }
     .traveller-header { text-align:center !important; }
     .sub-col { text-align:center !important; }
     .progress-summary { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
