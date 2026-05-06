@@ -490,8 +490,12 @@
         .tl-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(79,142,247,.15);color:#4f8ef7;border-radius:20px;font-size:.78rem;font-weight:600}
         .tl-tag button{background:none;border:none;color:#4f8ef7;cursor:pointer;font-size:.9rem;line-height:1;padding:0}
       /* companion tags */
-      .tl-companion-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:rgba(139,92,246,.15);color:#a78bfa;border-radius:20px;font-size:.78rem;font-weight:600}
-      .tl-companion-tag button{background:none;border:none;color:#a78bfa;cursor:pointer;font-size:.9rem;line-height:1;padding:0}
+      .tl-companion-tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:.78rem;font-weight:600;background:rgba(139,92,246,.15);color:#a78bfa}
+      .tl-companion-tag[data-trav="ben"]{background:rgba(79,142,247,.15);color:#4f8ef7}
+      .tl-companion-tag[data-trav="shaz"]{background:rgba(155,89,245,.15);color:#9b59f5}
+      .tl-companion-tag[data-trav="paul"]{background:rgba(62,207,142,.15);color:#3ecf8e}
+      .tl-companion-tag[data-trav="ruth"]{background:rgba(224,92,142,.15);color:#e05c8e}
+      .tl-companion-tag button{background:none;border:none;color:inherit;cursor:pointer;font-size:.9rem;line-height:1;padding:0}
 
         @media(max-width:540px){.tl-form-row{grid-template-columns:1fr}}
       </style>
@@ -729,7 +733,7 @@
               +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'—')+'</td>'
               +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
               +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
-              +'<td class="tl-companions-cell">'+(function(){var travs=(r.travellers||r.companions||[]).filter(function(id){return id!==TRAV_ID;});return travs.length?travs.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>';})()+'</td>'
+              +'<td class="tl-companions-cell">'+(function(){var travs=(r.travellers||r.companions||[]).filter(function(id){return id!==TRAV_ID;});return travs.length?travs.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag" data-trav="'+cid+'">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>';})()+'</td>'
               +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
               +'</tr>';
           }).join('');
@@ -825,7 +829,7 @@
             var _allT=_TRAVELLERS.concat([{id:TRAV_ID,name:'Me'}]);
             var cn=_allT.find(function(t){return t.id===v;});
             var canRemove=v!==TRAV_ID;
-            return'<span class="tl-companion-tag">'+(cn?esc(cn.name):esc(v))+(canRemove?'<button type="button" data-which="travellers" data-i="'+i+'">×</button>':'')+'</span>';
+            return'<span class="tl-companion-tag" data-trav="'+v+'">'+(cn?esc(cn.name):esc(v))+(canRemove?'<button type="button" data-which="travellers" data-i="'+i+'">×</button>':'')+'</span>';
           }
           return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
         }).join('');
