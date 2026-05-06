@@ -730,7 +730,7 @@
               +'<td class="tl-list-cell" title="'+esc(utl2txt)+'">'+esc(utl2txt||'—')+'</td>'
               +'<td><span class="tl-type-badge '+typeClass(r.type)+'">'+esc(r.type||'—')+'</span></td>'
               +'<td class="tl-companions-cell">'+(function(){var travs=(r.travellers||r.companions||[]).filter(function(id){return id!==TRAV_ID;});return travs.length?travs.map(function(cid){var cn=_TRAVELLERS.find(function(t){return t.id===cid;});return '<span class="tl-companion-tag">'+esc(cn?cn.name:cid)+'</span>';}).join(' '):'<span style="color:var(--color-muted)">—</span>';})()+'</td>'
-              +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>'
+              +((!r.owner||r.owner===TRAV_ID)?'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'">Edit</button><button class="tl-btn-del" data-idx="'+oi+'">Delete</button></div></td>':'<td><span style="font-size:.75rem;color:var(--color-muted);font-style:italic">logged by '+(r.owner)+'</span></td>')
               +'</tr>';
           }).join('');
         }
@@ -746,7 +746,7 @@
         if(tbody2)tbody2.addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;var idx=parseInt(btn.dataset.idx,10);if(btn.classList.contains('tl-btn-edit')){openModal(idx);}if(btn.classList.contains('tl-btn-del')){deleteTrip(idx);}});
 
         /* ── DELETE ── */
-        function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var trips=loadTrips();trips.splice(idx,1);saveTrips(trips);render();}
+        function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var trips=loadTrips();var t=trips[idx];if(t&&t.owner&&t.owner!==TRAV_ID){alert('This trip was logged by '+t.owner+' and can only be deleted from their page.');return;}trips.splice(idx,1);saveTrips(trips);render();}
 
         /* ── MODAL ── */
         var backdrop=document.getElementById('tl-modal-backdrop');
@@ -790,7 +790,7 @@
           var found=_countries.find(function(c){return c.name.toLowerCase()===country.toLowerCase();});
           if(found)continent=found.continent||'';
           var finish=document.getElementById('tf-finish').value||'';
-          var trip={country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
+          var trip={owner:TRAV_ID,country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
           var trips=loadTrips();
           if(editIdx===-1){trips.push(trip);}else{trips[editIdx]=trip;}
           saveTrips(trips);
