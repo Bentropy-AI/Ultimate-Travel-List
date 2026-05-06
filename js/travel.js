@@ -269,8 +269,7 @@ var TripStore = (function() {
     });
   }
 
-  /* Get trips for a traveller from cache (synchronous, use after load()) */
-  /* Get all trips a traveller appears on (owned or shared) */
+  /* Get all trips a traveller appears on */
   function getTrips(travId) {
     var result = [];
     for (var i = 0; i < _tripsCache.length; i++) {
@@ -281,16 +280,9 @@ var TripStore = (function() {
     return result;
   }
 
-  /* Save trips for travId — only replaces trips OWNED by travId.
-   * Trips owned by others that travId appears on are never touched. */
+  /* Replace the entire flat trips array (used after add/edit/delete from any page) */
   function saveTrips(travId, trips) {
-    var others = [];
-    for (var i = 0; i < _tripsCache.length; i++) {
-      var t = _tripsCache[i];
-      var owner = t.owner || (t.travellers ? t.travellers[0] : null) || travId;
-      if (owner !== travId) { others.push(t); }
-    }
-    _tripsCache = others.concat(trips);
+    _tripsCache = trips;
     _cacheSave(_tripsCache);
     _remoteRecord.trips = _tripsCache;
     _schedulePush(function(status) {
@@ -298,9 +290,14 @@ var TripStore = (function() {
     });
   }
 
+  /* Get the full unfiltered trips array (for add/edit/delete operations) */
+  function getAllTrips() {
+    return _tripsCache.slice();
+  }
+
   function onSave(fn) { _callbacks.push(fn); }
 
-  return { load:load, getTrips:getTrips, saveTrips:saveTrips, onSave:onSave };
+  return { load:load, getTrips:getTrips, getAllTrips:getAllTrips, saveTrips:saveTrips, onSave:onSave };
 }());
 
 /* ============================================================
