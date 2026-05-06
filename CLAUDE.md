@@ -1,7 +1,7 @@
 # CLAUDE.md — Ultimate Travel List: Architecture Reference
 
 > **Maintained by Claude.** Update this file at the end of any session that changes structure, data, logic, or pages.  
-> Repo: `bentropy-ai/Ultimate-Travel-List` · Hosted: GitHub Pages · Last updated: 2026-05-05
+> Repo: `bentropy-ai/Ultimate-Travel-List` · Hosted: GitHub Pages · Last updated: 2026-05-06
 
 ---
 
@@ -74,23 +74,20 @@ Single JSONBin record (`bin ID: 69cd4cbd36566621a86d74ab`) holds the entire muta
     "paul": { ... },
     "ruth": { ... }
   },
-  "trips": {
-    "ben":  [ { "id", "country", "continent", "locations", "start", "finish", "type", "utl1", "utl2", "companions" } ],
-    "shaz": [],
-    "paul": [],
-    "ruth": []
-  }
+  "trips": [ { "country", "continent", "locations", "start", "finish", "type", "utl1", "utl2", "travellers" }, ... ]
 }
 ```
 
-Every PUT writes the **full record** (visited + trips together) to prevent clobbering.
+`trips` is a **single flat array** shared across all travellers. Each trip has a `travellers` field (array of IDs) indicating who was on it. Every PUT writes the full record (visited + trips together) to prevent clobbering.
+
+**Legacy migration:** If `trips` is found as a per-traveller object (old format), `_normalise()` in `travel.js` automatically converts it to the flat array on load.
 
 ### 4.2 Local Cache (localStorage)
 
 | Key               | Contents                          |
 |-------------------|-----------------------------------|
 | `utl_store_v2`    | Full `visited` object (all 4 travellers) |
-| `utl_trips_v1`    | Full `trips` object (all 4 travellers)   |
+| `utl_trips_v1`    | Full `trips` flat array (all travellers)  |
 
 Cache is read immediately on page load for instant render; remote is fetched async and overwrites cache on success.
 
@@ -114,7 +111,6 @@ Cache is read immediately on page load for instant render; remote is fetched asy
 
 ```js
 {
-  id:          String,      // auto-generated or omitted
   country:     String,      // matched to countries.json name
   continent:   String,      // auto-filled from countries.json
   locations:   String,      // free text e.g. "Manila, Bohol, El Nido"
@@ -123,9 +119,12 @@ Cache is read immediately on page load for instant render; remote is fetched asy
   type:        "Travel" | "Work" | "Friends" | "Family",
   utl1:        [String],    // array of travellist1 item IDs or names
   utl2:        [String],    // array of travellist2 item IDs or names
-  companions:  [String]     // array of traveller IDs e.g. ["shaz","paul"]
+  travellers:  [String]     // array of ALL traveller IDs on this trip e.g. ["ben","shaz","paul"]
+                            // NOTE: includes the person who logged it — no separate owner field
 }
 ```
+
+The `travellers` field replaces the old `companions` field. Legacy records with `companions` are handled gracefully — code always checks `t.travellers || t.companions`.
 
 ---
 
@@ -138,7 +137,7 @@ All pages load `travel.js` and use `window.TravelApp`. The file is **pure ES5**.
 | Export | Type | Purpose |
 |--------|------|---------|
 | `Store` | Object | Visited item CRUD (toggle/isVisited/getVisitedArray/getVisitedCount/load/onSave) |
-| `TripStore` | Object | Trip log CRUD (load/getTrips/saveTrips/onSave) |
+| `TripStore` | Object | Trip log CRUD (load/getTrips/getAllTrips/saveTrips/onSave) |
 | `fetchJSON(file)` | Function | Fetches from `/data/{file}` with correct root path |
 | `getRoot()` | Function | Returns `../` when in `/pages/`, `./` from root |
 | `loadAllData()` | Function | Legacy — loads all 6 data files, merges localStorage cache into traveller objects |
@@ -164,11 +163,17 @@ Store.onSave(fn)               // Register callback(status, msg) — called afte
 ### 5.3 TripStore API
 
 ```js
-TripStore.load(travId)         // Fetches full remote record; returns Promise<trips[]>
-TripStore.getTrips(travId)     // Synchronous; returns cached trips array
-TripStore.saveTrips(travId, trips)  // Replaces trips array + debounced PUT
-TripStore.onSave(fn)           // Register callback(status, travId)
+TripStore.load(travId)            // Fetches full remote record; returns Promise<filtered trips[]>
+TripStore.getTrips(travId)        // Synchronous; returns trips where travellers includes travId
+TripStore.getAllTrips()           // Synchronous; returns the full flat trips array (use for add/edit/delete)
+TripStore.saveTrips(travId, trips) // Replaces the ENTIRE flat trips array + debounced PUT
+TripStore.onSave(fn)              // Register callback(status, travId)
 ```
+
+**Critical pattern for add/edit/delete on traveller pages:**
+- Display: `TripStore.getTrips(TRAV_ID)` — filtered view for this traveller
+- Mutate: `TripStore.getAllTrips()` → splice/push → `TripStore.saveTrips(TRAV_ID, updatedFullArray)`
+- The `oi` index in row render uses `loadTrips()` (= `getAllTrips()`) so Edit/Delete buttons reference the correct index in the full array
 
 ### 5.4 JSONBin Configuration
 
@@ -235,7 +240,14 @@ Tab switching logic is at the bottom of the page in a self-contained IIFE.
 
 The **Visual Timeline** (`window._vtRender`) uses SVG drawn from scratch. Scales: `decade` (0.35px/day), `year` (3.2px/day), `month` (24px/day). Trips are lane-assigned to avoid overlap.
 
-The **Travel Log** uses `TripStore.load(TRAV_ID)` then `TripStore.getTrips()` / `TripStore.saveTrips()`.
+The **Travel Log** uses `TripStore.load(TRAV_ID)` then:
+- `TripStore.getTrips(TRAV_ID)` to get the filtered display list (trips this traveller appears on)
+- `TripStore.getAllTrips()` as the base for add/edit/delete operations (full flat array)
+- `TripStore.saveTrips(TRAV_ID, fullArray)` to persist changes
+
+Any traveller tagged on a trip can edit or delete it — the change affects the single central record and disappears from all traveller pages simultaneously. The modal pre-populates `TRAV_ID` as a non-removable traveller tag; other travellers are added via multi-select combo. The `travellers` field stores all IDs including self.
+
+The map IIFE reads `utl_trips_v1` from localStorage and filters the flat array by `travellers.indexOf(TRAV_ID)` to get visit dates for the tooltip.
 
 The **Country Completion table** is Ben-specific (only in `ben.html`) and calculates a weighted completion % per country:
 - Country visited: 35%
@@ -308,6 +320,8 @@ Page-specific styles are always in inline `<style>` blocks in the `<head>` of th
 - **`function` declarations** — no arrow functions
 - Save toast pattern: fixed position `div.save-toast`, toggled with `.show` class, auto-removed after 1.8s
 - Search is always lowercase `.toLowerCase()` matched against `.indexOf()`
+- Travel log form uses `tf-travellers-*` element IDs (`tf-travellers-input`, `tf-travellers-list`, `tf-travellers-tags`, `tf-travellers-combo`)
+- Visited tick colours on tracker pages use `data-trav` CSS attribute selectors (`.cc-check.yes[data-trav="ben"]` etc.) — not a shared green
 
 ---
 
@@ -330,16 +344,17 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
-| 2026-05-06 | Travel Log summary line in `ben.html` extended to show UTL I and UTL II visit counts from filtered trips (e.g. "Showing 5 of 5 trips · 7 UTL I visits · 3 UTL II visits"). Counts are filter-aware and only shown if non-zero. |
-| 2026-05-05 | `CLAUDE.md` created from full repo analysis |
-| ~2026-04 | Timeline tab added to traveller pages (Visual Timeline + Travel Log + modal) |
-| ~2026-04 | `TripStore` added to `travel.js` alongside `Store`; single JSONBin record now holds both `visited` and `trips` |
-| ~2026-04 | Travel companion tracking added to trip modal (multi-select, stored as traveller ID array) |
-| ~2026-04 | Country Completion table added to `ben.html` (weighted % per country) |
-| ~2026-04 | amCharts 5 world map added to `ben.html` with completion colour gradient |
-| ~2026-03 | `travellist2.json` and TL2 tracker page added |
-| ~2026-03 | Analytics / Family Dashboard page added |
-| 2026-05-05 | Map hover tooltip extended with **Timeline section** on all 4 traveller pages — shows visit months (e.g. `Jul-22`) from trip log, latest first. New helpers `_trips`, `getTripDates(countryName)`, `fmtTripDate(s)` added inside each page's map IIFE. Trips loaded from `utl_trips_v1` localStorage on initial render and on `Store.onSave` refresh. |
+| 2026-05-06 | **Unified trip architecture** — `trips` in JSONBin refactored from per-traveller object `{ben:[],shaz:[]}` to a single flat array. Each trip has a `travellers:[String]` field (all travellers including self). `TripStore.getAllTrips()` added. `saveTrips` now replaces the full array. Any traveller can edit/delete any trip they appear on. Legacy `companions` field handled gracefully. |
+| 2026-05-06 | **Timeline tab rolled out to all traveller pages** — `shaz.html`, `paul.html`, `ruth.html` now match `ben.html` with Progress + Timeline tabs, world map, country completion table, visual timeline, travel log, and add/edit modal. Per-traveller colours applied throughout. |
+| 2026-05-06 | **Visited ticks coloured by traveller** on all tracker pages (`ultimatetravellist1`, `ultimatetravellist2`, `countries`, `unesco`) using CSS `data-trav` attribute selectors. |
+| 2026-05-06 | Capital column icon on `countries.html` changed from building emoji to 📍 pushpin (`&#128205;`). |
+| 2026-05-06 | Travel Log summary line extended to show UTL I and UTL II visit counts (filter-aware, only shown if non-zero). |
+| 2026-05-05 | `CLAUDE.md` created from full repo analysis. |
+| 2026-05-05 | Map hover tooltip extended with Timeline section on all 4 traveller pages. |
+| ~2026-04 | Timeline tab first added to `ben.html` (Visual Timeline + Travel Log + modal). |
+| ~2026-04 | `TripStore` added to `travel.js`; JSONBin record extended to hold trips alongside visited. |
+| ~2026-04 | Country Completion table and amCharts 5 world map added to `ben.html`. |
+| ~2026-03 | `travellist2.json` and TL2 tracker page added. Analytics / Family Dashboard page added. |
 
 ---
 
