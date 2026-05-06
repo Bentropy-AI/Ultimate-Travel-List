@@ -698,7 +698,21 @@
             return sortDir==='asc'?va.localeCompare(vb):vb.localeCompare(va);
           });
           var sumEl=document.getElementById('tl-summary-line');
-          if(sumEl) sumEl.textContent=trips.length?'Showing '+filtered.length+' of '+trips.length+' trip'+(trips.length!==1?'s':''):'No trips logged yet.';
+          if(sumEl){
+            if(trips.length){
+              var utl1Count=0,utl2Count=0;
+              for(var si=0;si<filtered.length;si++){
+                utl1Count+=(filtered[si].utl1&&filtered[si].utl1.length)?filtered[si].utl1.length:0;
+                utl2Count+=(filtered[si].utl2&&filtered[si].utl2.length)?filtered[si].utl2.length:0;
+              }
+              var sumTxt='Showing '+filtered.length+' of '+trips.length+' trip'+(trips.length!==1?'s':'');
+              if(utl1Count>0)sumTxt+=' \u00b7 '+utl1Count+' UTL I visit'+(utl1Count!==1?'s':'');
+              if(utl2Count>0)sumTxt+=' \u00b7 '+utl2Count+' UTL II visit'+(utl2Count!==1?'s':'');
+              sumEl.textContent=sumTxt;
+            } else {
+              sumEl.textContent='No trips logged yet.';
+            }
+          }
           document.querySelectorAll('.tl-table th[data-col]').forEach(function(th){th.classList.remove('sort-asc','sort-desc');if(th.dataset.col===sortCol)th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');});
           var tbody=document.getElementById('tl-tbody'); if(!tbody)return;
           if(!sorted.length){tbody.innerHTML=trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>';return;}
