@@ -330,6 +330,7 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
+| 2026-05-06 | Travel Log summary line in `ben.html` extended to show UTL I and UTL II visit counts from filtered trips (e.g. "Showing 5 of 5 trips · 7 UTL I visits · 3 UTL II visits"). Counts are filter-aware and only shown if non-zero. |
 | 2026-05-05 | `CLAUDE.md` created from full repo analysis |
 | ~2026-04 | Timeline tab added to traveller pages (Visual Timeline + Travel Log + modal) |
 | ~2026-04 | `TripStore` added to `travel.js` alongside `Store`; single JSONBin record now holds both `visited` and `trips` |
