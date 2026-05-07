@@ -115,7 +115,7 @@
       loadScripts(SCRIPTS,function(){
         Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
           var personData={};
-          var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id===TRAV_ID){_homeCountry=_td[_hi].home||'';break;}}
+          var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id==='shaz'){_homeCountry=_td[_hi].home||'';break;}}
           var cached=localStorage.getItem('utl_store_v2');if(cached){try{personData=JSON.parse(cached).shaz||{};}catch(e){}}
           var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('shaz')!==-1;});}catch(e){}}
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
