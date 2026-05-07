@@ -970,7 +970,7 @@
               var g=document.createElementNS(NS,'g');g.style.cursor='pointer';
               var bar=document.createElementNS(NS,'rect');bar.setAttribute('x',x1);bar.setAttribute('y',ly);bar.setAttribute('width',bw);bar.setAttribute('height',LANE_H);bar.setAttribute('rx',TRIP_R);bar.setAttribute('ry',TRIP_R);bar.setAttribute('fill',col);bar.setAttribute('fill-opacity','0.82');g.appendChild(bar);
               var shine=document.createElementNS(NS,'rect');shine.setAttribute('x',x1);shine.setAttribute('y',ly);shine.setAttribute('width',bw);shine.setAttribute('height',LANE_H/2);shine.setAttribute('rx',TRIP_R);shine.setAttribute('ry',TRIP_R);shine.setAttribute('fill','#ffffff');shine.setAttribute('fill-opacity','0.06');shine.setAttribute('pointer-events','none');g.appendChild(shine);
-              if(bw>34){var lbl=document.createElementNS(NS,'text');lbl.setAttribute('x',x1+6);lbl.setAttribute('y',ly+LANE_H/2+4);lbl.setAttribute('fill','#ffffff');lbl.setAttribute('font-size','10');lbl.setAttribute('font-weight','600');lbl.setAttribute('pointer-events','none');var mc=Math.floor(bw/7);var nm=t.country||'';lbl.textContent=nm.length>mc?nm.substring(0,mc-1)+'\u2026':nm;g.appendChild(lbl);}
+              if(bw>34){var lbl=document.createElementNS(NS,'text');lbl.setAttribute('x',x1+6);lbl.setAttribute('y',ly+LANE_H/2+4);lbl.setAttribute('fill','#ffffff');lbl.setAttribute('font-size','10');lbl.setAttribute('font-weight','600');lbl.setAttribute('pointer-events','none');var mc=Math.floor(bw/7);var nm=(t.countries&&t.countries.length)?t.countries.join(', '):(t.country||'');lbl.textContent=nm.length>mc?nm.substring(0,mc-1)+'\u2026':nm;g.appendChild(lbl);}
               g.addEventListener('mouseenter',function(ev){showTip(ev,t);});g.addEventListener('mousemove',function(ev){moveTip(ev);});g.addEventListener('mouseleave',function(){hideTip();});
               barsG.appendChild(g);
             });
@@ -979,7 +979,7 @@
           }
 
           function showTip(ev,t){
-            var html='<div class="tl-vt-tip-title">'+esc(t.country||'Unknown')+'</div>';
+            var _tipTitle=(t.countries&&t.countries.length)?t.countries.join(', '):(t.country||t.locations||'Trip');var html='<div class="tl-vt-tip-title">'+esc(_tipTitle)+'</div>';
             if(t.countries&&t.countries.length)html+='<div class="tl-vt-tip-row">Countries: <span>'+esc(t.countries.join(', '))+'</span></div>';else if(t.country)html+='<div class="tl-vt-tip-row">Country: <span>'+esc(t.country)+'</span></div>';if(t.continent)html+='<div class="tl-vt-tip-row">Continent: <span>'+esc(t.continent)+'</span></div>';
             if(t.type)html+='<div class="tl-vt-tip-row">Type: <span>'+esc(t.type)+'</span></div>';
             if(t.start)html+='<div class="tl-vt-tip-row">Start: <span>'+fmtDS(t.start)+'</span></div>';
