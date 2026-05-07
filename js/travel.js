@@ -291,9 +291,15 @@ var TripStore = (function() {
         var rec = d.record || {};
         _tripsCache = _normalise(rec.trips || []);
         _cacheSave(_tripsCache);
+        /* Also apply visited data so _visitedLoaded guard is satisfied */
+        if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); }
+        _remoteRecord.visited = _buildVisited();
+        _remoteRecord.trips = _tripsCache;
+        _visitedLoaded = true;
         _loaded = true;
         return getTrips(travId);
       }).catch(function() {
+        _visitedLoaded = true;
         _loaded = true;
         return getTrips(travId);
       });
