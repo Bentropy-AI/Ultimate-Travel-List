@@ -560,7 +560,7 @@
             <div class="tl-form-row">
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-type">Type of Travel <span class="req">*</span></label>
-                <select class="tl-form-select" id="tf-type" class="tl-home-hide">
+                <select class="tl-form-select tl-home-hide" id="tf-type">
                   <option value="">Select type…</option>
                   <option value="Travel">Travel</option>
                   <option value="Work">Work</option>
@@ -571,7 +571,7 @@
               </div>
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-travellers-input">Travellers</label>
-                <div class="tl-combo" id="tf-travellers-combo" class="tl-home-hide">
+                <div class="tl-combo tl-home-hide" id="tf-travellers-combo">
                   <input type="text" class="tl-form-input tl-combo-input" id="tf-travellers-input" placeholder="Add travellers…" autocomplete="off">
                   <div class="tl-combo-list" id="tf-travellers-list"></div>
                 </div>
@@ -581,12 +581,12 @@
             <div class="tl-form-row">
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-start">Start Date <span class="req">*</span></label>
-                <input type="date" class="tl-form-input" id="tf-start" class="tl-home-hide">
+                <input class="tl-form-input tl-home-hide" type="date" id="tf-start">
                 <span class="tl-error-msg" id="tf-start-err"></span>
               </div>
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-finish">Finish Date</label>
-                <input type="date" class="tl-form-input" id="tf-finish" class="tl-home-hide">
+                <input class="tl-form-input tl-home-hide" type="date" id="tf-finish">
               </div>
             </div>
             <div class="tl-form-row">
@@ -607,7 +607,7 @@
             <div class="tl-form-row full">
               <div class="tl-form-group">
                 <label class="tl-form-label" for="tf-locations">Locations <span style="font-weight:400;text-transform:none;letter-spacing:0">(areas visited)</span></label>
-                <textarea class="tl-form-textarea" id="tf-locations" class="tl-home-hide" placeholder="e.g. Manila, Sagada, Banaue, Bohol, Panglao, Boracay, El Nido"></textarea>
+                <textarea class="tl-form-textarea tl-home-hide" id="tf-locations" placeholder="e.g. Manila, Sagada, Banaue, Bohol, Panglao, Boracay, El Nido"></textarea>
               </div>
             </div>
             <div class="tl-form-row full">
