@@ -73,8 +73,8 @@ function _fetchFullRecord() {
     return r.json();
   }).then(function(d) {
     var rec = d.record || {};
-    if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); }
-    _remoteRecord.visited = _buildVisited();
+    if (rec.visited) { _applyVisited(rec.visited); }
+    /* _remoteRecord.visited will be set by Store when it processes this record */
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _tripsCache           = _remoteRecord.trips; /* sync _tripsCache - now in outer scope */
@@ -292,8 +292,7 @@ var TripStore = (function() {
         _tripsCache = _normalise(rec.trips || []);
         _cacheSave(_tripsCache);
         /* Also apply visited data so _visitedLoaded guard is satisfied */
-        if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); }
-        _remoteRecord.visited = _buildVisited();
+        if (rec.visited) { _applyVisited(rec.visited); }
         _remoteRecord.trips = _tripsCache;
         _visitedLoaded = true;
         _loaded = true;
@@ -325,7 +324,7 @@ var TripStore = (function() {
       return;
     }
     _remoteRecord.trips = _tripsCache;
-    _remoteRecord.visited = _buildVisited();
+    /* _remoteRecord.visited already set by last fetch — don't overwrite with _buildVisited */
     _schedulePush(function(status) {
       for (var i = 0; i < _callbacks.length; i++) { try { _callbacks[i](status, travId); } catch(e) {} }
     });
