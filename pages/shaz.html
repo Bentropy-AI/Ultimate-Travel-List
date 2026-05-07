@@ -127,7 +127,15 @@
               renderMap(cm);
             }
           }).catch(function(){});
-          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).shaz||{};}catch(e){}}var tc2=localStorage.getItem('utl_trips_v1');if(tc2){try{_trips=(JSON.parse(tc2)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('shaz')!==-1;});}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
+          if(window.TravelApp&&window.TravelApp.Store){
+            window.TravelApp.Store.load(function(){
+              var c2=localStorage.getItem('utl_store_v2');
+              if(c2){try{personData=JSON.parse(c2).shaz||{};}catch(e){}}
+              cm=buildMap(res[0],res[1],res[2],res[3],personData);
+              renderMap(cm);
+            });
+            window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).shaz||{};}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
+          }
         if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('shaz')!==-1;});}catch(e){}}});}
         });
       });
