@@ -309,6 +309,7 @@
             '<td class="cc-bar-cell"><div class="cc-bar-wrap"><span class="cc-pct" style="color:'+pctColor(r.completion)+'">'+r.completion+'%</span><div class="cc-bar-track"><div class="cc-bar-fill '+bc+'" style="width:'+r.completion+'%"></div></div></div></td>'+
           '</tr>';
         }).join('');
+        tbody.innerHTML = rowsHtml;
       }
 
       document.getElementById('cc-search').addEventListener('input',function(){curSearch=this.value;render();});
