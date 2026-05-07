@@ -700,7 +700,10 @@
 
         /* ── RENDER TABLE ── */
         function render(){
-          var trips = loadTrips();
+          var allTripsR = loadTrips();
+          var hRec = null;
+          for(var _ri=0;_ri<allTripsR.length;_ri++){if(allTripsR[_ri]._home){hRec=allTripsR[_ri];break;}}
+          var trips = allTripsR.filter(function(t){return !t._home;});
           var s = curSearch.toLowerCase();
           var filtered = trips.filter(function(r){
             var cstr=((r.countries&&r.countries.length)?r.countries.join(' '):(r.country||''));var ms=!s||cstr.toLowerCase().indexOf(s)!==-1||(r.continent||'').toLowerCase().indexOf(s)!==-1||(r.locations||'').toLowerCase().indexOf(s)!==-1;
