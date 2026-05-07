@@ -56,6 +56,7 @@ function fetchJSON(file) {
    are never clobbered by each other.
    ============================================================ */
 var _remoteRecord = { visited: {}, trips: [] };
+var _tripsCache    = [];   /* flat trips array — shared between TripStore and _fetchFullRecord */
 var _visitedLoaded = false; /* guard: don't PUT trips until visited is loaded */
 var _remoteLoaded  = false;
 var _pendingFlush  = null;
@@ -76,7 +77,7 @@ function _fetchFullRecord() {
     _remoteRecord.visited = _buildVisited();
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
-    _tripsCache           = _remoteRecord.trips; /* always sync _tripsCache from remote */
+    _tripsCache           = _remoteRecord.trips; /* sync _tripsCache - now in outer scope */
     try { localStorage.setItem('utl_trips_v1', JSON.stringify(_tripsCache)); } catch(e) {}
     _remoteLoaded = true;
     _fetchPromise = null;
@@ -257,9 +258,7 @@ function _normalise(raw) {
    ============================================================ */
 var TripStore = (function() {
   /* Unified flat trips array - each trip has a 'travellers' field (array of IDs).
-   * _tripsCache is the raw value stored in JSONBin under the 'trips' key.
-   * Legacy: if trips is an object (per-traveller arrays), it is migrated on load. */
-  var _tripsCache = [];   /* flat Array of trip objects */
+   * _tripsCache is declared in outer scope so _fetchFullRecord can also populate it. */
   var _loaded = false;
   var _callbacks = [];
 
