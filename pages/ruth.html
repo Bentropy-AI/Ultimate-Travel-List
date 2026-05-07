@@ -332,16 +332,28 @@
 
       Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json')]).then(function(res){
         var tl1=res[0],tl2=res[1],countries=res[2];
-        var personData2={};
-        var cached=localStorage.getItem('utl_store_v2');
-        if(cached){try{personData2=JSON.parse(cached).ruth||{};}catch(e){}}
-        _rows=buildRows(tl1,tl2,countries,personData2);
+        function getPersonData(){
+          var pd={countries:[],capitals:[],travellist1:[],travellist2:[],animals:[],unesco:[]};
+          if(window.TravelApp&&window.TravelApp.Store){
+            var S=window.TravelApp.Store;
+            pd.countries=S.getVisitedArray('ruth','countries');
+            pd.capitals=S.getVisitedArray('ruth','capitals');
+            pd.travellist1=S.getVisitedArray('ruth','travellist1');
+            pd.travellist2=S.getVisitedArray('ruth','travellist2');
+          } else {
+            try{var c=localStorage.getItem('utl_store_v2');if(c){var l=JSON.parse(c)['ruth']||{};pd=l;}}catch(e){}
+          }
+          return pd;
+        }
+        _rows=buildRows(tl1,tl2,countries,getPersonData());
         render();
         if(window.TravelApp&&window.TravelApp.Store){
+          window.TravelApp.Store.load(function(){
+            _rows=buildRows(tl1,tl2,countries,getPersonData());
+            render();
+          });
           window.TravelApp.Store.onSave(function(){
-            var c2=localStorage.getItem('utl_store_v2');
-            if(c2){try{personData2=JSON.parse(c2).ruth||{};}catch(e){}}
-            _rows=buildRows(tl1,tl2,countries,personData2);
+            _rows=buildRows(tl1,tl2,countries,getPersonData());
             render();
           });
         }
