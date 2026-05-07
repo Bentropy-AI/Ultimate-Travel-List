@@ -932,7 +932,7 @@
         (function(){
           var TRAV_ID = 'ben';
           var TYPE_COLORS = {Travel:'#f59e0b',Work:'#0ea5e9',Friends:'#fb7185',Family:'#f97316',School:'#14b8a6'};
-          var PPD = {decade:1.2,year:3.2,month:24};
+          var PPD = {decade:0.35,year:3.2,month:24};
           var AXIS_H=38,LANE_H=20,LANE_GAP=4,TRIP_R=3,PAD_H=10,PAD_L=8,MIN_BAR=5,MAX_LANES=8;
           var scale='year',viewStart=null,viewEnd=null;
 
@@ -955,16 +955,12 @@
           function tripColor(t){return TYPE_COLORS[t]||'#7a7f9a';}
           function dateToX(d,vs,ppd){return PAD_L+daysBetween(vs,d)*ppd;}
 
+          var TYPE_LANES={Travel:0,Friends:1,Family:2,Work:3,School:4};
           function assignLanes(trips){
-            var laneEnds=[];
             return trips.map(function(t){
               var s=parseDate(t.start),e=parseDate(t.finish)||(s?addDays(s,1):null);
               if(!s){e=null;}
-              var lane=-1;
-              /* Find first free lane */
-              for(var i=0;i<laneEnds.length;i++){if(!laneEnds[i]||!s||laneEnds[i]<=s){lane=i;laneEnds[i]=e||addDays(s||new Date(),1);break;}}
-              /* Create new lane if needed */
-              if(lane===-1){lane=laneEnds.length;laneEnds.push(e||addDays(s||new Date(),1));}
+              var lane=TYPE_LANES.hasOwnProperty(t.type)?TYPE_LANES[t.type]:3;
               return Object.assign({},t,{_s:s,_e:e||addDays(s||new Date(),1),_lane:lane});
             });
           }
@@ -1002,14 +998,25 @@
             if(!vw)return;
             var vs=vw.s,ve=vw.e,totalDays=daysBetween(vs,ve);
             var totalW=Math.max(PAD_L*2+totalDays*ppd,(wrap.clientWidth||900)-2);
-            var laneCount=0;trips.forEach(function(t){if(t._lane>=laneCount)laneCount=t._lane+1;});
-            var dispLanes=Math.min(laneCount,MAX_LANES);
-            var svgH=AXIS_H+dispLanes*(LANE_H+LANE_GAP)+PAD_H;
+            var laneCount=Object.keys(TYPE_LANES).length;
+            var svgH=AXIS_H+laneCount*(LANE_H+LANE_GAP)+PAD_H;
             svgEl.setAttribute('width',Math.ceil(totalW));svgEl.setAttribute('height',svgH);svgEl.innerHTML='';
 
             var stripeG=document.createElementNS(NS,'g');
             if(scale!=='month'){var sy=vs.getFullYear();while(true){var sd=new Date(sy,0,1),ed=new Date(sy+1,0,1);if(sd>ve)break;if(ed>vs){var sx=dateToX(sd,vs,ppd),sw=dateToX(ed,vs,ppd)-sx;if(sy%2===0){var srect=document.createElementNS(NS,'rect');srect.setAttribute('x',sx);srect.setAttribute('y',AXIS_H);srect.setAttribute('width',sw);srect.setAttribute('height',svgH-AXIS_H);srect.setAttribute('fill','#ffffff');srect.setAttribute('fill-opacity','0.025');stripeG.appendChild(srect);}}sy++;if(sy>2150)break;}}
             svgEl.appendChild(stripeG);
+            /* Draw lane type labels on left axis */
+            var laneLabels=Object.keys(TYPE_LANES);
+            laneLabels.forEach(function(type,idx){
+              var ly2=AXIS_H+idx*(LANE_H+LANE_GAP)+LANE_GAP/2+LANE_H/2+4;
+              var lbl2=document.createElementNS(NS,'text');
+              lbl2.setAttribute('x','4');lbl2.setAttribute('y',ly2);
+              lbl2.setAttribute('fill',TYPE_COLORS[type]||'#7a7f9a');
+              lbl2.setAttribute('font-size','9');lbl2.setAttribute('font-weight','600');
+              lbl2.setAttribute('pointer-events','none');
+              lbl2.textContent=type;
+              svgEl.appendChild(lbl2);
+            });
             var axLine=document.createElementNS(NS,'line');axLine.setAttribute('x1',0);axLine.setAttribute('y1',AXIS_H-1);axLine.setAttribute('x2',Math.ceil(totalW));axLine.setAttribute('y2',AXIS_H-1);axLine.setAttribute('stroke','#2e3350');axLine.setAttribute('stroke-width','1');svgEl.appendChild(axLine);
 
             var ticks=buildTicks(vs,ve,ppd);
@@ -1027,7 +1034,7 @@
             trips.forEach(function(t){
               if(!t._s)return;
               var x1=dateToX(t._s,vs,ppd),x2=dateToX(t._e,vs,ppd),bw=Math.max(x2-x1,MIN_BAR);
-              var _lane=Math.min(t._lane,MAX_LANES-1);var ly=AXIS_H+_lane*(LANE_H+LANE_GAP)+LANE_GAP/2,col=tripColor(t.type);
+              var ly=AXIS_H+t._lane*(LANE_H+LANE_GAP)+LANE_GAP/2,col=tripColor(t.type);
               if(x1>totalW+20||x2<-20)return;
               var g=document.createElementNS(NS,'g');g.style.cursor='pointer';
               var bar=document.createElementNS(NS,'rect');bar.setAttribute('x',x1);bar.setAttribute('y',ly);bar.setAttribute('width',bw);bar.setAttribute('height',LANE_H);bar.setAttribute('rx',TRIP_R);bar.setAttribute('ry',TRIP_R);bar.setAttribute('fill',col);bar.setAttribute('fill-opacity','0.82');g.appendChild(bar);
