@@ -282,17 +282,21 @@ var TripStore = (function() {
   /* Load trips from remote (or cache on failure). Returns Promise<trips_for_traveller[]> */
   function load(travId) {
     var cached = _cacheLoad();
-    if (cached) { _tripsCache = _normalise(cached); }
+    if (cached && cached.length) { _tripsCache = _normalise(cached); }
 
-    return _fetchFullRecord().then(function(rec) {
-      _tripsCache = _normalise(rec.trips || []);
-      _cacheSave(_tripsCache);
-      _loaded = true;
-      return getTrips(travId);
-    }).catch(function() {
-      _loaded = true;
-      return getTrips(travId);
-    });
+    /* Fetch trips directly — don't rely on _fetchFullRecord sharing */
+    return fetch(_BIN_URL + '/latest', { headers: { 'X-Master-Key': _API_KEY } })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var rec = d.record || {};
+        _tripsCache = _normalise(rec.trips || []);
+        _cacheSave(_tripsCache);
+        _loaded = true;
+        return getTrips(travId);
+      }).catch(function() {
+        _loaded = true;
+        return getTrips(travId);
+      });
   }
 
   /* Get all trips a traveller appears on */
