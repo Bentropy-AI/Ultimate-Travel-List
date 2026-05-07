@@ -272,7 +272,8 @@
       "carthage",
       "rynek-glowny",
       "geysir"
-    ]
+    ],
+    "home": "United Kingdom"
   },
   {
     "id": "shaz",
@@ -451,7 +452,8 @@
       "carthage",
       "rynek-glowny",
       "geysir"
-    ]
+    ],
+    "home": "United Kingdom"
   },
   {
     "id": "paul",
@@ -601,7 +603,8 @@
       "portmeirion",
       "rynek-glowny",
       "geysir"
-    ]
+    ],
+    "home": "United Kingdom"
   },
   {
     "id": "ruth",
@@ -752,6 +755,7 @@
       "pafos-archaeological-site",
       "rynek-glowny",
       "geysir"
-    ]
+    ],
+    "home": "United Kingdom"
   }
 ]
