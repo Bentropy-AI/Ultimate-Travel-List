@@ -1,0 +1,37 @@
+name: Nightly JSONBin Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 2am UTC daily
+  workflow_dispatch:       # allows manual trigger from GitHub Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch JSONBin and save backup
+        run: |
+          curl -s "https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest" \
+            -H "X-Master-Key: ${{ secrets.JSONBIN_KEY }}" \
+            | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)
+          rec = d.get('record', {})
+          out = json.dumps(rec, indent=2)
+          open('data/backup.json', 'w').write(out)
+          v = rec.get('visited', {})
+          for tid in ['ben','shaz','paul','ruth']:
+              t = v.get(tid, {})
+              print(f\"{tid}: countries={len(t.get('countries',[]))} capitals={len(t.get('capitals',[]))} tl1={len(t.get('travellist1',[]))} tl2={len(t.get('travellist2',[]))}\")
+          "
+
+      - name: Commit backup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/backup.json
+          git diff --staged --quiet || git commit -m "Automated backup $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push
