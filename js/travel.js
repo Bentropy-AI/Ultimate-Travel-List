@@ -76,6 +76,8 @@ function _fetchFullRecord() {
     _remoteRecord.visited = _buildVisited();
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
+    _tripsCache           = _remoteRecord.trips; /* always sync _tripsCache from remote */
+    try { localStorage.setItem('utl_trips_v1', JSON.stringify(_tripsCache)); } catch(e) {}
     _remoteLoaded = true;
     _fetchPromise = null;
     return _remoteRecord;
