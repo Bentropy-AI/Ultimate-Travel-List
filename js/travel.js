@@ -323,11 +323,26 @@ var TripStore = (function() {
       /* visited not yet loaded — skip PUT to avoid clobbering visited data */
       return;
     }
-    _remoteRecord.trips = _tripsCache;
-    /* _remoteRecord.visited already set by last fetch — don't overwrite with _buildVisited */
-    _schedulePush(function(status) {
-      for (var i = 0; i < _callbacks.length; i++) { try { _callbacks[i](status, travId); } catch(e) {} }
-    });
+    /* Always GET fresh visited before PUT to prevent data loss */
+    fetch(_BIN_URL + '/latest', { headers: { 'X-Master-Key': _API_KEY } })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        var safeVisited = (d.record && d.record.visited) ? d.record.visited : _remoteRecord.visited;
+        var payload = { visited: safeVisited, trips: _tripsCache };
+        return fetch(_BIN_URL, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Master-Key': _API_KEY },
+          body: JSON.stringify(payload)
+        });
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d.record && d.record.visited) { _remoteRecord.visited = d.record.visited; }
+        for (var i = 0; i < _callbacks.length; i++) { try { _callbacks[i]('success', travId); } catch(e) {} }
+      })
+      .catch(function(e) {
+        console.error('saveTrips failed:', e);
+      });
   }
 
   /* Get the full unfiltered trips array (for add/edit/delete operations) */
