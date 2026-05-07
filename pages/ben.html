@@ -933,7 +933,7 @@
           var TRAV_ID = 'ben';
           var TYPE_COLORS = {Travel:'#f59e0b',Work:'#0ea5e9',Friends:'#fb7185',Family:'#f97316',School:'#14b8a6'};
           var PPD = {decade:0.35,year:3.2,month:24};
-          var AXIS_H=38,LANE_H=28,LANE_GAP=8,TRIP_R=4,PAD_H=10,PAD_L=8,MIN_BAR=5;
+          var AXIS_H=38,LANE_H=20,LANE_GAP=4,TRIP_R=3,PAD_H=10,PAD_L=8,MIN_BAR=5,MAX_LANES=8;
           var scale='year',viewStart=null,viewEnd=null;
 
           var wrap  = document.getElementById('tl-vt-canvas-wrap');
@@ -961,8 +961,17 @@
               var s=parseDate(t.start),e=parseDate(t.finish)||(s?addDays(s,1):null);
               if(!s){e=null;}
               var lane=-1;
+              /* Find first free lane */
               for(var i=0;i<laneEnds.length;i++){if(!laneEnds[i]||!s||laneEnds[i]<=s){lane=i;laneEnds[i]=e||addDays(s||new Date(),1);break;}}
-              if(lane===-1){lane=laneEnds.length;laneEnds.push(e||addDays(s||new Date(),1));}
+              /* If no free lane and under cap, create new lane */
+              if(lane===-1&&laneEnds.length<MAX_LANES){lane=laneEnds.length;laneEnds.push(e||addDays(s||new Date(),1));}
+              /* If at cap, assign to lane with earliest end (least overlap) */
+              if(lane===-1){
+                var earliest=0;
+                for(var j=1;j<laneEnds.length;j++){if(laneEnds[j]<laneEnds[earliest])earliest=j;}
+                lane=earliest;
+                if(e)laneEnds[lane]=e;
+              }
               return Object.assign({},t,{_s:s,_e:e||addDays(s||new Date(),1),_lane:lane});
             });
           }
