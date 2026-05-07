@@ -72,7 +72,7 @@
       var W={country:0.35,capital:0.15,tl1:0.25,tl2:0.25};
       var _trips=[];
       function fmtTripDate(s){if(!s)return null;var d=new Date(s+'T00:00:00');if(isNaN(d.getTime()))return null;return d.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}).replace(' ','-');}
-      function getTripDates(countryName){var matched=[];for(var i=0;i<_trips.length;i++){var _tv=_trips[i].travellers||_trips[i].companions||[];if(_trips[i].country===countryName&&_tv.indexOf('shaz')!==-1){var lbl=fmtTripDate(_trips[i].start);if(lbl&&matched.indexOf(lbl)===-1)matched.push(lbl);}}if(!matched.length)return null;matched.sort(function(a,b){return new Date('01-'+b.split('-').reverse().join('-'))-new Date('01-'+a.split('-').reverse().join('-'));});return matched.join('  |  ');}
+      function getTripDates(countryName){var matched=[];for(var i=0;i<_trips.length;i++){var _tv=_trips[i].travellers||_trips[i].companions||[];var _tc=_trips[i].countries||(_trips[i].country?[_trips[i].country]:[]);if(_tc.indexOf(countryName)!==-1&&_tv.indexOf('shaz')!==-1){var lbl=fmtTripDate(_trips[i].start);if(lbl&&matched.indexOf(lbl)===-1)matched.push(lbl);}}if(!matched.length)return null;matched.sort(function(a,b){return new Date('01-'+b.split('-').reverse().join('-'))-new Date('01-'+a.split('-').reverse().join('-'));});return matched.join('  |  ');}
       function resolveISOs(c,bn){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return bn[c]?[bn[c]]:[];}
       function lerp(c1,c2,t){var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255,r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;return(Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);}
       function getColor(p){var C0=0x1a1530,C1=0x4a1a98,C2=0x7a3ad4,C3=0x9b59f5;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}
@@ -583,16 +583,17 @@
             </div>
             <div class="tl-form-row">
               <div class="tl-form-group">
-                <label class="tl-form-label" for="tf-country-input">Country <span class="req">*</span></label>
+                <label class="tl-form-label" for="tf-country-input">Countries <span class="req">*</span></label>
+                <div id="tf-countries-tags"></div>
                 <div class="tl-combo" id="tf-country-combo">
-                  <input type="text" class="tl-form-input tl-combo-input" id="tf-country-input" placeholder="Search country…" autocomplete="off">
+                  <input type="text" class="tl-form-input tl-combo-input" id="tf-country-input" placeholder="Add country…" autocomplete="off">
                   <div class="tl-combo-list" id="tf-country-list"></div>
                 </div>
                 <span class="tl-error-msg" id="tf-country-err"></span>
               </div>
               <div class="tl-form-group">
                 <label class="tl-form-label">Continent</label>
-                <input type="text" class="tl-form-input" id="tf-continent" readonly placeholder="Auto-filled from country" style="opacity:.6;cursor:default">
+                <input type="hidden" id="tf-continent">
               </div>
             </div>
             <div class="tl-form-row full">
@@ -687,7 +688,7 @@
           var trips = loadTrips();
           var s = curSearch.toLowerCase();
           var filtered = trips.filter(function(r){
-            var ms=!s||(r.country||'').toLowerCase().indexOf(s)!==-1||(r.continent||'').toLowerCase().indexOf(s)!==-1||(r.locations||'').toLowerCase().indexOf(s)!==-1;
+            var cstr=((r.countries&&r.countries.length)?r.countries.join(' '):(r.country||''));var ms=!s||cstr.toLowerCase().indexOf(s)!==-1||(r.continent||'').toLowerCase().indexOf(s)!==-1||(r.locations||'').toLowerCase().indexOf(s)!==-1;
             var mf=curFilter==='all'?true:r.type===curFilter;
             return ms&&mf;
           });
@@ -728,7 +729,7 @@
             var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
             return '<tr data-idx="'+oi+'">'
               +'<td class="tl-date-col">'+fmtMonth(r.start)+'</td>'
-              +'<td class="tl-country-col">'+esc(r.country||'—')+'</td>'
+              +'<td class="tl-country-col">'+esc((r.countries&&r.countries.length)?r.countries.join(', '):(r.country||'—'))+'</td>'
               +'<td><span class="tl-cont-badge">'+esc(r.continent||'—')+'</span></td>'
               +'<td class="tl-loc-cell" title="'+esc(r.locations||'')+'">'+esc(r.locations||'—')+'</td>'
               +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'—')+'</td>'
@@ -762,13 +763,12 @@
         document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 
         function openModal(idx){
-          editIdx=idx; clearErrors(); _utl1Selected=[]; _utl2Selected=[]; _travellersSelected=[TRAV_ID];
-          renderTags('utl1'); renderTags('utl2'); renderTags('travellers');
+          editIdx=idx; clearErrors(); _utl1Selected=[]; _utl2Selected=[]; _countriesSelected=f.countries||[]; _travellersSelected=[TRAV_ID];
+          renderTags('utl1'); renderTags('utl2'); renderTags('countries'); renderTags('travellers');
           document.getElementById('tl-modal-title').textContent=idx===-1?'Add Trip':'Edit Trip';
-          var f={country:'',continent:'',locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
-          if(idx!==-1){var t=loadTrips()[idx];if(t){f.country=t.country||'';f.continent=t.continent||'';f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
-          document.getElementById('tf-country-input').value=f.country;
-          document.getElementById('tf-continent').value=f.continent;
+          var f={countries:[],locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
+          if(idx!==-1){var t=loadTrips()[idx];if(t){f.countries=Array.isArray(t.countries)?t.countries.slice():(t.country?[t.country]:[]);f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
+          document.getElementById('tf-country-input').value='';
       _travellersSelected=(f.travellers||f.companions||[TRAV_ID]).slice(); if(_travellersSelected.indexOf(TRAV_ID)===-1){_travellersSelected.unshift(TRAV_ID);} renderTags('travellers');
           document.getElementById('tf-locations').value=f.locations;
           document.getElementById('tf-start').value=f.start;
@@ -779,23 +779,27 @@
           document.getElementById('tf-start').focus();
         }
         function closeModal(){backdrop.classList.remove('open');editIdx=-1;}
-        function clearErrors(){['tf-start-err','tf-country-err','tf-type-err'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='';});['tf-start','tf-country-input','tf-type'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});}
+        function clearErrors(){['tf-start-err','tf-country-err','tf-type-err'].forEach(function(id){var el=document.getElementById(id);if(el)el.textContent='';});['tf-start','tf-type'].forEach(function(id){var el=document.getElementById(id);if(el)el.classList.remove('error');});}
 
         document.getElementById('tl-modal-save').addEventListener('click',function(){
           clearErrors();
-          var country=document.getElementById('tf-country-input').value.trim();
+          var country=_countriesSelected.join('|');
           var type=document.getElementById('tf-type').value;
           var start=document.getElementById('tf-start').value||'';
           var ok=true;
           if(!start){document.getElementById('tf-start-err').textContent='Required';document.getElementById('tf-start').classList.add('error');ok=false;}
-          if(!country){document.getElementById('tf-country-err').textContent='Required';document.getElementById('tf-country-input').classList.add('error');ok=false;}
+          if(!_countriesSelected.length){document.getElementById('tf-country-err').textContent='Add at least one country';ok=false;}
           if(!type){document.getElementById('tf-type-err').textContent='Required';document.getElementById('tf-type').classList.add('error');ok=false;}
           if(!ok)return;
           var continent='';
+          var continentCounts={};
+          for(var ci=0;ci<_countriesSelected.length;ci++){var fc=_countries.find(function(c){return c.name===_countriesSelected[ci];});if(fc&&fc.continent){continentCounts[fc.continent]=(continentCounts[fc.continent]||0)+1;}}
+          var maxC=0;for(var ck in continentCounts){if(continentCounts[ck]>maxC){maxC=continentCounts[ck];continent=ck;}}
+          if(Object.keys(continentCounts).length>1){continent='Multi-continent';}
           var found=_countries.find(function(c){return c.name.toLowerCase()===country.toLowerCase();});
           if(found)continent=found.continent||'';
           var finish=document.getElementById('tf-finish').value||'';
-          var trip={country:country,continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
+          var trip={countries:_countriesSelected.slice(),continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
           var trips=loadTrips();
           if(editIdx===-1){trips.push(trip);}else{trips[editIdx]=trip;}
           saveTrips(trips);
@@ -815,17 +819,21 @@
           function selectItem(val){_sel=val;input.value=val;list.classList.remove('open');onSelect(val);}
         }
 
-        makeCombo('tf-country-input','tf-country-list',function(){return _countries.map(function(c){return c.name;});},function(val){var found=_countries.find(function(c){return c.name===val;});document.getElementById('tf-continent').value=found?(found.continent||''):'';});
+        makeCombo('tf-country-input','tf-country-list',function(){return _countries.filter(function(c){return _countriesSelected.indexOf(c.name)===-1;}).map(function(c){return c.name;});},function(val){if(_countriesSelected.indexOf(val)===-1){_countriesSelected.push(val);document.getElementById('tf-country-input').value='';renderTags('countries');}});
         makeCombo('tf-utl1-input','tf-utl1-list',function(){return _tl1Items.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl1Selected.indexOf(n)===-1;});},function(val){if(_utl1Selected.indexOf(val)===-1)_utl1Selected.push(val);document.getElementById('tf-utl1-input').value='';renderTags('utl1');});
         makeCombo('tf-utl2-input','tf-utl2-list',function(){return _tl2Items.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl2Selected.indexOf(n)===-1;});},function(val){if(_utl2Selected.indexOf(val)===-1)_utl2Selected.push(val);document.getElementById('tf-utl2-input').value='';renderTags('utl2');});
         makeCombo('tf-travellers-input','tf-travellers-list',function(){return _TRAVELLERS.map(function(t){return t.name;});},function(name){var t=_TRAVELLERS.find(function(x){return x.name===name;});var val=t?t.id:name.toLowerCase();if(_travellersSelected.indexOf(val)===-1){_travellersSelected.push(val);document.getElementById('tf-travellers-input').value='';renderTags('travellers');}});
 
         function renderTags(which){
+        var isCountry=which==='countries';
         var isTrav=which==='travellers';
-        var arr=which==='utl1'?_utl1Selected:which==='utl2'?_utl2Selected:_travellersSelected;
-        var el=document.getElementById('tf-'+which+'-tags');
+        var arr=which==='utl1'?_utl1Selected:which==='utl2'?_utl2Selected:which==='countries'?_countriesSelected:_travellersSelected;
+        var el=document.getElementById(which==='countries'?'tf-countries-tags':'tf-'+which+'-tags');
         if(!el)return;
         el.innerHTML=arr.map(function(v,i){
+          if(isCountry){
+            return'<span class="tl-companion-tag" style="background:rgba(100,116,139,.15);color:var(--color-text)">'+esc(v)+'<button type="button" data-which="countries" data-i="'+i+'">×</button></span>';
+          }
           if(isTrav){
             var _allT=_TRAVELLERS.concat([{id:TRAV_ID,name:'Me'}]);
             var cn=_allT.find(function(t){return t.id===v;});
@@ -838,6 +846,7 @@
               document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
         document.getElementById('tf-utl2-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl2Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl2');});
         document.getElementById('tf-travellers-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_travellersSelected.splice(parseInt(btn.dataset.i,10),1);renderTags('travellers');});
+        document.getElementById('tf-countries-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_countriesSelected.splice(parseInt(btn.dataset.i,10),1);renderTags('countries');});
         document.getElementById('tf-country-input').addEventListener('change',function(){var val=this.value.trim();var found=_countries.find(function(c){return c.name.toLowerCase()===val.toLowerCase();});document.getElementById('tf-continent').value=found?(found.continent||''):'';});
 
       }());
@@ -959,7 +968,7 @@
 
           function showTip(ev,t){
             var html='<div class="tl-vt-tip-title">'+esc(t.country||'Unknown')+'</div>';
-            if(t.continent)html+='<div class="tl-vt-tip-row">Continent: <span>'+esc(t.continent)+'</span></div>';
+            if(t.countries&&t.countries.length)html+='<div class="tl-vt-tip-row">Countries: <span>'+esc(t.countries.join(', '))+'</span></div>';else if(t.country)html+='<div class="tl-vt-tip-row">Country: <span>'+esc(t.country)+'</span></div>';if(t.continent)html+='<div class="tl-vt-tip-row">Continent: <span>'+esc(t.continent)+'</span></div>';
             if(t.type)html+='<div class="tl-vt-tip-row">Type: <span>'+esc(t.type)+'</span></div>';
             if(t.start)html+='<div class="tl-vt-tip-row">Start: <span>'+fmtDS(t.start)+'</span></div>';
             if(t.finish)html+='<div class="tl-vt-tip-row">End: <span>'+fmtDS(t.finish)+'</span></div>';
