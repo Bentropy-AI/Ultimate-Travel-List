@@ -738,7 +738,19 @@
           }
           document.querySelectorAll('.tl-table th[data-col]').forEach(function(th){th.classList.remove('sort-asc','sort-desc');if(th.dataset.col===sortCol)th.classList.add(sortDir==='asc'?'sort-asc':'sort-desc');});
           var tbody=document.getElementById('tl-tbody'); if(!tbody)return;
-          var homeRowHtml='<tr class="tl-home-row"><td colspan="7"><span class="tl-home-label">&#127968; Home &mdash; United Kingdom</span> <span style="font-size:.75rem;color:var(--color-muted)">UTL I: '+(hRec&&hRec.utl1&&hRec.utl1.length?hRec.utl1.length:0)+' &nbsp; UTL II: '+(hRec&&hRec.utl2&&hRec.utl2.length?hRec.utl2.length:0)+'</span></td><td><button class="tl-home-edit-btn" id="tl-home-edit-btn" title="Edit home UTL items">&#9998;</button></td></tr>';
+          function idToNameH(id,items){var found=items.find(function(i){return i.id===id;});if(found)return found.name||found.title||id;return id.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}
+          var hUtl1txt=hRec&&Array.isArray(hRec.utl1)?hRec.utl1.map(function(id){return idToNameH(id,_tl1Items);}).join(', '):'';
+          var hUtl2txt=hRec&&Array.isArray(hRec.utl2)?hRec.utl2.map(function(id){return idToNameH(id,_tl2Items);}).join(', '):'';
+          var homeRowHtml='<tr class="tl-home-row">'
+            +'<td class="tl-date-col" style="color:#f59e0b;font-weight:700">&#127968; Home</td>'
+            +'<td class="tl-country-col" style="color:#f59e0b;font-weight:600">United Kingdom</td>'
+            +'<td><span class="tl-cont-badge">Europe</span></td>'
+            +'<td class="tl-loc-cell"><span style="color:var(--color-muted)">&#8212;</span></td>'
+            +'<td class="tl-list-cell" title="'+esc(hUtl1txt)+'">'+(hUtl1txt?esc(hUtl1txt):'<span style="color:var(--color-muted)">&#8212;</span>')+'</td>'
+            +'<td class="tl-list-cell" title="'+esc(hUtl2txt)+'">'+(hUtl2txt?esc(hUtl2txt):'<span style="color:var(--color-muted)">&#8212;</span>')+'</td>'
+            +'<td></td><td></td>'
+            +'<td><button class="tl-home-edit-btn" id="tl-home-edit-btn" title="Edit home UTL items">&#9998;</button></td>'
+            +'</tr>';
           if(!sorted.length){tbody.innerHTML=(trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>')+homeRowHtml;return;}
           var rowsHtml=sorted.map(function(r){
             var oi=loadTrips().indexOf(r);
