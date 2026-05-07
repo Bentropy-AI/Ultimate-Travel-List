@@ -763,18 +763,30 @@
         document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
 
         function openModal(idx){
-          editIdx=idx; clearErrors(); _utl1Selected=[]; _utl2Selected=[]; _countriesSelected=f.countries||[]; _travellersSelected=[TRAV_ID];
-          renderTags('utl1'); renderTags('utl2'); renderTags('countries'); renderTags('travellers');
+          editIdx=idx; clearErrors();
+          /* Build f from trip data (or defaults) FIRST, then populate selections */
+          var f={countries:[],locations:'',start:'',finish:'',type:'',utl1:[],utl2:[],travellers:[]};
+          if(idx!==-1){var t=loadTrips()[idx];if(t){
+            f.countries=Array.isArray(t.countries)?t.countries.slice():(t.country?[t.country]:[]);
+            f.locations=t.locations||''; f.start=t.start||''; f.finish=t.finish||''; f.type=t.type||'';
+            f.utl1=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);
+            f.utl2=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);
+            f.travellers=(t.travellers||t.companions||[]).slice();
+          }}
+          /* Reset selections from f */
+          _countriesSelected=f.countries.slice();
+          _utl1Selected=f.utl1.slice();
+          _utl2Selected=f.utl2.slice();
+          _travellersSelected=f.travellers.length?f.travellers.slice():[TRAV_ID];
+          if(_travellersSelected.indexOf(TRAV_ID)===-1){_travellersSelected.unshift(TRAV_ID);}
+          /* Populate form fields */
           document.getElementById('tl-modal-title').textContent=idx===-1?'Add Trip':'Edit Trip';
-          var f={countries:[],locations:'',start:'',finish:'',type:'',utl1:[],utl2:[]};
-          if(idx!==-1){var t=loadTrips()[idx];if(t){f.countries=Array.isArray(t.countries)?t.countries.slice():(t.country?[t.country]:[]);f.locations=t.locations||'';f.start=t.start||'';f.finish=t.finish||'';f.type=t.type||'';_utl1Selected=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);_utl2Selected=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);}}
           document.getElementById('tf-country-input').value='';
-      _travellersSelected=(f.travellers||f.companions||[TRAV_ID]).slice(); if(_travellersSelected.indexOf(TRAV_ID)===-1){_travellersSelected.unshift(TRAV_ID);} renderTags('travellers');
           document.getElementById('tf-locations').value=f.locations;
           document.getElementById('tf-start').value=f.start;
           document.getElementById('tf-finish').value=f.finish;
           document.getElementById('tf-type').value=f.type;
-          renderTags('utl1'); renderTags('utl2');
+          renderTags('countries'); renderTags('utl1'); renderTags('utl2'); renderTags('travellers');
           backdrop.classList.add('open');
           document.getElementById('tf-start').focus();
         }
