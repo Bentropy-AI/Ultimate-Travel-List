@@ -762,7 +762,8 @@
             +'</tr>';
           if(!sorted.length){tbody.innerHTML=(trips.length?'<tr><td colspan="8" class="tl-no-results">No trips match your search.</td></tr>':'<tr><td colspan="8" class="tl-empty-state-cell"><div class="tl-empty-icon">\u2708\uFE0F</div><p>No trips logged yet.<br><strong>Click \u2708\uFE0F Add Trip</strong> to record your first!</p></td></tr>')+homeRowHtml;return;}
           var rowsHtml=sorted.map(function(r){
-            var oi=loadTrips().indexOf(r);
+            var _tripId=r._id||(r.start+'|'+(r.countries||[r.country||'']).join(','));
+            var oi=_tripId;
             function idToName(id,items){var found=items.find(function(i){return i.id===id;});if(found)return found.name||found.title||id;return id.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}
             var utl1txt=Array.isArray(r.utl1)?r.utl1.map(function(id){return idToName(id,_tl1Items);}).join(', '):(r.utl1?idToName(r.utl1,_tl1Items):'');
             var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
@@ -789,10 +790,13 @@
         var thead=document.querySelector('#tl-table thead');
         if(thead)thead.addEventListener('click',function(e){var th=e.target.closest('th[data-col]');if(!th)return;var col=th.dataset.col;if(sortCol===col){sortDir=sortDir==='asc'?'desc':'asc';}else{sortCol=col;sortDir=(col==='country'||col==='continent'||col==='type')?'asc':'desc';}render();});
         var tbody2=document.getElementById('tl-tbody');
-        if(tbody2)tbody2.addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;var idx=parseInt(btn.dataset.idx,10);if(btn.classList.contains('tl-btn-edit')){openModal(idx);}if(btn.classList.contains('tl-btn-del')){deleteTrip(idx);}});
+        if(tbody2)tbody2.addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;var key=btn.dataset.idx;if(btn.classList.contains('tl-btn-edit')){openModal(key);}if(btn.classList.contains('tl-btn-del')){deleteTrip(key);}});
 
         /* ── DELETE ── */
-        function deleteTrip(idx){if(!confirm('Delete this trip entry?'))return;var all=loadTrips();all.splice(idx,1);saveTrips(all);render();}
+        function deleteTrip(key){if(!confirm('Delete this trip entry?'))return;
+          var all=loadTrips();
+          var di=-1;for(var _di=0;_di<all.length;_di++){var _did=all[_di]._id||(all[_di].start+'|'+(all[_di].countries||[all[_di].country||'']).join(','));if(_did===String(key)){di=_di;break;}}
+          if(di!==-1)all.splice(di,1);saveTrips(all);render();}
 
         /* ── MODAL ── */
         var backdrop=document.getElementById('tl-modal-backdrop');
@@ -825,7 +829,9 @@
           editIdx=idx; clearErrors();
           /* Build f from trip data (or defaults) FIRST, then populate selections */
           var f={countries:[],locations:'',start:'',finish:'',type:'',utl1:[],utl2:[],travellers:[]};
-          if(idx!==-1){var t=loadTrips()[idx];if(t){
+          var _foundTrip=null;
+          if(idx!==-1&&idx!==null&&idx!==undefined){var _all=loadTrips();for(var _fi=0;_fi<_all.length;_fi++){var _fid=_all[_fi]._id||(_all[_fi].start+'|'+(_all[_fi].countries||[_all[_fi].country||'']).join(','));if(_fid===String(idx)){_foundTrip=_all[_fi];break;}}}
+          if(_foundTrip){var t=_foundTrip;{
             f.countries=Array.isArray(t.countries)?t.countries.slice():(t.country?[t.country]:[]);
             f.locations=t.locations||''; f.start=t.start||''; f.finish=t.finish||''; f.type=t.type||'';
             f.utl1=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);
@@ -872,7 +878,13 @@
           var finish=document.getElementById('tf-finish').value||'';
           var trip={countries:_countriesSelected.slice(),continent:continent,locations:document.getElementById('tf-locations').value.trim(),start:start,finish:finish,type:type,utl1:_utl1Selected.slice(),utl2:_utl2Selected.slice(),travellers:_travellersSelected.slice()};
           var trips=loadTrips();
-          if(editIdx===-1){trips.push(trip);}else{trips[editIdx]=trip;}
+          if(editIdx===-1||editIdx===null||editIdx===undefined){
+            trip._id=Date.now().toString(36)+Math.random().toString(36).slice(2);
+            trips.push(trip);
+          } else {
+            var _si=-1;for(var _sj=0;_sj<trips.length;_sj++){var _sid=trips[_sj]._id||(trips[_sj].start+'|'+(trips[_sj].countries||[trips[_sj].country||'']).join(','));if(_sid===String(editIdx)){_si=_sj;break;}}
+            if(_si!==-1){trips[_si]=trip;trip._id=trips[_si]._id||editIdx;}else{trip._id=Date.now().toString(36)+Math.random().toString(36).slice(2);trips.push(trip);}
+          }
           saveTrips(trips);
           closeModal(); render();
         });
