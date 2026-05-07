@@ -429,30 +429,45 @@ function renderComparisonTable(opts) {
 /* ============================================================
    SECTION 10 - LEGACY loadAllData
    ============================================================ */
-function loadAllData() {
+function loadAllData(onRemote) {
   return Promise.all([
     fetchJSON('travellers.json'), fetchJSON('countries.json'), fetchJSON('animals.json'),
     fetchJSON('unesco.json'),     fetchJSON('travellist1.json'),
     fetchJSON('travellist2.json').catch(function(){ return []; })
   ]).then(function(results) {
     var travellers = results[0];
-    try {
-      var raw = localStorage.getItem(_CACHE_KEY);
-      if (raw) {
-        var local = JSON.parse(raw);
-        for (var j=0;j<travellers.length;j++) {
-          var t=travellers[j], l=local[t.id];
-          if (l && typeof l==='object') {
-            if(l.countries)   t.countries   = l.countries;
-            if(l.capitals)    t.capitals    = l.capitals;
-            if(l.animals)     t.animals     = l.animals;
-            if(l.unesco)      t.unesco      = l.unesco;
-            if(l.travellist1) t.travellist1 = l.travellist1;
-            if(l.travellist2) t.travellist2 = l.travellist2;
-          }
+
+    function _applyToTravellers(visited) {
+      for (var j = 0; j < travellers.length; j++) {
+        var t = travellers[j], l = visited[t.id];
+        if (l && typeof l === 'object') {
+          if (l.countries)   t.countries   = l.countries;
+          if (l.capitals)    t.capitals    = l.capitals;
+          if (l.animals)     t.animals     = l.animals;
+          if (l.unesco)      t.unesco      = l.unesco;
+          if (l.travellist1) t.travellist1 = l.travellist1;
+          if (l.travellist2) t.travellist2 = l.travellist2;
         }
       }
+    }
+
+    /* Apply localStorage cache immediately for fast render */
+    try {
+      var raw = localStorage.getItem(_CACHE_KEY);
+      if (raw) { _applyToTravellers(JSON.parse(raw)); }
     } catch(e) {}
+
+    /* Then fetch from JSONBin and re-apply for accuracy */
+    _fetchFullRecord().then(function(rec) {
+      if (rec.visited) {
+        _applyToTravellers(rec.visited);
+        _cacheSave(rec.visited);
+      }
+      if (typeof onRemote === 'function') onRemote();
+    }).catch(function() {
+      if (typeof onRemote === 'function') onRemote();
+    });
+
     return { travellers:travellers, countries:results[1], animals:results[2],
              unesco:results[3], tl1:results[4], tl2:results[5] };
   });
