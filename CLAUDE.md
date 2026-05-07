@@ -348,6 +348,7 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
+| 2026-05-07 | **Multiple render fixes** — (1) CC table render() was building rowsHtml but never assigning to tbody.innerHTML. (2) Travel log render() referenced `hRec` before it was defined — caused silent ReferenceError stopping render. Fixed by defining `hRec` locally at top of render(). (3) `_fetchFullRecord` was not calling `_applyVisited()` so JSONBin data never updated in-memory state. (4) `loadAllData()` only read localStorage, never fetched JSONBin — added onRemote callback and direct JSONBin fetch. (5) CC table IIFE read localStorage directly — replaced with direct JSONBin fetch. |
 | 2026-05-07 | **Nightly backup workflow** added at `.github/workflows/backup.yml`. Runs at 2am UTC daily (and on manual dispatch). Fetches full JSONBin record and commits it to `data/backup.json`. Requires `JSONBIN_KEY` repository secret. |
 | 2026-05-07 | **Data restored** from `utl_jb_visited` localStorage cache after race condition in `saveTrips` wiped JSONBin visited data. Race condition fixed with `_visitedLoaded` guard flag in `travel.js`. |
 | 2026-05-06 | **Home country** — `home` field added to all traveller profiles in `travellers.json` (currently `"United Kingdom"` for all four). Map tooltip shows "Home Country" indicator for the home country. No trip entry needed for home — UTL items ticked directly on tracker pages. `_homeCountry` variable populated in map IIFE from travellers data. |
