@@ -116,6 +116,7 @@
         Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
           var personData={};
           var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id===TRAV_ID){_homeCountry=_td[_hi].home||'';break;}}var cached=localStorage.getItem('utl_store_v2');if(cached){try{personData=JSON.parse(cached).paul||{};}catch(e){}}
+          fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}}).then(function(r){return r.json();}).then(function(jd){if(jd.record&&jd.record.visited&&jd.record.visited['paul']){personData=jd.record.visited['paul'];cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);}}).catch(function(){});
           var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('paul')!==-1;});}catch(e){}}
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
           renderMap(cm);
@@ -702,7 +703,7 @@
           var allTripsR = loadTrips();
           var hRec = null;
           for(var _ri=0;_ri<allTripsR.length;_ri++){if(allTripsR[_ri]._home){hRec=allTripsR[_ri];break;}}
-          var trips = allTripsR.filter(function(t){return !t._home;});
+          var trips = allTripsR.filter(function(t){if(t._home)return false;var tv=t.travellers||t.companions||[];return tv.indexOf(TRAV_ID)!==-1;});
           var s = curSearch.toLowerCase();
           var filtered = trips.filter(function(r){
             var cstr=((r.countries&&r.countries.length)?r.countries.join(' '):(r.country||''));var ms=!s||cstr.toLowerCase().indexOf(s)!==-1||(r.continent||'').toLowerCase().indexOf(s)!==-1||(r.locations||'').toLowerCase().indexOf(s)!==-1;
