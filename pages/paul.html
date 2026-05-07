@@ -846,13 +846,13 @@
           var f={countries:[],locations:'',start:'',finish:'',type:'',utl1:[],utl2:[],travellers:[]};
           var _foundTrip=null;
           if(idx!==-1&&idx!==null&&idx!==undefined){var _all=loadTrips();for(var _fi=0;_fi<_all.length;_fi++){var _fid=_all[_fi]._id||(_all[_fi].start+'|'+(_all[_fi].countries||[_all[_fi].country||'']).join(','));if(_fid===String(idx)){_foundTrip=_all[_fi];break;}}}
-          if(_foundTrip){var t=_foundTrip;{
+          if(_foundTrip){var t=_foundTrip;
             f.countries=Array.isArray(t.countries)?t.countries.slice():(t.country?[t.country]:[]);
             f.locations=t.locations||''; f.start=t.start||''; f.finish=t.finish||''; f.type=t.type||'';
             f.utl1=Array.isArray(t.utl1)?t.utl1.slice():(t.utl1?[t.utl1]:[]);
             f.utl2=Array.isArray(t.utl2)?t.utl2.slice():(t.utl2?[t.utl2]:[]);
             f.travellers=(t.travellers||t.companions||[]).slice();
-          }}
+          }
           /* Reset selections from f */
           _countriesSelected=f.countries.slice();
           _utl1Selected=f.utl1.slice();
