@@ -229,6 +229,10 @@ function _normalise(raw) {
         }
         t.travellers = travs;
       }
+      /* Migrate legacy single country string to countries array */
+      if (!t.countries) {
+        t.countries = t.country ? [t.country] : [];
+      }
       flat.push(t);
     }
   }
