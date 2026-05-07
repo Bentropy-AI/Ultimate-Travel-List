@@ -61,8 +61,11 @@ var _remoteLoaded  = false;
 var _pendingFlush  = null;
 var _flushCallbacks = [];
 
+var _fetchPromise = null;
 function _fetchFullRecord() {
-  return fetch(_BIN_URL + '/latest', {
+  /* Deduplicate concurrent fetches — reuse in-flight promise */
+  if (_fetchPromise) return _fetchPromise;
+  _fetchPromise = fetch(_BIN_URL + '/latest', {
     headers: { 'X-Master-Key': _API_KEY }
   }).then(function(r) {
     if (!r.ok) throw new Error('JSONBin GET failed: ' + r.status);
@@ -74,8 +77,13 @@ function _fetchFullRecord() {
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _remoteLoaded = true;
+    _fetchPromise = null;
     return _remoteRecord;
+  }).catch(function(e) {
+    _fetchPromise = null;
+    throw e;
   });
+  return _fetchPromise;
 }
 
 function _pushFullRecord() {
