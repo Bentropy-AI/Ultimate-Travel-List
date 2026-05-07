@@ -749,6 +749,7 @@
               +'<td><div class="tl-row-actions"><button class="tl-btn-edit" data-idx="'+oi+'" title="Edit">&#9998;</button><button class="tl-btn-del" data-idx="'+oi+'" title="Delete">&#128465;</button></div></td>'
               +'</tr>';
           }).join('');
+          tbody.innerHTML = rowsHtml + homeRowHtml;
         }
 
         /* ── TABLE EVENTS ── */
