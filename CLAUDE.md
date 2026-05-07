@@ -95,7 +95,7 @@ Cache is read immediately on page load for instant render; remote is fetched asy
 
 **travellers.json** — baseline arrays are legacy; live state comes from JSONBin:
 ```json
-{ "id": "ben", "name": "Ben", "emoji": "B", "color": "#4f8ef7",
+{ "id": "ben", "name": "Ben", "emoji": "B", "color": "#4f8ef7", "home": "United Kingdom",
   "countries": ["AL","AR",...], "travellist2": ["petra",...], ... }
 ```
 
@@ -348,6 +348,7 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
+| 2026-05-06 | **Home country** — `home` field added to all traveller profiles in `travellers.json` (currently `"United Kingdom"` for all four). Map tooltip shows "Home Country" indicator for the home country. No trip entry needed for home — UTL items ticked directly on tracker pages. `_homeCountry` variable populated in map IIFE from travellers data. |
 | 2026-05-06 | **Multi-country trips** — `country` field replaced with `countries:[]` array. Modal uses multi-select combo (same pattern as travellers). Continent auto-derived on save (majority wins; "Multi-continent" if split). Map tooltip matches against `countries[]`. Timeline bar shows "Primary +N" if multiple. Search filters across all countries. Legacy `country` string auto-migrated by `_normalise()`. CSV format uses pipe-separated countries. |
 | 2026-05-06 | **Unified trip architecture** — `trips` in JSONBin refactored from per-traveller object `{ben:[],shaz:[]}` to a single flat array. Each trip has a `travellers:[String]` field (all travellers including self). `TripStore.getAllTrips()` added. `saveTrips` now replaces the full array. Any traveller can edit/delete any trip they appear on. Legacy `companions` field handled gracefully. |
 | 2026-05-06 | **Timeline tab rolled out to all traveller pages** — `shaz.html`, `paul.html`, `ruth.html` now match `ben.html` with Progress + Timeline tabs, world map, country completion table, visual timeline, travel log, and add/edit modal. Per-traveller colours applied throughout. |
