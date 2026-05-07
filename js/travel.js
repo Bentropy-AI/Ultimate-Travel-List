@@ -56,6 +56,7 @@ function fetchJSON(file) {
    are never clobbered by each other.
    ============================================================ */
 var _remoteRecord = { visited: {}, trips: [] };
+var _visitedLoaded = false; /* guard: don't PUT trips until visited is loaded */
 var _remoteLoaded  = false;
 var _pendingFlush  = null;
 var _flushCallbacks = [];
@@ -69,6 +70,7 @@ function _fetchFullRecord() {
   }).then(function(d) {
     var rec = d.record || {};
     _remoteRecord.visited = rec.visited || {};
+    _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _remoteLoaded = true;
     return _remoteRecord;
@@ -177,7 +179,7 @@ var Store = (function() {
       if (cached) _applyVisited(cached);
 
       _fetchFullRecord().then(function(rec) {
-        if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); }
+        if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); _visitedLoaded = true; }
         if (typeof onRemote === 'function') onRemote();
       }).catch(function() {
         if (typeof onRemote === 'function') onRemote();
@@ -298,7 +300,12 @@ var TripStore = (function() {
   function saveTrips(travId, trips) {
     _tripsCache = trips;
     _cacheSave(_tripsCache);
+    if (!_visitedLoaded) {
+      /* visited not yet loaded — skip PUT to avoid clobbering visited data */
+      return;
+    }
     _remoteRecord.trips = _tripsCache;
+    _remoteRecord.visited = _buildVisited();
     _schedulePush(function(status) {
       for (var i = 0; i < _callbacks.length; i++) { try { _callbacks[i](status, travId); } catch(e) {} }
     });
