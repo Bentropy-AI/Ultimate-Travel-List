@@ -69,7 +69,8 @@ function _fetchFullRecord() {
     return r.json();
   }).then(function(d) {
     var rec = d.record || {};
-    _remoteRecord.visited = rec.visited || {};
+    if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); }
+    _remoteRecord.visited = _buildVisited();
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _remoteLoaded = true;
