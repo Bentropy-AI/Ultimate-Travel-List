@@ -421,6 +421,7 @@
               <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#0ea5e9"></div>Work</div>
               <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#fb7185"></div>Friends</div>
               <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#f97316"></div>Family</div>
+              <div class="tl-vt-leg-item"><div class="tl-vt-leg-dot" style="background:#14b8a6"></div>School</div>
             </div>
           </div>
           <div id="tl-vt-canvas-wrap" class="vt-empty">
@@ -465,6 +466,7 @@
         .tl-type-Work{color:#0ea5e9}
         .tl-type-Friends{color:#fb7185}
         .tl-type-Family{color:#f97316}
+        .tl-type-School{color:#14b8a6}
         .tl-type-other{color:var(--color-muted)}
         .tl-summary-line{font-size:.82rem;color:var(--color-muted);margin-bottom:1rem}
         .tl-no-results{text-align:center;padding:2rem;color:var(--color-muted)}
@@ -551,7 +553,7 @@
             <button class="filter-btn" data-filter="Travel">Travel</button>
             <button class="filter-btn" data-filter="Work">Work</button>
             <button class="filter-btn" data-filter="Friends">Friends</button>
-            <button class="filter-btn" data-filter="Family">Family</button>
+            <button class="filter-btn" data-filter="Family">Family</button><button class="filter-btn" data-filter="School">School</button>
           </div>
         </div>
 
@@ -713,7 +715,7 @@
         }).catch(function(){ render(); });
 
         /* ── HELPERS ── */
-        function typeClass(t){if(!t)return'tl-type-other';if(t==='Travel')return'tl-type-Travel';if(t==='Work')return'tl-type-Work';if(t==='Friends')return'tl-type-Friends';if(t==='Family')return'tl-type-Family';return'tl-type-other';}
+        function typeClass(t){if(!t)return'tl-type-other';if(t==='Travel')return'tl-type-Travel';if(t==='Work')return'tl-type-Work';if(t==='Friends')return'tl-type-Friends';if(t==='Family')return'tl-type-Family';if(t==='School')return'tl-type-School';return'tl-type-other';}
         function fmtDate(d){if(!d)return'—';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'});}
         function fmtMonth(d){if(!d)return'—';var p=new Date(d+'T00:00:00');return p.toLocaleDateString('en-GB',{month:'short',year:'2-digit'}).replace(' ','-');}
         function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -943,7 +945,7 @@
            ══════════════════════════════════════════════════════ */
         (function(){
           var TRAV_ID = 'shaz';
-          var TYPE_COLORS = {Travel:'#f59e0b',Work:'#0ea5e9',Friends:'#fb7185',Family:'#f97316'};
+          var TYPE_COLORS = {Travel:'#f59e0b',Work:'#0ea5e9',Friends:'#fb7185',Family:'#f97316',School:'#14b8a6'};
           var PPD = {decade:0.35,year:3.2,month:24};
           var AXIS_H=38,LANE_H=28,LANE_GAP=8,TRIP_R=4,PAD_H=10,PAD_L=8,MIN_BAR=5;
           var scale='year',viewStart=null,viewEnd=null;
