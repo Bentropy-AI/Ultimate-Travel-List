@@ -119,12 +119,16 @@ Cache is read immediately on page load for instant render; remote is fetched asy
   type:        "Travel" | "Work" | "Friends" | "Family",
   utl1:        [String],    // array of travellist1 item IDs or names
   utl2:        [String],    // array of travellist2 item IDs or names
+  countries:   [String],    // array of country names e.g. ["United Kingdom","France"] — matched to countries.json names
+  continent:   String,      // auto-derived on save: majority continent, or 'Multi-continent' if split
   travellers:  [String]     // array of ALL traveller IDs on this trip e.g. ["ben","shaz","paul"]
                             // NOTE: includes the person who logged it — no separate owner field
 }
 ```
 
 The `travellers` field replaces the old `companions` field. Legacy records with `companions` are handled gracefully — code always checks `t.travellers || t.companions`.
+
+The `countries` field replaces the old single `country` string. Legacy records are auto-migrated by `_normalise()` in `travel.js` (`country → countries:[country]`). Code always checks `t.countries || (t.country ? [t.country] : [])`.
 
 ---
 
@@ -344,6 +348,7 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
+| 2026-05-06 | **Multi-country trips** — `country` field replaced with `countries:[]` array. Modal uses multi-select combo (same pattern as travellers). Continent auto-derived on save (majority wins; "Multi-continent" if split). Map tooltip matches against `countries[]`. Timeline bar shows "Primary +N" if multiple. Search filters across all countries. Legacy `country` string auto-migrated by `_normalise()`. CSV format uses pipe-separated countries. |
 | 2026-05-06 | **Unified trip architecture** — `trips` in JSONBin refactored from per-traveller object `{ben:[],shaz:[]}` to a single flat array. Each trip has a `travellers:[String]` field (all travellers including self). `TripStore.getAllTrips()` added. `saveTrips` now replaces the full array. Any traveller can edit/delete any trip they appear on. Legacy `companions` field handled gracefully. |
 | 2026-05-06 | **Timeline tab rolled out to all traveller pages** — `shaz.html`, `paul.html`, `ruth.html` now match `ben.html` with Progress + Timeline tabs, world map, country completion table, visual timeline, travel log, and add/edit modal. Per-traveller colours applied throughout. |
 | 2026-05-06 | **Visited ticks coloured by traveller** on all tracker pages (`ultimatetravellist1`, `ultimatetravellist2`, `countries`, `unesco`) using CSS `data-trav` attribute selectors. |
