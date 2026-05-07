@@ -978,15 +978,8 @@
               var lane=-1;
               /* Find first free lane */
               for(var i=0;i<laneEnds.length;i++){if(!laneEnds[i]||!s||laneEnds[i]<=s){lane=i;laneEnds[i]=e||addDays(s||new Date(),1);break;}}
-              /* If no free lane and under cap, create new lane */
-              if(lane===-1&&laneEnds.length<MAX_LANES){lane=laneEnds.length;laneEnds.push(e||addDays(s||new Date(),1));}
-              /* If at cap, assign to lane with earliest end (least overlap) */
-              if(lane===-1){
-                var earliest=0;
-                for(var j=1;j<laneEnds.length;j++){if(laneEnds[j]<laneEnds[earliest])earliest=j;}
-                lane=earliest;
-                if(e)laneEnds[lane]=e;
-              }
+              /* Create new lane if needed */
+              if(lane===-1){lane=laneEnds.length;laneEnds.push(e||addDays(s||new Date(),1));}
               return Object.assign({},t,{_s:s,_e:e||addDays(s||new Date(),1),_lane:lane});
             });
           }
@@ -1025,7 +1018,8 @@
             var vs=vw.s,ve=vw.e,totalDays=daysBetween(vs,ve);
             var totalW=Math.max(PAD_L*2+totalDays*ppd,(wrap.clientWidth||900)-2);
             var laneCount=0;trips.forEach(function(t){if(t._lane>=laneCount)laneCount=t._lane+1;});
-            var svgH=AXIS_H+laneCount*(LANE_H+LANE_GAP)+PAD_H;
+            var dispLanes=Math.min(laneCount,MAX_LANES);
+            var svgH=AXIS_H+dispLanes*(LANE_H+LANE_GAP)+PAD_H;
             svgEl.setAttribute('width',Math.ceil(totalW));svgEl.setAttribute('height',svgH);svgEl.innerHTML='';
 
             var stripeG=document.createElementNS(NS,'g');
@@ -1048,7 +1042,7 @@
             trips.forEach(function(t){
               if(!t._s)return;
               var x1=dateToX(t._s,vs,ppd),x2=dateToX(t._e,vs,ppd),bw=Math.max(x2-x1,MIN_BAR);
-              var ly=AXIS_H+t._lane*(LANE_H+LANE_GAP)+LANE_GAP/2,col=tripColor(t.type);
+              var _lane=Math.min(t._lane,MAX_LANES-1);var ly=AXIS_H+_lane*(LANE_H+LANE_GAP)+LANE_GAP/2,col=tripColor(t.type);
               if(x1>totalW+20||x2<-20)return;
               var g=document.createElementNS(NS,'g');g.style.cursor='pointer';
               var bar=document.createElementNS(NS,'rect');bar.setAttribute('x',x1);bar.setAttribute('y',ly);bar.setAttribute('width',bw);bar.setAttribute('height',LANE_H);bar.setAttribute('rx',TRIP_R);bar.setAttribute('ry',TRIP_R);bar.setAttribute('fill',col);bar.setAttribute('fill-opacity','0.82');g.appendChild(bar);
