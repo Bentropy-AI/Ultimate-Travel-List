@@ -768,7 +768,7 @@
             var utl2txt=Array.isArray(r.utl2)?r.utl2.map(function(id){return idToName(id,_tl2Items);}).join(', '):(r.utl2?idToName(r.utl2,_tl2Items):'');
             return '<tr data-idx="'+oi+'">'
               +'<td class="tl-date-col">'+fmtMonth(r.start)+'</td>'
-              +'<td class="tl-country-col">'+esc((r.countries&&r.countries.length)?r.countries.join(', '):(r.country||'—'))+'</td>'
+              +'<td class="tl-country-col" title="'+esc((r.countries&&r.countries.length)?r.countries.join(', '):(r.country||''))+'">'+esc((r.countries&&r.countries.length)?r.countries.join(', '):(r.country||'—'))+'</td>'
               +'<td><span class="tl-cont-badge">'+esc(r.continent||'—')+'</span></td>'
               +'<td class="tl-loc-cell" title="'+esc(r.locations||'')+'">'+esc(r.locations||'—')+'</td>'
               +'<td class="tl-list-cell" title="'+esc(utl1txt)+'">'+esc(utl1txt||'—')+'</td>'
