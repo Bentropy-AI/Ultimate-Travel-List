@@ -331,31 +331,22 @@
 
       Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json')]).then(function(res){
         var tl1=res[0],tl2=res[1],countries=res[2];
-        function getPersonData(){
-          /* Try Store state first, fall back to localStorage */
-          var pd={countries:[],capitals:[],travellist1:[],travellist2:[],animals:[],unesco:[]};
-          if(window.TravelApp&&window.TravelApp.Store){
-            var S=window.TravelApp.Store;
-            pd.countries=S.getVisitedArray('ben','countries');
-            pd.capitals=S.getVisitedArray('ben','capitals');
-            pd.travellist1=S.getVisitedArray('ben','travellist1');
-            pd.travellist2=S.getVisitedArray('ben','travellist2');
-          } else {
-            try{var c=localStorage.getItem('utl_store_v2');if(c){var l=JSON.parse(c)['ben']||{};pd=l;}}catch(e){}
-          }
-          return pd;
+        function buildFromVisited(visited){
+          var pd=visited['ben']||{};
+          _rows=buildRows(tl1,tl2,countries,pd);
+          render();
         }
-        _rows=buildRows(tl1,tl2,countries,getPersonData());
-        render();
-        /* Re-render when remote data arrives */
+        /* Render from cache immediately */
+        try{var _cc=localStorage.getItem('utl_store_v2');if(_cc){buildFromVisited(JSON.parse(_cc));}}catch(e){}
+        /* Then fetch fresh from JSONBin */
+        fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{
+          headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}
+        }).then(function(r){return r.json();}).then(function(d){
+          if(d.record&&d.record.visited){buildFromVisited(d.record.visited);}
+        }).catch(function(){});
         if(window.TravelApp&&window.TravelApp.Store){
-          window.TravelApp.Store.load(function(){
-            _rows=buildRows(tl1,tl2,countries,getPersonData());
-            render();
-          });
           window.TravelApp.Store.onSave(function(){
-            _rows=buildRows(tl1,tl2,countries,getPersonData());
-            render();
+            try{var _cc2=localStorage.getItem('utl_store_v2');if(_cc2){buildFromVisited(JSON.parse(_cc2));}}catch(e){}
           });
         }
       });
