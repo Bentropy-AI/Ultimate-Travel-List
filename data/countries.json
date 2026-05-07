@@ -1128,6 +1128,24 @@
     "continent": "Europe"
   },
   {
+    "id": "GB-SCT",
+    "name": "Scotland",
+    "capital": "Edinburgh",
+    "continent": "Europe"
+  },
+  {
+    "id": "GB-WLS",
+    "name": "Wales",
+    "capital": "Cardiff",
+    "continent": "Europe"
+  },
+  {
+    "id": "GB-NIR",
+    "name": "Northern Ireland",
+    "capital": "Belfast",
+    "continent": "Europe"
+  },
+  {
     "id": "US",
     "name": "United States",
     "capital": "Washington D.C.",
