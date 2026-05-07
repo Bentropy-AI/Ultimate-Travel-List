@@ -348,6 +348,11 @@ UNESCO `country` fields can be multi-value (comma-separated) and use `UNESCO_NM`
 
 | Date | Change |
 |------|--------|
+| 2026-05-07 | **Map legend colours** — gradient bar and swatches updated to use each traveller's colour palette. Ben=blue, Shaz=purple, Paul=green, Ruth=pink. |
+| 2026-05-07 | **Summary stat cards** — coloured top border and tinted background added to `#pStats` cards on each traveller page matching their colour. Stat numbers coloured via `#pStats .stat-card .stat-number` with `!important`. |
+| 2026-05-07 | **Home bucket per-traveller** — `_home` records now stamped with `travellers:[TRAV_ID]`. Save/lookup/render all filter by TRAV_ID so each traveller has independent UK UTL ticks. |
+| 2026-05-07 | **Map IIFE fixes (shaz/paul/ruth)** — `TRAV_ID` replaced with hardcoded id in map IIFE (declared too late). Duplicate `var tc`/`var cm` declarations removed. `Store.load()` added to trigger remote fetch and re-render map. |
+| 2026-05-07 | **Trip filter by TRAV_ID** — `render()` now filters `trips` by `travellers.indexOf(TRAV_ID)` so Paul/Ruth only see trips they were tagged on. |
 | 2026-05-07 | **Multiple render fixes** — (1) CC table render() was building rowsHtml but never assigning to tbody.innerHTML. (2) Travel log render() referenced `hRec` before it was defined — caused silent ReferenceError stopping render. Fixed by defining `hRec` locally at top of render(). (3) `_fetchFullRecord` was not calling `_applyVisited()` so JSONBin data never updated in-memory state. (4) `loadAllData()` only read localStorage, never fetched JSONBin — added onRemote callback and direct JSONBin fetch. (5) CC table IIFE read localStorage directly — replaced with direct JSONBin fetch. |
 | 2026-05-07 | **Nightly backup workflow** added at `.github/workflows/backup.yml`. Runs at 2am UTC daily (and on manual dispatch). Fetches full JSONBin record and commits it to `data/backup.json`. Requires `JSONBIN_KEY` repository secret. |
 | 2026-05-07 | **Data restored** from `utl_jb_visited` localStorage cache after race condition in `saveTrips` wiped JSONBin visited data. Race condition fixed with `_visitedLoaded` guard flag in `travel.js`. |
