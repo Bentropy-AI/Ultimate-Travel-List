@@ -1065,7 +1065,11 @@
     var app = window.TravelApp;
     var PERSON = "ben";
     app.renderNav(PERSON);
-    app.loadAllData().then(function(data) {
+    var _cachedData = null;
+    function updateStats(data) {
+      if (data) _cachedData = data;
+      else data = _cachedData;
+      if (!data) return;
       var travellers = data.travellers;
       var countries  = data.countries;
       var animals    = data.animals;
@@ -1084,6 +1088,9 @@
         app.buildStatCard((t.capitals||[]).length,    "/ " + countries.length + " Capitals") +
         app.buildStatCard((t.unesco||[]).length,      "/ " + unesco.length + " UNESCO Sites") +
         app.buildStatCard((t.animals||[]).length,     "/ " + animals.length + " Animals");
+    }
+    app.loadAllData(function(){ updateStats(null); }).then(function(data) {
+      updateStats(data);
     }).catch(function(err) { console.error(err); });
   </script>
 </body>
