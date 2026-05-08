@@ -90,14 +90,25 @@ function _fetchFullRecord() {
 }
 
 function _pushFullRecord() {
-  return fetch(_BIN_URL, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Master-Key': _API_KEY },
-    body: JSON.stringify(_remoteRecord)
-  }).then(function(r) {
-    if (!r.ok) throw new Error('JSONBin PUT failed: ' + r.status);
-    return r.json();
-  });
+  /* Always GET fresh trips before PUT so visited saves never wipe trips */
+  return fetch(_BIN_URL + '/latest', { headers: { 'X-Master-Key': _API_KEY } })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var latestTrips = (d.record && d.record.trips) ? d.record.trips : _tripsCache;
+      var payload = {
+        visited: _remoteRecord.visited,
+        trips: latestTrips.length ? latestTrips : _tripsCache
+      };
+      return fetch(_BIN_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Master-Key': _API_KEY },
+        body: JSON.stringify(payload)
+      });
+    })
+    .then(function(r) {
+      if (!r.ok) throw new Error('JSONBin PUT failed: ' + r.status);
+      return r.json();
+    });
 }
 
 /* debounce – one PUT at most every 800ms */
