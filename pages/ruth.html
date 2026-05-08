@@ -1071,6 +1071,8 @@
               barsG.appendChild(g);
             });
             svgEl.appendChild(barsG);
+            /* Scroll to latest trips (far right) */
+            setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth;},50);
             if(infoEl){var fm=function(d){return d.toLocaleDateString('en-GB',{month:'short',year:'numeric'});};infoEl.textContent=fm(vs)+' \u2013 '+fm(ve)+' \u00b7 '+trips.length+' trip'+(trips.length!==1?'s':'');}
           }
 
