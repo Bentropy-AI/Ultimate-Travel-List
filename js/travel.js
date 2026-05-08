@@ -73,8 +73,7 @@ function _fetchFullRecord() {
     return r.json();
   }).then(function(d) {
     var rec = d.record || {};
-    if (rec.visited) { _applyVisited(rec.visited); }
-    /* _remoteRecord.visited will be set by Store when it processes this record */
+    if (rec.visited) { _applyVisited(rec.visited); _remoteRecord.visited = rec.visited; }
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _tripsCache           = _remoteRecord.trips; /* sync _tripsCache - now in outer scope */
