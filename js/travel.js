@@ -120,7 +120,8 @@ function _fetchFullRecord() {
     return r.json();
   }).then(function(d) {
     var rec = d.record || {};
-    if (rec.visited) { _applyVisited(rec.visited); _remoteRecord.visited = rec.visited; }
+    /* Store raw visited — _applyVisited called by Store.load after _travellers is set */
+    if (rec.visited) { _remoteRecord.visited = rec.visited; }
     _visitedLoaded = true;
     _remoteRecord.trips   = _normalise(rec.trips || []);
     _tripsCache           = _remoteRecord.trips; /* sync _tripsCache - now in outer scope */
@@ -248,7 +249,12 @@ var Store = (function() {
       if (cached) _applyVisited(cached);
 
       _fetchFullRecord().then(function(rec) {
-        if (rec.visited) { _applyVisited(rec.visited); _cacheSave(_buildVisited()); _visitedLoaded = true; }
+        /* _travellers now set — safe to apply visited state */
+        if (_remoteRecord.visited && Object.keys(_remoteRecord.visited).length) {
+          _applyVisited(_remoteRecord.visited);
+          _cacheSave(_buildVisited());
+          _visitedLoaded = true;
+        }
         if (typeof onRemote === 'function') onRemote();
       }).catch(function() {
         if (typeof onRemote === 'function') onRemote();
