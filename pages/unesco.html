@@ -339,13 +339,20 @@
                   for (var ai = 0; ai < arr.length; ai++) _visitedSets[tid][arr[ai]] = true;
             }
 
-            /* Override Store.isVisited for UNESCO using our direct data */
+            /* Override Store.isVisited and getVisitedCount for UNESCO using our direct data */
             var _origIsVisited = Store.isVisited;
             Store.isVisited = function(travId, category, itemId) {
                   if (category === 'unesco' && _visitedSets[travId]) {
                         return !!_visitedSets[travId][itemId];
                   }
                   return _origIsVisited(travId, category, itemId);
+            };
+            var _origGetVisitedCount = Store.getVisitedCount;
+            Store.getVisitedCount = function(travId, category) {
+                  if (category === 'unesco' && _visitedSets[travId]) {
+                        return Object.keys(_visitedSets[travId]).length;
+                  }
+                  return _origGetVisitedCount(travId, category);
             };
 
             buildSiteMap();
