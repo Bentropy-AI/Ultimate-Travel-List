@@ -29,7 +29,7 @@
    AUTH - Simple client-side password gate
    Password hash can be updated via GitHub secret or direct edit
    ============================================================ */
-var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_HASH = '0209442e115ad7bc79fd281d91423a86b619e3c711fe574b7cc198d2e3c461c4';
 var _AUTH_KEY  = 'utl_auth_v1';
 
 function _sha256(str) {
@@ -531,7 +531,7 @@ function renderComparisonTable(opts) {
    AUTH - Simple client-side password gate
    Password hash can be updated via GitHub secret or direct edit
    ============================================================ */
-var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_HASH = '0209442e115ad7bc79fd281d91423a86b619e3c711fe574b7cc198d2e3c461c4';
 var _AUTH_KEY  = 'utl_auth_v1';
 
 function _sha256(str) {
@@ -625,7 +625,7 @@ function loadAllData(onRemote) {
    AUTH - Simple client-side password gate
    Password hash can be updated via GitHub secret or direct edit
    ============================================================ */
-var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_HASH = '0209442e115ad7bc79fd281d91423a86b619e3c711fe574b7cc198d2e3c461c4';
 var _AUTH_KEY  = 'utl_auth_v1';
 
 function _sha256(str) {
