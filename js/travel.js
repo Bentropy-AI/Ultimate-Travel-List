@@ -475,7 +475,7 @@ function renderNav(activeKey) {
   if (isAuthenticated()) {
     html += '<button class="nav-auth-btn" onclick="authLogout()">&#128274; Logout</button>';
   } else {
-    html += '<button class="nav-auth-btn nav-auth-btn--login" onclick="showLoginModal()">&#128275; Edit Mode</button>';
+    html += '<button class="nav-auth-btn nav-auth-btn--login" onclick="showLoginModal()">&#128275; Log in</button>';
   }
   var inner = document.querySelector('.site-nav .nav-inner');
   if (inner) inner.innerHTML = html;
