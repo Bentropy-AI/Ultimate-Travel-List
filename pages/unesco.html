@@ -318,11 +318,62 @@
             return map;
       }
 
-      Store.load(redraw).then(function(data) {
-            _travellers = data.travellers;
-            _allSites = data.unesco || [];
+      /* Fetch all data in parallel for reliable rendering */
+      Promise.all([
+            fetch('../data/travellers.json').then(function(r){return r.json();}),
+            fetch('../data/unesco.json').then(function(r){return r.json();}),
+            fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{
+                  headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}
+            }).then(function(r){return r.json();})
+      ]).then(function(results) {
+            _travellers = results[0];
+            _allSites   = results[1];
+            var visited = (results[2].record && results[2].record.visited) || {};
+
+            /* Build visited sets directly from JSONBin */
+            var _visitedSets = {};
+            for (var ti = 0; ti < _travellers.length; ti++) {
+                  var tid = _travellers[ti].id;
+                  _visitedSets[tid] = {};
+                  var arr = (visited[tid] && visited[tid].unesco) || [];
+                  for (var ai = 0; ai < arr.length; ai++) _visitedSets[tid][arr[ai]] = true;
+            }
+
+            /* Override Store methods to use our direct data */
+            Store.isVisited = function(travId, category, itemId) {
+                  if (category === 'unesco') return !!(_visitedSets[travId] && _visitedSets[travId][itemId]);
+                  return false;
+            };
+            Store.getVisitedCount = function(travId, category) {
+                  if (category === 'unesco') return _visitedSets[travId] ? Object.keys(_visitedSets[travId]).length : 0;
+                  return 0;
+            };
+            Store.toggle = function(travId, category, itemId) {
+                  if (!isAuthenticated()) { showLoginModal(); return; }
+                  if (category !== 'unesco') return;
+                  if (_visitedSets[travId] && _visitedSets[travId][itemId]) {
+                        delete _visitedSets[travId][itemId];
+                  } else {
+                        if (!_visitedSets[travId]) _visitedSets[travId] = {};
+                        _visitedSets[travId][itemId] = true;
+                  }
+                  /* Save to JSONBin */
+                  var unescoBin = {};
+                  for (var t in _visitedSets) unescoBin[t] = Object.keys(_visitedSets[t]);
+                  fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}})
+                        .then(function(r){return r.json();})
+                        .then(function(jd){
+                              var rec = jd.record || {};
+                              for (var t2 in unescoBin) { if(rec.visited && rec.visited[t2]) rec.visited[t2].unesco = unescoBin[t2]; }
+                              return fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab',{method:'PUT',
+                                    headers:{'Content-Type':'application/json','X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'},
+                                    body:JSON.stringify({visited:rec.visited,trips:rec.trips})});
+                        });
+            };
+
             buildSiteMap();
             redraw();
+            renderSummary();
 
             /* Tick clicks */
             document.getElementById('ccTable').addEventListener('click', function(e) {
