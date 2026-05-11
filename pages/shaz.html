@@ -917,9 +917,22 @@
           function selectItem(val){_sel=val;input.value=val;list.classList.remove('open');onSelect(val);}
         }
 
-        makeCombo('tf-country-input','tf-country-list',function(){return _countries.filter(function(c){return _countriesSelected.indexOf(c.name)===-1;}).map(function(c){return c.name;});},function(val){if(_countriesSelected.indexOf(val)===-1){_countriesSelected.push(val);document.getElementById('tf-country-input').value='';renderTags('countries');}});
-        makeCombo('tf-utl1-input','tf-utl1-list',function(){return _tl1Items.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl1Selected.indexOf(n)===-1;});},function(val){if(_utl1Selected.indexOf(val)===-1)_utl1Selected.push(val);document.getElementById('tf-utl1-input').value='';renderTags('utl1');});
-        makeCombo('tf-utl2-input','tf-utl2-list',function(){return _tl2Items.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl2Selected.indexOf(n)===-1;});},function(val){if(_utl2Selected.indexOf(val)===-1)_utl2Selected.push(val);document.getElementById('tf-utl2-input').value='';renderTags('utl2');});
+        makeCombo('tf-country-input','tf-country-list',function(){return _countries.filter(function(c){return _countriesSelected.indexOf(c.name)===-1;}).map(function(c){return c.name;});},function(val){if(_countriesSelected.indexOf(val)===-1){_countriesSelected.push(val);document.getElementById('tf-country-input').value='';renderTags('countries');/* Refresh UTL lists to show only items for selected countries */
+          var u1=document.getElementById('tf-utl1-input');var u2=document.getElementById('tf-utl2-input');if(u1&&u1===document.activeElement)u1.dispatchEvent(new Event('input'));if(u2&&u2===document.activeElement)u2.dispatchEvent(new Event('input'));}});
+        makeCombo('tf-utl1-input','tf-utl1-list',function(){
+          var filtered=_tl1Items.filter(function(i){
+            if(!_countriesSelected.length)return true;
+            return _countriesSelected.indexOf(i.country)!==-1;
+          });
+          return filtered.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl1Selected.indexOf(n)===-1;});
+        },function(val){if(_utl1Selected.indexOf(val)===-1)_utl1Selected.push(val);document.getElementById('tf-utl1-input').value='';renderTags('utl1');});
+        makeCombo('tf-utl2-input','tf-utl2-list',function(){
+          var filtered=_tl2Items.filter(function(i){
+            if(!_countriesSelected.length)return true;
+            return _countriesSelected.indexOf(i.country)!==-1;
+          });
+          return filtered.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl2Selected.indexOf(n)===-1;});
+        },function(val){if(_utl2Selected.indexOf(val)===-1)_utl2Selected.push(val);document.getElementById('tf-utl2-input').value='';renderTags('utl2');});
         makeCombo('tf-travellers-input','tf-travellers-list',function(){return _TRAVELLERS.map(function(t){return t.name;});},function(name){var t=_TRAVELLERS.find(function(x){return x.name===name;});var val=t?t.id:name.toLowerCase();if(_travellersSelected.indexOf(val)===-1){_travellersSelected.push(val);document.getElementById('tf-travellers-input').value='';renderTags('travellers');}});
 
         function renderTags(which){
