@@ -318,14 +318,11 @@
             return map;
       }
 
-      Store.load(function() {
-            /* onRemote: fires after JSONBin fetch with correct visited state */
-            if (_allSites.length) { redraw(); renderSummary(); }
-      }).then(function(data) {
+      Store.load(redraw).then(function(data) {
             _travellers = data.travellers;
             _allSites = data.unesco || [];
             buildSiteMap();
-            redraw(); renderSummary();
+            redraw();
 
             /* Tick clicks */
             document.getElementById('ccTable').addEventListener('click', function(e) {
