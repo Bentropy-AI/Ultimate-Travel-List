@@ -69,6 +69,7 @@ main { flex: 1; padding: 2rem 0 4rem; }
      color: var(--color-primary);
      white-space: nowrap;
      text-decoration: none;
+     margin-right: 1.5rem;
 }
 .nav-brand:hover { color: var(--color-primary-h); }
 
