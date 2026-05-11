@@ -318,7 +318,10 @@
             return map;
       }
 
-      Store.load(redraw).then(function(data) {
+      Store.load(function() {
+            /* onRemote: fired after JSONBin fetch — _allSites already set, just redraw */
+            redraw();
+      }).then(function(data) {
             _travellers = data.travellers;
             _allSites = data.unesco || [];
             var siteMap = buildSiteMap();
