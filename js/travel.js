@@ -24,6 +24,53 @@
  * Pure ES5 - no template literals, no destructuring.
  */
 
+
+/* ============================================================
+   AUTH - Simple client-side password gate
+   Password hash can be updated via GitHub secret or direct edit
+   ============================================================ */
+var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_KEY  = 'utl_auth_v1';
+
+function _sha256(str) {
+  /* Simple SHA-256 using SubtleCrypto - returns Promise<hex string> */
+  var buf = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buf).then(function(hashBuf) {
+    return Array.from(new Uint8Array(hashBuf))
+      .map(function(b) { return b.toString(16).padStart(2,'0'); })
+      .join('');
+  });
+}
+
+function isAuthenticated() {
+  try { return localStorage.getItem(_AUTH_KEY) === _AUTH_HASH; } catch(e) { return false; }
+}
+
+function authLogin(password, cb) {
+  _sha256(password).then(function(hash) {
+    if (hash === _AUTH_HASH) {
+      try { localStorage.setItem(_AUTH_KEY, hash); } catch(e) {}
+      if (cb) cb(true);
+    } else {
+      if (cb) cb(false);
+    }
+  });
+}
+
+function authLogout() {
+  try { localStorage.removeItem(_AUTH_KEY); } catch(e) {}
+  window.location.reload();
+}
+
+function applyAuthMode() {
+  /* Add or remove 'read-only' class on body */
+  if (isAuthenticated()) {
+    document.body.classList.remove('read-only');
+  } else {
+    document.body.classList.add('read-only');
+  }
+}
+
 /* ============================================================
    SECTION 1 - CONFIGURATION
    ============================================================ */
@@ -213,6 +260,7 @@ var Store = (function() {
   }
 
   function toggle(travId, category, itemId) {
+    if (!isAuthenticated()) { showLoginModal(); return; }
     if (!_state[travId]) _state[travId] = {};
     if (!_state[travId][category]) _state[travId][category] = {};
     if (_state[travId][category][itemId]) { delete _state[travId][category][itemId]; }
@@ -327,6 +375,7 @@ var TripStore = (function() {
 
   /* Replace the entire flat trips array (used after add/edit/delete from any page) */
   function saveTrips(travId, trips) {
+    if (!isAuthenticated()) { showLoginModal(); return; }
     _tripsCache = trips;
     _cacheSave(_tripsCache);
     if (!_visitedLoaded) {
@@ -422,8 +471,16 @@ function renderNav(activeKey) {
     '<li class="nav-dropdown"><span class="nav-dropdown-label">Travellers <span class="caret">&#9660;</span></span><ul class="nav-submenu">'+travHtml+'</ul></li>' +
     '<li class="nav-dropdown"><span class="nav-dropdown-label">Analytics <span class="caret">&#9660;</span></span><ul class="nav-submenu">'+analyticsHtml+'</ul></li>' +
     '</ul>';
+  /* Add login/logout button */
+  if (isAuthenticated()) {
+    html += '<button class="nav-auth-btn" onclick="authLogout()">&#128274; Logout</button>';
+  } else {
+    html += '<button class="nav-auth-btn nav-auth-btn--login" onclick="showLoginModal()">&#128275; Edit Mode</button>';
+  }
   var inner = document.querySelector('.site-nav .nav-inner');
   if (inner) inner.innerHTML = html;
+  /* Apply read-only mode after nav renders */
+  applyAuthMode();
 }
 
 /* ============================================================
@@ -467,6 +524,53 @@ function renderComparisonTable(opts) {
     if(onToggle){var dots=container.querySelectorAll('.dot[data-trav]');for(var di=0;di<dots.length;di++){dots[di].addEventListener('click',function(){var tid=this.getAttribute('data-trav'),iid=this.getAttribute('data-iid');if(tid&&iid){Store.toggle(tid,category,iid);onToggle(tid,iid);render();}});}}
   }
   render();
+}
+
+
+/* ============================================================
+   AUTH - Simple client-side password gate
+   Password hash can be updated via GitHub secret or direct edit
+   ============================================================ */
+var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_KEY  = 'utl_auth_v1';
+
+function _sha256(str) {
+  /* Simple SHA-256 using SubtleCrypto - returns Promise<hex string> */
+  var buf = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buf).then(function(hashBuf) {
+    return Array.from(new Uint8Array(hashBuf))
+      .map(function(b) { return b.toString(16).padStart(2,'0'); })
+      .join('');
+  });
+}
+
+function isAuthenticated() {
+  try { return localStorage.getItem(_AUTH_KEY) === _AUTH_HASH; } catch(e) { return false; }
+}
+
+function authLogin(password, cb) {
+  _sha256(password).then(function(hash) {
+    if (hash === _AUTH_HASH) {
+      try { localStorage.setItem(_AUTH_KEY, hash); } catch(e) {}
+      if (cb) cb(true);
+    } else {
+      if (cb) cb(false);
+    }
+  });
+}
+
+function authLogout() {
+  try { localStorage.removeItem(_AUTH_KEY); } catch(e) {}
+  window.location.reload();
+}
+
+function applyAuthMode() {
+  /* Add or remove 'read-only' class on body */
+  if (isAuthenticated()) {
+    document.body.classList.remove('read-only');
+  } else {
+    document.body.classList.add('read-only');
+  }
 }
 
 /* ============================================================
@@ -514,6 +618,53 @@ function loadAllData(onRemote) {
     return { travellers:travellers, countries:results[1], animals:results[2],
              unesco:results[3], tl1:results[4], tl2:results[5] };
   });
+}
+
+
+/* ============================================================
+   AUTH - Simple client-side password gate
+   Password hash can be updated via GitHub secret or direct edit
+   ============================================================ */
+var _AUTH_HASH = '190ae5a26660093e48c27859b7ce9f92436bf1bfc4a0ab6dc175c842950c71f6';
+var _AUTH_KEY  = 'utl_auth_v1';
+
+function _sha256(str) {
+  /* Simple SHA-256 using SubtleCrypto - returns Promise<hex string> */
+  var buf = new TextEncoder().encode(str);
+  return crypto.subtle.digest('SHA-256', buf).then(function(hashBuf) {
+    return Array.from(new Uint8Array(hashBuf))
+      .map(function(b) { return b.toString(16).padStart(2,'0'); })
+      .join('');
+  });
+}
+
+function isAuthenticated() {
+  try { return localStorage.getItem(_AUTH_KEY) === _AUTH_HASH; } catch(e) { return false; }
+}
+
+function authLogin(password, cb) {
+  _sha256(password).then(function(hash) {
+    if (hash === _AUTH_HASH) {
+      try { localStorage.setItem(_AUTH_KEY, hash); } catch(e) {}
+      if (cb) cb(true);
+    } else {
+      if (cb) cb(false);
+    }
+  });
+}
+
+function authLogout() {
+  try { localStorage.removeItem(_AUTH_KEY); } catch(e) {}
+  window.location.reload();
+}
+
+function applyAuthMode() {
+  /* Add or remove 'read-only' class on body */
+  if (isAuthenticated()) {
+    document.body.classList.remove('read-only');
+  } else {
+    document.body.classList.add('read-only');
+  }
 }
 
 /* ============================================================
