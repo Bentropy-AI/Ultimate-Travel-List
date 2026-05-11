@@ -186,10 +186,23 @@ var Store = (function() {
   var _travellers  = [];
 
   function _cacheLoad() {
-    try { var r = localStorage.getItem(_CACHE_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
+    try {
+      var r = localStorage.getItem(_CACHE_KEY);
+      if (!r) return null;
+      var ts = localStorage.getItem(_CACHE_KEY + '_ts');
+      if (!ts || Date.now() - parseInt(ts) > 30 * 60 * 1000) {
+        localStorage.removeItem(_CACHE_KEY);
+        localStorage.removeItem(_CACHE_KEY + '_ts');
+        return null;
+      }
+      return JSON.parse(r);
+    } catch(e) { return null; }
   }
   function _cacheSave(visited) {
-    try { localStorage.setItem(_CACHE_KEY, JSON.stringify(visited)); } catch(e) {}
+    try {
+      localStorage.setItem(_CACHE_KEY, JSON.stringify(visited));
+      localStorage.setItem(_CACHE_KEY + '_ts', String(Date.now()));
+    } catch(e) {}
   }
   function _arrayToSet(arr) {
     var s = {}; if (!arr) return s;
