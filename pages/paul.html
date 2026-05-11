@@ -922,16 +922,14 @@
         makeCombo('tf-utl1-input','tf-utl1-list',function(){
           var filtered=_tl1Items.filter(function(i){
             if(!_countriesSelected.length)return true;
-            var mapped=_TL_COUNTRY_NORM[i.country]||[i.country];
-            return _countriesSelected.some(function(c){return mapped.indexOf(c)!==-1;});
+            return _countriesSelected.indexOf(i.country)!==-1;
           });
           return filtered.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl1Selected.indexOf(n)===-1;});
         },function(val){if(_utl1Selected.indexOf(val)===-1)_utl1Selected.push(val);document.getElementById('tf-utl1-input').value='';renderTags('utl1');});
         makeCombo('tf-utl2-input','tf-utl2-list',function(){
           var filtered=_tl2Items.filter(function(i){
             if(!_countriesSelected.length)return true;
-            var mapped=_TL_COUNTRY_NORM[i.country]||[i.country];
-            return _countriesSelected.some(function(c){return mapped.indexOf(c)!==-1;});
+            return _countriesSelected.indexOf(i.country)!==-1;
           });
           return filtered.map(function(i){return i.name||i.title||String(i.id);}).filter(function(n){return _utl2Selected.indexOf(n)===-1;});
         },function(val){if(_utl2Selected.indexOf(val)===-1)_utl2Selected.push(val);document.getElementById('tf-utl2-input').value='';renderTags('utl2');});
