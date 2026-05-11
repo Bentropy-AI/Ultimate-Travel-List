@@ -540,3 +540,87 @@ main { flex: 1; padding: 2rem 0 4rem; }
   max-width: 320px;
   margin: 0;
 }
+
+/* ── AUTH ──────────────────────────────────────────────────── */
+.nav-auth-btn {
+  margin-left: auto;
+  padding: 7px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-muted);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+.nav-auth-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+.nav-auth-btn--login { color: var(--color-primary); border-color: var(--color-primary); }
+.nav-auth-btn--login:hover { background: rgba(79,142,247,.1); }
+
+/* Login modal */
+#auth-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#auth-modal-backdrop.open { display: flex; }
+#auth-modal {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 340px;
+  max-width: 90vw;
+}
+#auth-modal h3 { margin: 0 0 8px; font-size: 1.1rem; }
+#auth-modal p  { margin: 0 0 20px; color: var(--color-muted); font-size: .85rem; }
+#auth-password-input {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: .9rem;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+#auth-password-input:focus { outline: none; border-color: var(--color-primary); }
+#auth-error { color: #ef4444; font-size: .8rem; min-height: 18px; margin-bottom: 12px; }
+.auth-modal-btns { display: flex; gap: 10px; justify-content: flex-end; }
+#auth-submit-btn {
+  padding: 8px 20px;
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: .875rem;
+}
+#auth-submit-btn:hover { opacity: .85; }
+#auth-cancel-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: .875rem;
+}
+
+/* Read-only mode — hide all write UI */
+body.read-only .tl-add-btn,
+body.read-only .tl-btn-edit,
+body.read-only .tl-btn-del,
+body.read-only .tl-home-edit-btn,
+body.read-only .cc-check,
+body.read-only .tl-vt-zoom-btn:not(.active),
+body.read-only input[type="checkbox"].cc-check { display: none !important; }
+body.read-only .cc-check-cell { pointer-events: none; opacity: .4; cursor: default; }
