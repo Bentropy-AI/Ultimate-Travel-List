@@ -616,11 +616,12 @@ main { flex: 1; padding: 2rem 0 4rem; }
 }
 
 /* Read-only mode — hide all write UI */
+/* Hide write actions in read-only mode */
 body.read-only .tl-add-btn,
 body.read-only .tl-btn-edit,
 body.read-only .tl-btn-del,
-body.read-only .tl-home-edit-btn,
-body.read-only .cc-check,
-body.read-only .tl-vt-zoom-btn:not(.active),
-body.read-only input[type="checkbox"].cc-check { display: none !important; }
-body.read-only .cc-check-cell { pointer-events: none; opacity: .4; cursor: default; }
+body.read-only .tl-home-edit-btn { display: none !important; }
+
+/* Ticks visible but non-interactive in read-only mode */
+body.read-only .cc-check { pointer-events: none !important; cursor: default !important; }
+body.read-only .cc-check-cell { pointer-events: none; cursor: default; }
