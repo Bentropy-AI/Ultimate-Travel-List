@@ -55,5 +55,49 @@
         cards('overviewPeaks','county_peaks',pk.length);
   }).catch(function(e){console.error(e);});
     </script>
-  </body>
+  
+  <!-- Auth Login Modal -->
+  <div id="auth-modal-backdrop">
+    <div id="auth-modal">
+      <h3>&#128275; Edit Mode</h3>
+      <p>Enter the password to enable editing</p>
+      <input type="password" id="auth-password-input" placeholder="Password..." autocomplete="current-password">
+      <div id="auth-error"></div>
+      <div class="auth-modal-btns">
+        <button id="auth-cancel-btn" onclick="document.getElementById('auth-modal-backdrop').classList.remove('open')">Cancel</button>
+        <button id="auth-submit-btn">Unlock</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    function showLoginModal() {
+      document.getElementById('auth-modal-backdrop').classList.add('open');
+      document.getElementById('auth-password-input').value = '';
+      document.getElementById('auth-error').textContent = '';
+      setTimeout(function(){ document.getElementById('auth-password-input').focus(); }, 50);
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      var submitBtn = document.getElementById('auth-submit-btn');
+      var input = document.getElementById('auth-password-input');
+      function tryLogin() {
+        var pw = input.value;
+        if (!pw) return;
+        submitBtn.textContent = '...';
+        authLogin(pw, function(ok) {
+          if (ok) {
+            document.getElementById('auth-modal-backdrop').classList.remove('open');
+            window.location.reload();
+          } else {
+            document.getElementById('auth-error').textContent = 'Incorrect password';
+            submitBtn.textContent = 'Unlock';
+            input.value = '';
+            input.focus();
+          }
+        });
+      }
+      submitBtn.addEventListener('click', tryLogin);
+      input.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+    });
+  </script>
+</body>
 </html>
