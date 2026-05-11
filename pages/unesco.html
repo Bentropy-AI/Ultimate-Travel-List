@@ -318,11 +318,39 @@
             return map;
       }
 
-      Store.load(redraw).then(function(data) {
-            _travellers = data.travellers;
-            _allSites = data.unesco || [];
+      /* Fetch static data and JSONBin in parallel, render when all ready */
+      Promise.all([
+            fetch('../data/travellers.json').then(function(r){return r.json();}),
+            fetch('../data/unesco.json').then(function(r){return r.json();}),
+            fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{
+                  headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}
+            }).then(function(r){return r.json();})
+      ]).then(function(results) {
+            _travellers = results[0];
+            _allSites   = results[1];
+            var visited = (results[2].record && results[2].record.visited) || {};
+
+            /* Build visited lookup: travId -> set of UNESCO IDs */
+            var _visitedSets = {};
+            for (var ti = 0; ti < _travellers.length; ti++) {
+                  var tid = _travellers[ti].id;
+                  _visitedSets[tid] = {};
+                  var arr = (visited[tid] && visited[tid].unesco) || [];
+                  for (var ai = 0; ai < arr.length; ai++) _visitedSets[tid][arr[ai]] = true;
+            }
+
+            /* Override Store.isVisited for UNESCO using our direct data */
+            var _origIsVisited = Store.isVisited;
+            Store.isVisited = function(travId, category, itemId) {
+                  if (category === 'unesco' && _visitedSets[travId]) {
+                        return !!_visitedSets[travId][itemId];
+                  }
+                  return _origIsVisited(travId, category, itemId);
+            };
+
             buildSiteMap();
             redraw();
+            renderSummary();
 
             /* Tick clicks */
             document.getElementById('ccTable').addEventListener('click', function(e) {
