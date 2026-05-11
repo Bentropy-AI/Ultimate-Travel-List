@@ -318,14 +318,27 @@
             return map;
       }
 
-      Store.load(function() {
-            /* onRemote: fired after JSONBin fetch — _allSites already set, just redraw */
-            redraw();
-      }).then(function(data) {
+      Store.load(null).then(function(data) {
             _travellers = data.travellers;
             _allSites = data.unesco || [];
             var siteMap = buildSiteMap();
             redraw();
+            /* Also fetch JSONBin directly to ensure visited state is current */
+            fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest', {
+                  headers: { 'X-Master-Key': '$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.' }
+            }).then(function(r) { return r.json(); }).then(function(jd) {
+                  if (jd.record && jd.record.visited) {
+                        /* Apply visited state from JSONBin */
+                        var v = jd.record.visited;
+                        for (var ti = 0; ti < _travellers.length; ti++) {
+                              var tid = _travellers[ti].id;
+                              if (v[tid] && v[tid].unesco) {
+                                    Store._applyUNESCO && Store._applyUNESCO(tid, v[tid].unesco);
+                              }
+                        }
+                  }
+                  redraw();
+            }).catch(function() { redraw(); });
 
             /* Tick clicks */
             document.getElementById('ccTable').addEventListener('click', function(e) {
