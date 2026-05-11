@@ -5,6 +5,9 @@ on:
     - cron: '0 2 * * *'  # 2am UTC daily
   workflow_dispatch:       # allows manual trigger from GitHub Actions tab
 
+permissions:
+  contents: write
+
 jobs:
   backup:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
           v = rec.get('visited', {})
           for tid in ['ben','shaz','paul','ruth']:
               t = v.get(tid, {})
-              print(f\"{tid}: countries={len(t.get('countries',[]))} capitals={len(t.get('capitals',[]))} tl1={len(t.get('travellist1',[]))} tl2={len(t.get('travellist2',[]))}\")
+              print(f\"{tid}: countries={len(t.get('countries',[]))} tl1={len(t.get('travellist1',[]))} tl2={len(t.get('travellist2',[]))} unesco={len(t.get('unesco',[]))}\")
           "
 
       - name: Commit backup
