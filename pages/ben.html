@@ -1158,7 +1158,7 @@
             return id.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
           }
 
-          function renderMissing(visited, trips, countries, tl1Items, tl2Items) {
+          function renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items) {
             var ben = visited['ben'] || {};
 
             /* --- Countries --- */
@@ -1169,22 +1169,40 @@
             trips.forEach(function(t){
               (t.countries || (t.country ? [t.country] : [])).forEach(function(c){ loggedCountries[c] = true; });
             });
+            /* Home country always counts as logged */
+            loggedCountries['United Kingdom'] = true;
             var missingCountries = visitedCountries.filter(function(n){ return !loggedCountries[n]; }).sort();
 
             /* --- UTL I --- */
             var visitedTl1 = ben.travellist1 || [];
             var loggedTl1 = {};
             trips.forEach(function(t){ (t.utl1 || []).forEach(function(id){ loggedTl1[id] = true; }); });
-            var missingTl1 = visitedTl1.filter(function(id){ return !loggedTl1[id]; })
-              .map(function(id){ return { id:id, name: idToDisplayName(id, tl1Items) }; })
+            /* Home record UTL1 values may be stored as names — mark both id and name as logged */
+            (homeRec ? (homeRec.utl1 || []) : []).forEach(function(val){
+              loggedTl1[val] = true;
+              var found = tl1Items.find(function(i){ return i.name === val || i.title === val || i.id === val; });
+              if (found) { loggedTl1[found.id] = true; loggedTl1[found.name || found.title] = true; }
+            });
+            var missingTl1 = visitedTl1.filter(function(id){
+              var name = idToDisplayName(id, tl1Items);
+              return !loggedTl1[id] && !loggedTl1[name];
+            }).map(function(id){ return { id:id, name: idToDisplayName(id, tl1Items) }; })
               .sort(function(a,b){ return a.name.localeCompare(b.name); });
 
             /* --- UTL II --- */
             var visitedTl2 = ben.travellist2 || [];
             var loggedTl2 = {};
             trips.forEach(function(t){ (t.utl2 || []).forEach(function(id){ loggedTl2[id] = true; }); });
-            var missingTl2 = visitedTl2.filter(function(id){ return !loggedTl2[id]; })
-              .map(function(id){ return { id:id, name: idToDisplayName(id, tl2Items) }; })
+            /* Home record UTL2 values may be stored as names — mark both id and name as logged */
+            (homeRec ? (homeRec.utl2 || []) : []).forEach(function(val){
+              loggedTl2[val] = true;
+              var found = tl2Items.find(function(i){ return i.name === val || i.title === val || i.id === val; });
+              if (found) { loggedTl2[found.id] = true; loggedTl2[found.name || found.title] = true; }
+            });
+            var missingTl2 = visitedTl2.filter(function(id){
+              var name = idToDisplayName(id, tl2Items);
+              return !loggedTl2[id] && !loggedTl2[name];
+            }).map(function(id){ return { id:id, name: idToDisplayName(id, tl2Items) }; })
               .sort(function(a,b){ return a.name.localeCompare(b.name); });
 
             function makeGroup(title, icon, items, nameFn) {
@@ -1218,10 +1236,15 @@
               var countries = res[0], tl1Items = res[1], tl2Items = res[2];
               var rec = res[3].record || res[3];
               var visited = rec.visited || {};
-              var trips = (rec.trips || []).filter(function(t){
+              var allTrips = rec.trips || [];
+              var homeRec = null;
+              allTrips.forEach(function(t){
+                if (t._home && (t.travellers||[]).indexOf('ben') !== -1) homeRec = t;
+              });
+              var trips = allTrips.filter(function(t){
                 return !t._home && (t.travellers||t.companions||[]).indexOf('ben') !== -1;
               });
-              renderMissing(visited, trips, countries, tl1Items, tl2Items);
+              renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items);
             }).catch(function(e){
               document.getElementById('tl-missing-loading').textContent = 'Could not load data.';
             });
