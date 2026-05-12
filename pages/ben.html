@@ -1123,6 +1123,123 @@
           /* Also attempt render now in case TripStore already has data from cache */
           setTimeout(function(){ render(); }, 100);        }());
         </script>
+
+      <!-- SECTION: MISSING FROM LOG -->
+      <section class="section" id="tl-missing-section">
+        <h2 class="section-title">🔍 Missing From Log</h2>
+        <p style="color:var(--color-muted);font-size:.85rem;margin-bottom:1rem">
+          Items ticked as visited in the main lists but not yet referenced in any trip log entry. As you update your logs, this list will shrink.
+        </p>
+        <style>
+          #tl-missing-wrap { display:flex; flex-direction:column; gap:1.5rem; }
+          .tl-missing-group { background:var(--color-surface2); border:1px solid var(--color-border); border-radius:var(--radius); overflow:hidden; }
+          .tl-missing-group-header { padding:.6rem 1rem; background:var(--color-surface3,rgba(255,255,255,.04)); border-bottom:1px solid var(--color-border); display:flex; align-items:center; gap:.6rem; font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--color-muted); }
+          .tl-missing-count { background:var(--color-ben); color:#fff; border-radius:20px; padding:1px 8px; font-size:.72rem; font-weight:700; }
+          .tl-missing-table { width:100%; border-collapse:collapse; font-size:.82rem; }
+          .tl-missing-table td { padding:.45rem .9rem; border-bottom:1px solid var(--color-border); color:var(--color-text); vertical-align:middle; }
+          .tl-missing-table tr:last-child td { border-bottom:none; }
+          .tl-missing-table td:first-child { color:var(--color-muted); width:40%; }
+          .tl-missing-empty { padding:.8rem 1rem; color:var(--color-muted); font-size:.82rem; font-style:italic; }
+          #tl-missing-loading { color:var(--color-muted); font-size:.85rem; padding:1rem 0; }
+        </style>
+        <div id="tl-missing-loading">Loading...</div>
+        <div id="tl-missing-wrap" style="display:none"></div>
+        <script>
+        (function(){
+          var BIN_URL = 'https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest';
+          var BIN_KEY = '$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.';
+          var rp2 = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
+          function fj2(f){ return fetch(rp2+'data/'+f).then(function(r){return r.json();}); }
+          function esc2(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+          function idToDisplayName(id, items) {
+            var found = items.find(function(i){ return i.id === id || i.name === id || i.title === id; });
+            if (found) return found.name || found.title || id;
+            return id.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
+          }
+
+          function renderMissing(visited, trips, countries, tl1Items, tl2Items) {
+            var ben = visited['ben'] || {};
+
+            /* --- Countries --- */
+            var isoToName = {};
+            countries.forEach(function(c){ isoToName[c.id] = c.name; });
+            var visitedCountries = (ben.countries || []).map(function(iso){ return isoToName[iso] || iso; });
+            var loggedCountries = {};
+            trips.forEach(function(t){
+              (t.countries || (t.country ? [t.country] : [])).forEach(function(c){ loggedCountries[c] = true; });
+            });
+            var missingCountries = visitedCountries.filter(function(n){ return !loggedCountries[n]; }).sort();
+
+            /* --- UTL I --- */
+            var visitedTl1 = ben.travellist1 || [];
+            var loggedTl1 = {};
+            trips.forEach(function(t){ (t.utl1 || []).forEach(function(id){ loggedTl1[id] = true; }); });
+            var missingTl1 = visitedTl1.filter(function(id){ return !loggedTl1[id]; })
+              .map(function(id){ return { id:id, name: idToDisplayName(id, tl1Items) }; })
+              .sort(function(a,b){ return a.name.localeCompare(b.name); });
+
+            /* --- UTL II --- */
+            var visitedTl2 = ben.travellist2 || [];
+            var loggedTl2 = {};
+            trips.forEach(function(t){ (t.utl2 || []).forEach(function(id){ loggedTl2[id] = true; }); });
+            var missingTl2 = visitedTl2.filter(function(id){ return !loggedTl2[id]; })
+              .map(function(id){ return { id:id, name: idToDisplayName(id, tl2Items) }; })
+              .sort(function(a,b){ return a.name.localeCompare(b.name); });
+
+            function makeGroup(title, icon, items, nameFn) {
+              var rows = items.length
+                ? items.map(function(item){
+                    return '<tr><td>'+esc2(typeof item === 'string' ? item : item.name)+'</td></tr>';
+                  }).join('')
+                : '<tr><td colspan="2" class="tl-missing-empty">All logged ✓</td></tr>';
+              return '<div class="tl-missing-group">'
+                + '<div class="tl-missing-group-header">'+icon+' '+esc2(title)
+                + '<span class="tl-missing-count">'+items.length+'</span></div>'
+                + '<table class="tl-missing-table"><tbody>'+rows+'</tbody></table>'
+                + '</div>';
+            }
+
+            var html = makeGroup('Countries', '🌍', missingCountries)
+              + makeGroup('UTL I Items', '⭐', missingTl1)
+              + makeGroup('UTL II Items', '🌟', missingTl2);
+
+            document.getElementById('tl-missing-loading').style.display = 'none';
+            var wrap = document.getElementById('tl-missing-wrap');
+            wrap.innerHTML = html;
+            wrap.style.display = 'flex';
+          }
+
+          function load() {
+            Promise.all([
+              fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json'),
+              fetch(BIN_URL, { headers:{'X-Master-Key':BIN_KEY} }).then(function(r){return r.json();})
+            ]).then(function(res){
+              var countries = res[0], tl1Items = res[1], tl2Items = res[2];
+              var rec = res[3].record || res[3];
+              var visited = rec.visited || {};
+              var trips = (rec.trips || []).filter(function(t){
+                return !t._home && (t.travellers||t.companions||[]).indexOf('ben') !== -1;
+              });
+              renderMissing(visited, trips, countries, tl1Items, tl2Items);
+            }).catch(function(e){
+              document.getElementById('tl-missing-loading').textContent = 'Could not load data.';
+            });
+          }
+
+          /* Re-render whenever trips or visited data changes */
+          if (window.TravelApp && window.TravelApp.TripStore) {
+            window.TravelApp.TripStore.onSave(function(){ load(); });
+          }
+          if (window.TravelApp && window.TravelApp.Store) {
+            window.TravelApp.Store.onSave(function(){ load(); });
+          }
+
+          load();
+        }());
+        </script>
+      </section>
+
 </div><!-- end tab-panel#timeline -->
     </div>
   </main>
