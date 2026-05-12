@@ -936,7 +936,8 @@
             var canRemove=v!==TRAV_ID;
             return'<span class="tl-companion-tag" data-trav="'+v+'">'+(cn?esc(cn.name):esc(v))+(canRemove?'<button type="button" data-which="travellers" data-i="'+i+'">×</button>':'')+'</span>';
           }
-          return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
+          var displayV=(which==='utl1'||which==='utl2')?function(){var items=which==='utl1'?_tl1Items:_tl2Items;var found=items.find(function(i){return i.id===v||i.name===v||i.title===v;});if(found)return found.name||found.title||v;return v.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}():v;
+          return'<span class="tl-tag">'+esc(displayV)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
         }).join('');
       }
               document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
