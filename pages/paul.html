@@ -1221,10 +1221,15 @@
               var countries = res[0], tl1Items = res[1], tl2Items = res[2];
               var rec = res[3].record || res[3];
               var visited = rec.visited || {};
-              var trips = (rec.trips || []).filter(function(t){
+              var allTrips = rec.trips || [];
+              var homeRec = null;
+              allTrips.forEach(function(t){
+                if (t._home && (t.travellers||[]).indexOf(TRAV_ID_M) !== -1) homeRec = t;
+              });
+              var trips = allTrips.filter(function(t){
                 return !t._home && (t.travellers||t.companions||[]).indexOf(TRAV_ID_M) !== -1;
               });
-              renderMissing(visited, trips, countries, tl1Items, tl2Items);
+              renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items);
             }).catch(function(){
               document.getElementById('tl-missing-loading').textContent = 'Could not load data.';
             });
