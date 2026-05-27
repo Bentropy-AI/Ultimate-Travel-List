@@ -121,27 +121,26 @@
         Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
           var personData={};
           var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id==='paul'){_homeCountry=_td[_hi].home||'';break;}}
-          var cached=localStorage.getItem('utl_store_v2');if(cached){try{personData=JSON.parse(cached).paul||{};}catch(e){}}
-          var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('paul')!==-1;});}catch(e){}}
+          function _refreshMapData(){
+            var store=window.TravelApp&&window.TravelApp.Store;
+            var tripStore=window.TravelApp&&window.TravelApp.TripStore;
+            var pd={countries:[],capitals:[],travellist1:[],travellist2:[],unesco:[],animals:[]};
+            if(store){
+              pd.countries=store.getVisitedArray('paul','countries');
+              pd.capitals=store.getVisitedArray('paul','capitals');
+              pd.travellist1=store.getVisitedArray('paul','travellist1');
+              pd.travellist2=store.getVisitedArray('paul','travellist2');
+              pd.unesco=store.getVisitedArray('paul','unesco');
+              pd.animals=store.getVisitedArray('paul','animals');
+            }
+            if(tripStore){ _trips=tripStore.getTrips('paul'); }
+            return pd;
+          }
+          var personData=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
           renderMap(cm);
-          fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}}).then(function(r){return r.json();}).then(function(jd){
-            if(jd.record&&jd.record.visited&&jd.record.visited['paul']){
-              personData=jd.record.visited['paul'];
-              cm=buildMap(res[0],res[1],res[2],res[3],personData);
-              renderMap(cm);
-            }
-          }).catch(function(){});
-          if(window.TravelApp&&window.TravelApp.Store){
-            window.TravelApp.Store.load(function(){
-              var c2=localStorage.getItem('utl_store_v2');
-              if(c2){try{personData=JSON.parse(c2).paul||{};}catch(e){}}
-              cm=buildMap(res[0],res[1],res[2],res[3],personData);
-              renderMap(cm);
-            });
-            window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{personData=JSON.parse(c2).paul||{};}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
-          }
-        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('paul')!==-1;});}catch(e){}}});}
+          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
+        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
         });
       });
     }());
@@ -359,16 +358,24 @@
           _rows=buildRows(tl1,tl2,countries,pd);
           render();
         }
-        try{var _cc=localStorage.getItem('utl_store_v2');if(_cc){buildFromVisited(JSON.parse(_cc));}}catch(e){}
-        fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{
-          headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}
-        }).then(function(r){return r.json();}).then(function(d){
-          if(d.record&&d.record.visited){buildFromVisited(d.record.visited);}
-        }).catch(function(){});
+        /* Read from GitHub-backed store */
+        function buildFromStore(){
+          var store=window.TravelApp&&window.TravelApp.Store;
+          var pd={};
+          if(store){
+            pd.countries=store.getVisitedArray('paul','countries');
+            pd.capitals=store.getVisitedArray('paul','capitals');
+            pd.travellist1=store.getVisitedArray('paul','travellist1');
+            pd.travellist2=store.getVisitedArray('paul','travellist2');
+          }
+          buildFromVisited({'paul':pd});
+        }
+        var _tries=0,_poll=setInterval(function(){
+          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
+          if(++_tries>40){clearInterval(_poll);buildFromStore();}
+        },150);
         if(window.TravelApp&&window.TravelApp.Store){
-          window.TravelApp.Store.onSave(function(){
-            try{var _cc2=localStorage.getItem('utl_store_v2');if(_cc2){buildFromVisited(JSON.parse(_cc2));}}catch(e){}
-          });
+          window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
     }());
@@ -1161,8 +1168,6 @@
         <script>
         (function(){
           var TRAV_ID_M = 'paul';
-          var BIN_URL = 'https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest';
-          var BIN_KEY = '$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.';
           var rp2 = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
           function fj2(f){ return fetch(rp2+'data/'+f).then(function(r){return r.json();}); }
           function esc2(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1233,13 +1238,23 @@
           }
           function load() {
             Promise.all([
-              fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json'),
-              fetch(BIN_URL, { headers:{'X-Master-Key':BIN_KEY} }).then(function(r){return r.json();})
+              fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json')
             ]).then(function(res){
               var countries = res[0], tl1Items = res[1], tl2Items = res[2];
-              var rec = res[3].record || res[3];
-              var visited = rec.visited || {};
-              var allTrips = rec.trips || [];
+              var store = window.TravelApp && window.TravelApp.Store;
+              var tripStore = window.TravelApp && window.TravelApp.TripStore;
+              var visited = {};
+              if (store) {
+                visited[TRAV_ID_M] = {
+                  countries:   store.getVisitedArray(TRAV_ID_M,'countries'),
+                  capitals:    store.getVisitedArray(TRAV_ID_M,'capitals'),
+                  travellist1: store.getVisitedArray(TRAV_ID_M,'travellist1'),
+                  travellist2: store.getVisitedArray(TRAV_ID_M,'travellist2'),
+                  unesco:      store.getVisitedArray(TRAV_ID_M,'unesco'),
+                  animals:     store.getVisitedArray(TRAV_ID_M,'animals')
+                };
+              }
+              var allTrips = tripStore ? tripStore.getAllTrips() : [];
               var homeRec = null;
               allTrips.forEach(function(t){
                 if (t._home && (t.travellers||[]).indexOf(TRAV_ID_M) !== -1) homeRec = t;
@@ -1248,7 +1263,7 @@
                 return !t._home && (t.travellers||t.companions||[]).indexOf(TRAV_ID_M) !== -1;
               });
               renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items);
-            }).catch(function(){
+            }).catch(function(e){
               document.getElementById('tl-missing-loading').textContent = 'Could not load data.';
             });
           }
