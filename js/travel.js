@@ -399,9 +399,17 @@ var Store = (function() {
 
   function onSave(fn) { _saveCallbacks.push(fn); }
 
+  function applyRemote(visited) {
+    /* Called by loadAllData after its own remote fetch to keep Store in sync */
+    if (visited && typeof visited === 'object') {
+      _applyVisited(visited);
+    }
+  }
+
   return { load:load, toggle:toggle, isVisited:isVisited,
            getVisitedArray:getVisitedArray, getVisitedCount:getVisitedCount,
-           onSave:onSave, onRemoteLoad:onRemoteLoad, _fireRemote:_fireRemote };
+           onSave:onSave, onRemoteLoad:onRemoteLoad, _fireRemote:_fireRemote,
+           applyRemote:applyRemote };
 }());
 
 /* ============================================================
