@@ -140,7 +140,11 @@
           var ben=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],ben);
           renderMap(cm);
-          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
+          /* Re-render after remote GitHub data loads */
+          if(window.TravelApp&&window.TravelApp.Store){
+            window.TravelApp.Store.onRemoteLoad(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});
+            window.TravelApp.Store.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});
+          }
           if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
         });
       });
@@ -371,11 +375,10 @@
           }
           buildFromVisited({'ben':pd});
         }
-        var _tries=0,_poll=setInterval(function(){
-          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
-          if(++_tries>40){clearInterval(_poll);buildFromStore();}
-        },150);
+        /* Build immediately from cache, then rebuild after remote loads */
+        buildFromStore();
         if(window.TravelApp&&window.TravelApp.Store){
+          window.TravelApp.Store.onRemoteLoad(function(){ buildFromStore(); });
           window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
