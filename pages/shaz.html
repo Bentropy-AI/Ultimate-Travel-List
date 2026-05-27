@@ -139,7 +139,11 @@
           var personData=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
           renderMap(cm);
-          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
+          /* Re-render after remote GitHub data loads */
+          if(window.TravelApp&&window.TravelApp.Store){
+            window.TravelApp.Store.onRemoteLoad(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
+            window.TravelApp.Store.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
+          }
         if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
         });
       });
@@ -370,10 +374,11 @@
           }
           buildFromVisited({'shaz':pd});
         }
-        /* Build immediately from cache, then rebuild after remote loads */
-        buildFromStore();
+        var _tries=0,_poll=setInterval(function(){
+          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
+          if(++_tries>40){clearInterval(_poll);buildFromStore();}
+        },150);
         if(window.TravelApp&&window.TravelApp.Store){
-          window.TravelApp.Store.onRemoteLoad(function(){ buildFromStore(); });
           window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
