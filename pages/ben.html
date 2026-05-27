@@ -1335,6 +1335,34 @@
     }).catch(function(err) { console.error(err); });
   </script>
 
+
+  <!-- Storage sync patch: ensures map and country table read from Store after remote load -->
+  <script>
+  (function waitForTravelApp() {
+    var app = window.TravelApp;
+    if (!app || !app.Store) { setTimeout(waitForTravelApp, 50); return; }
+    var Store = app.Store;
+
+    /* Patch applyRemote onto Store if not present */
+    if (!Store.applyRemote) {
+      Store.applyRemote = function(visited) {
+        if (!visited || typeof visited !== 'object') return;
+        /* Force re-read from cache by firing onRemoteLoad callbacks */
+        if (Store._fireRemote) Store._fireRemote();
+      };
+    }
+
+    /* Patch loadAllData to fire Store.onRemoteLoad callbacks after remote data arrives */
+    var origLoad = app.loadAllData;
+    app.loadAllData = function(onRemote) {
+      return origLoad(function() {
+        /* After remote GitHub data is applied to travellers[], also notify Store listeners */
+        if (Store._fireRemote) Store._fireRemote();
+        if (typeof onRemote === 'function') onRemote();
+      });
+    };
+  }());
+  </script>
   <!-- Auth Login Modal -->
   <div id="auth-modal-backdrop">
     <div id="auth-modal">
