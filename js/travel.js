@@ -360,8 +360,10 @@ var Store = (function() {
           _cacheSave(_buildVisited());
         }
         if (typeof onRemote === 'function') onRemote();
+        _fireRemote();
       }).catch(function() {
         if (typeof onRemote === 'function') onRemote();
+        _fireRemote();
       });
 
       return {
@@ -391,10 +393,15 @@ var Store = (function() {
 
   function getVisitedCount(travId, category) { return getVisitedArray(travId, category).length; }
 
+  var _remoteCallbacks = [];
+  function onRemoteLoad(fn) { _remoteCallbacks.push(fn); }
+  function _fireRemote() { _remoteCallbacks.forEach(function(cb){ try{cb();}catch(e){} }); }
+
   function onSave(fn) { _saveCallbacks.push(fn); }
 
   return { load:load, toggle:toggle, isVisited:isVisited,
-           getVisitedArray:getVisitedArray, getVisitedCount:getVisitedCount, onSave:onSave };
+           getVisitedArray:getVisitedArray, getVisitedCount:getVisitedCount,
+           onSave:onSave, onRemoteLoad:onRemoteLoad, _fireRemote:_fireRemote };
 }());
 
 /* ============================================================
