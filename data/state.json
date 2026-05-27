@@ -244,7 +244,7 @@
         "tikal-national-park-guatemala",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "\u00feingvellir-national-park-iceland",
+        "þingvellir-national-park-iceland",
         "red-fort-complex-india",
         "humayun-s-tomb-delhi-india",
         "qutb-minar-and-its-monuments-delhi-india",
@@ -280,7 +280,7 @@
         "vilnius-historic-centre-lithuania",
         "city-of-luxembourg-its-old-quarters-and-fortifications-luxembourg",
         "kinabalu-park-malaysia",
-        "\u0127al-saflieni-hypogeum-malta",
+        "ħal-saflieni-hypogeum-malta",
         "city-of-valletta-malta",
         "megalithic-temples-of-malta-malta",
         "sian-ka-an-mexico",
@@ -1048,7 +1048,7 @@
         "tikal-national-park-guatemala",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "\u00feingvellir-national-park-iceland",
+        "þingvellir-national-park-iceland",
         "red-fort-complex-india",
         "humayun-s-tomb-delhi-india",
         "qutb-minar-and-its-monuments-delhi-india",
@@ -1081,7 +1081,7 @@
         "historic-centre-of-riga-latvia",
         "vilnius-historic-centre-lithuania",
         "city-of-luxembourg-its-old-quarters-and-fortifications-luxembourg",
-        "\u0127al-saflieni-hypogeum-malta",
+        "ħal-saflieni-hypogeum-malta",
         "city-of-valletta-malta",
         "megalithic-temples-of-malta-malta",
         "sian-ka-an-mexico",
@@ -1751,7 +1751,7 @@
         "old-town-of-corfu-greece",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "\u00feingvellir-national-park-iceland",
+        "þingvellir-national-park-iceland",
         "masada-israel",
         "biblical-tels-megiddo-hazor-beer-sheba-israel",
         "historic-centre-of-florence-italy",
@@ -1795,7 +1795,7 @@
         "seventeenth-century-canal-ring-area-of-amsterdam-inside-the-singelgracht-netherl",
         "te-wahipounamu-south-west-new-zealand-new-zealand",
         "bryggen-norway",
-        "west-norwegian-fjords-geirangerfjord-and-n\u00e6r\u00f8yfjord-norway",
+        "west-norwegian-fjords-geirangerfjord-and-nærøyfjord-norway",
         "birthplace-of-jesus-church-of-the-nativity-and-the-pilgrimage-route-bethlehem-pa",
         "palestine-land-of-olives-and-vines-cultural-landscape-of-southern-jerusalem-battir-palestine",
         "hebron-al-khalil-old-town-palestine",
@@ -2389,7 +2389,7 @@
         "old-town-of-corfu-greece",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "\u00feingvellir-national-park-iceland",
+        "þingvellir-national-park-iceland",
         "masada-israel",
         "old-city-of-acre-israel",
         "biblical-tels-megiddo-hazor-beer-sheba-israel",
@@ -2436,7 +2436,7 @@
         "seventeenth-century-canal-ring-area-of-amsterdam-inside-the-singelgracht-netherl",
         "te-wahipounamu-south-west-new-zealand-new-zealand",
         "bryggen-norway",
-        "west-norwegian-fjords-geirangerfjord-and-n\u00e6r\u00f8yfjord-norway",
+        "west-norwegian-fjords-geirangerfjord-and-nærøyfjord-norway",
         "birthplace-of-jesus-church-of-the-nativity-and-the-pilgrimage-route-bethlehem-pa",
         "palestine-land-of-olives-and-vines-cultural-landscape-of-southern-jerusalem-battir-palestine",
         "hebron-al-khalil-old-town-palestine",
@@ -2915,7 +2915,7 @@
         "Oman"
       ],
       "continent": "Asia",
-      "locations": "Muscat, Ras al Hadd, Wahiba Sands, Nizw\u00e1, Jebel Shams, Jebel Akhdar",
+      "locations": "Muscat, Ras al Hadd, Wahiba Sands, Nizwá, Jebel Shams, Jebel Akhdar",
       "start": "2025-11-26",
       "finish": "2025-12-06",
       "type": "Travel",
@@ -3636,7 +3636,7 @@
         "Colombia"
       ],
       "continent": "South America",
-      "locations": "Bogot\u00e1, Medell\u00edn, Cartagena, Tayrona, Santa Marta",
+      "locations": "Bogotá, Medellín, Cartagena, Tayrona, Santa Marta",
       "start": "2022-08-26",
       "finish": "2022-09-12",
       "type": "Travel",
@@ -5158,7 +5158,7 @@
         "Iceland"
       ],
       "continent": "Europe",
-      "locations": "Reykjavik, Sn\u00e6fellsnes (date needs confirming from book)",
+      "locations": "Reykjavik, Snæfellsnes (date needs confirming from book)",
       "start": "2017-04-28",
       "finish": "2017-05-01",
       "type": "Travel",
@@ -5700,6 +5700,29 @@
         "British Museum"
       ],
       "utl2": []
+    },
+    {
+      "countries": [
+        "Greece"
+      ],
+      "continent": "Europe",
+      "locations": "Crete, Santorini, Mykonos",
+      "start": "2026-05-13",
+      "finish": "2026-05-24",
+      "type": "Family",
+      "utl1": [
+        "Santorini"
+      ],
+      "utl2": [
+        "The Cyclades"
+      ],
+      "travellers": [
+        "ben",
+        "shaz",
+        "paul",
+        "ruth"
+      ],
+      "_id": "mpnwgk8y77wjiz2h3k9"
     }
   ]
 }
