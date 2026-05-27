@@ -370,11 +370,10 @@
           }
           buildFromVisited({'ruth':pd});
         }
-        var _tries=0,_poll=setInterval(function(){
-          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
-          if(++_tries>40){clearInterval(_poll);buildFromStore();}
-        },150);
+        /* Build immediately from cache, then rebuild after remote loads */
+        buildFromStore();
         if(window.TravelApp&&window.TravelApp.Store){
+          window.TravelApp.Store.onRemoteLoad(function(){ buildFromStore(); });
           window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
