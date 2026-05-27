@@ -119,12 +119,29 @@
       function fj(f){return fetch(rp+'data/'+f).then(function(r){return r.json();});}
       loadScripts(SCRIPTS,function(){
         Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
-          var ben={};var cached=localStorage.getItem('utl_store_v2');if(cached){try{ben=JSON.parse(cached).ben||{};}catch(e){}}
-          var tc=localStorage.getItem('utl_trips_v1');if(tc){try{_trips=(JSON.parse(tc)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ben')!==-1;});}catch(e){}}
+          /* Read from new GitHub-backed store */
+          function _refreshMapData(){
+            var store=window.TravelApp&&window.TravelApp.Store;
+            var tripStore=window.TravelApp&&window.TravelApp.TripStore;
+            var benVisited={countries:[],capitals:[],travellist1:[],travellist2:[],unesco:[],animals:[]};
+            if(store){
+              benVisited.countries=store.getVisitedArray('ben','countries');
+              benVisited.capitals=store.getVisitedArray('ben','capitals');
+              benVisited.travellist1=store.getVisitedArray('ben','travellist1');
+              benVisited.travellist2=store.getVisitedArray('ben','travellist2');
+              benVisited.unesco=store.getVisitedArray('ben','unesco');
+              benVisited.animals=store.getVisitedArray('ben','animals');
+            }
+            if(tripStore){
+              _trips=tripStore.getTrips('ben');
+            }
+            return benVisited;
+          }
+          var ben=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],ben);
           renderMap(cm);
-          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){var c2=localStorage.getItem('utl_store_v2');if(c2){try{ben=JSON.parse(c2).ben||{};}catch(e){}}var tc2=localStorage.getItem('utl_trips_v1');if(tc2){try{_trips=(JSON.parse(tc2)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ben')!==-1;});}catch(e){}}cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
-        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){var tc3=localStorage.getItem('utl_trips_v1');if(tc3){try{_trips=(JSON.parse(tc3)||[]).filter(function(x){var tv=x.travellers||x.companions||[];return tv.indexOf('ben')!==-1;});}catch(e){}}});}
+          if(window.TravelApp&&window.TravelApp.Store){window.TravelApp.Store.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
+          if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
         });
       });
     }());
@@ -342,18 +359,24 @@
           _rows=buildRows(tl1,tl2,countries,pd);
           render();
         }
-        /* Render from cache immediately */
-        try{var _cc=localStorage.getItem('utl_store_v2');if(_cc){buildFromVisited(JSON.parse(_cc));}}catch(e){}
-        /* Then fetch fresh from JSONBin */
-        fetch('https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest',{
-          headers:{'X-Master-Key':'$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.'}
-        }).then(function(r){return r.json();}).then(function(d){
-          if(d.record&&d.record.visited){buildFromVisited(d.record.visited);}
-        }).catch(function(){});
+        /* Read from GitHub-backed store */
+        function buildFromStore(){
+          var store=window.TravelApp&&window.TravelApp.Store;
+          var pd={};
+          if(store){
+            pd.countries=store.getVisitedArray('ben','countries');
+            pd.capitals=store.getVisitedArray('ben','capitals');
+            pd.travellist1=store.getVisitedArray('ben','travellist1');
+            pd.travellist2=store.getVisitedArray('ben','travellist2');
+          }
+          buildFromVisited({'ben':pd});
+        }
+        var _tries=0,_poll=setInterval(function(){
+          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
+          if(++_tries>40){clearInterval(_poll);buildFromStore();}
+        },150);
         if(window.TravelApp&&window.TravelApp.Store){
-          window.TravelApp.Store.onSave(function(){
-            try{var _cc2=localStorage.getItem('utl_store_v2');if(_cc2){buildFromVisited(JSON.parse(_cc2));}}catch(e){}
-          });
+          window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
     }());
@@ -1146,8 +1169,6 @@
         <div id="tl-missing-wrap" style="display:none"></div>
         <script>
         (function(){
-          var BIN_URL = 'https://api.jsonbin.io/v3/b/69cd4cbd36566621a86d74ab/latest';
-          var BIN_KEY = '$2a$10$ZBPwhHYl3Fa7.3xScA8xVe4Nq7UfBqDgk/kFuk7E7dDktRt8yapM.';
           var rp2 = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
           function fj2(f){ return fetch(rp2+'data/'+f).then(function(r){return r.json();}); }
           function esc2(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1230,13 +1251,23 @@
 
           function load() {
             Promise.all([
-              fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json'),
-              fetch(BIN_URL, { headers:{'X-Master-Key':BIN_KEY} }).then(function(r){return r.json();})
+              fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json')
             ]).then(function(res){
               var countries = res[0], tl1Items = res[1], tl2Items = res[2];
-              var rec = res[3].record || res[3];
-              var visited = rec.visited || {};
-              var allTrips = rec.trips || [];
+              var store = window.TravelApp && window.TravelApp.Store;
+              var tripStore = window.TravelApp && window.TravelApp.TripStore;
+              var visited = {};
+              if (store) {
+                visited['ben'] = {
+                  countries:   store.getVisitedArray('ben','countries'),
+                  capitals:    store.getVisitedArray('ben','capitals'),
+                  travellist1: store.getVisitedArray('ben','travellist1'),
+                  travellist2: store.getVisitedArray('ben','travellist2'),
+                  unesco:      store.getVisitedArray('ben','unesco'),
+                  animals:     store.getVisitedArray('ben','animals')
+                };
+              }
+              var allTrips = tripStore ? tripStore.getAllTrips() : [];
               var homeRec = null;
               allTrips.forEach(function(t){
                 if (t._home && (t.travellers||[]).indexOf('ben') !== -1) homeRec = t;
