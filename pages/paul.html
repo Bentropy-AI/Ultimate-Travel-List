@@ -118,7 +118,10 @@
       var rp=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';
       function fj(f){return fetch(rp+'data/'+f).then(function(r){return r.json();});}
       loadScripts(SCRIPTS,function(){
-        Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
+        Promise.all([
+          fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json'),
+          new Promise(function(resolve){ if(window.TravelApp&&window.TravelApp.Store){ window.TravelApp.Store.load(resolve); } else { resolve(); } })
+        ]).then(function(res){
           var personData={};
           var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id==='paul'){_homeCountry=_td[_hi].home||'';break;}}
           function _refreshMapData(){
@@ -139,9 +142,7 @@
           var personData=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],personData);
           renderMap(cm);
-          /* Re-render after remote GitHub data loads */
           if(window.TravelApp&&window.TravelApp.Store){
-            window.TravelApp.Store.onRemoteLoad(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
             window.TravelApp.Store.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
           }
         if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
