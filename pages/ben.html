@@ -118,31 +118,33 @@
       var rp=(window.location.pathname.indexOf('/pages/')!==-1)?'../':'./';
       function fj(f){return fetch(rp+'data/'+f).then(function(r){return r.json();});}
       loadScripts(SCRIPTS,function(){
-        Promise.all([fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json')]).then(function(res){
-          /* Read from new GitHub-backed store */
+        Promise.all([
+          fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json'),
+          /* Load Store data before rendering map */
+          new Promise(function(resolve){
+            if(window.TravelApp&&window.TravelApp.Store){ window.TravelApp.Store.load(resolve); }
+            else { resolve(); }
+          })
+        ]).then(function(res){
           function _refreshMapData(){
             var store=window.TravelApp&&window.TravelApp.Store;
             var tripStore=window.TravelApp&&window.TravelApp.TripStore;
-            var benVisited={countries:[],capitals:[],travellist1:[],travellist2:[],unesco:[],animals:[]};
+            var pd={countries:[],capitals:[],travellist1:[],travellist2:[],unesco:[],animals:[]};
             if(store){
-              benVisited.countries=store.getVisitedArray('ben','countries');
-              benVisited.capitals=store.getVisitedArray('ben','capitals');
-              benVisited.travellist1=store.getVisitedArray('ben','travellist1');
-              benVisited.travellist2=store.getVisitedArray('ben','travellist2');
-              benVisited.unesco=store.getVisitedArray('ben','unesco');
-              benVisited.animals=store.getVisitedArray('ben','animals');
+              pd.countries=store.getVisitedArray('ben','countries');
+              pd.capitals=store.getVisitedArray('ben','capitals');
+              pd.travellist1=store.getVisitedArray('ben','travellist1');
+              pd.travellist2=store.getVisitedArray('ben','travellist2');
+              pd.unesco=store.getVisitedArray('ben','unesco');
+              pd.animals=store.getVisitedArray('ben','animals');
             }
-            if(tripStore){
-              _trips=tripStore.getTrips('ben');
-            }
-            return benVisited;
+            if(tripStore){ _trips=tripStore.getTrips('ben'); }
+            return pd;
           }
           var ben=_refreshMapData();
           var cm=buildMap(res[0],res[1],res[2],res[3],ben);
           renderMap(cm);
-          /* Re-render after remote GitHub data loads */
           if(window.TravelApp&&window.TravelApp.Store){
-            window.TravelApp.Store.onRemoteLoad(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});
             window.TravelApp.Store.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});
           }
           if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);});}
