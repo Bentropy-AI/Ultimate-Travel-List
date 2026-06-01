@@ -1681,6 +1681,31 @@
             return { newOnly:newOnly, returned:returned, total:totalVisited };
           })(),
 
+          longestRevisitGap: (function() {
+            var countryVisits = {};
+            benTrips.forEach(function(t) {
+              if (!t.start) return;
+              (t.countries||[]).forEach(function(c) {
+                if (!countryVisits[c]) countryVisits[c] = [];
+                countryVisits[c].push(t.start);
+              });
+            });
+            var best = null;
+            Object.keys(countryVisits).forEach(function(country) {
+              var dates = countryVisits[country].slice().sort();
+              if (dates.length < 2) return;
+              for (var i = 1; i < dates.length; i++) {
+                var d1 = new Date(dates[i-1]+'T00:00:00');
+                var d2 = new Date(dates[i]+'T00:00:00');
+                var days = Math.round((d2-d1)/86400000);
+                if (!best || days > best.days) {
+                  best = { country:country, from:dates[i-1], to:dates[i], days:days };
+                }
+              }
+            });
+            return best;
+          })(),
+
           utlEfficiency: (function() {
             var nonWorkTrips = benTrips.filter(function(t){ return t.type !== 'Work'; });
             var totalUtl = 0;
@@ -2131,6 +2156,20 @@
           '</div>';
       }
 
+      function cardLongestRevisit(d) {
+        var g = d.longestRevisitGap;
+        if (!g) return '';
+        var years = (g.days / 365.25).toFixed(1);
+        var fromYr = g.from.substr(0,4);
+        var toYr   = g.to.substr(0,4);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Longest wait to revisit</span>' +
+          '<div class="ins-hero-sm">'+years+' <span class="ins-unit">years</span></div>' +
+          '<div class="ins-label"><strong>'+g.country+'</strong> — first visited '+fromYr+', returned '+toYr+'</div>' +
+          '<div class="ins-sub">'+g.days.toLocaleString()+' days between visits</div>' +
+          '</div>';
+      }
+
       function renderInsights(d) {
         var html = '<div class="ins-masonry">' +
           cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
@@ -2143,7 +2182,7 @@
           cardHalfway(d) +
           cardDaysSinceLast(d) + cardLongestAtHome(d) + cardIntensityByYear(d) +
           cardContDays(d) + cardExplorerRatio(d) + cardTravellerProfile(d) +
-          cardUtlEfficiency(d) +
+          cardUtlEfficiency(d) + cardLongestRevisit(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
