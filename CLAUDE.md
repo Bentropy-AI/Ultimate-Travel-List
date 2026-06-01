@@ -3,6 +3,133 @@
 > **Maintained by Claude.** Update this file at the end of any session that changes structure, data, logic, or pages.  
 > Repo: `bentropy-ai/Ultimate-Travel-List` · Hosted: GitHub Pages · Last updated: 2026-05-06
 
+
+---
+
+## 0. CRITICAL: How to Work on Traveller Pages
+
+**The four traveller pages (`ben.html`, `shaz.html`, `paul.html`, `ruth.html`) are structurally identical.** They differ only in person ID, name, initial, colour variable, and colour hex. They are maintained as four separate files — no build step, no templating engine.
+
+### Rule: always change all four pages together
+
+**Never commit a change to one traveller page without applying it to all four.**
+
+### Workflow for any change to a traveller page
+
+1. Make the change to `ben.html` only and verify it works.
+2. Run the substitution script below to generate the other three.
+3. Commit all four files in a single commit.
+
+### Substitution script
+
+```python
+import base64, json, urllib.request
+
+TOKEN = "YOUR_PAT"
+REPO  = "bentropy-ai/Ultimate-Travel-List"
+
+with open('ben.html', 'r') as f:
+    ben = f.read()
+
+PEOPLE = [
+    {'id':'shaz','name':'Shaz','initial':'S','color_var':'color-shaz','pstats_color':'#9b59f5','pstats_bg':'rgba(155,89,245,.07)','btn_fallback':'#9b59f5'},
+    {'id':'paul','name':'Paul','initial':'P','color_var':'color-paul','pstats_color':'#3ecf8e','pstats_bg':'rgba(62,207,142,.07)','btn_fallback':'#3ecf8e'},
+    {'id':'ruth','name':'Ruth','initial':'R','color_var':'color-ruth','pstats_color':'#e05c8e','pstats_bg':'rgba(224,92,142,.07)','btn_fallback':'#e05c8e'},
+]
+
+# All person-specific substitutions — extend this list if new patterns are added
+def make_replacements(p):
+    pid=p['id']; cv=p['color_var']; nm=p['name']; ini=p['initial']
+    pc=p['pstats_color']; pb=p['pstats_bg']; bf=p['btn_fallback']
+    return [
+        ('<title>Ben - Travel Progress</title>', f'<title>{nm} - Travel Progress</title>'),
+        ('#pStats .stat-card .stat-number { color: #4f8ef7 !important; }\n      #pStats .stat-card { border-top: 3px solid #4f8ef7; background: rgba(79,142,247,.07); }',
+         f'#pStats .stat-card .stat-number {{ color: {pc} !important; }}\n      #pStats .stat-card {{ border-top: 3px solid {pc}; background: {pb}; }}'),
+        ('class="person-avatar avatar-ben">B<', f'class="person-avatar avatar-{pid}">{ini}<'),
+        ('style="color:var(--color-ben)">Ben<', f'style="color:var(--{cv})">{nm}<'),
+        ('class="traveller-tabs tabs-ben"', f'class="traveller-tabs tabs-{pid}"'),
+        ('background:linear-gradient(90deg,#2563c4,var(--color-ben))', f'background:linear-gradient(90deg,#2563c4,var(--{cv}))'),
+        ('.tl-vt-zoom-btn.active{background:var(--color-ben);color:#fff;border-color:var(--color-ben)}',
+         f'.tl-vt-zoom-btn.active{{background:var(--{cv});color:#fff;border-color:var(--{cv})}}'),
+        ('.tl-date-col{font-weight:600;color:var(--color-ben)!important;font-size:.85rem}',
+         f'.tl-date-col{{font-weight:600;color:var(--{cv})!important;font-size:.85rem}}'),
+        ('background:var(--color-ben);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity var(--transition);white-space:nowrap}',
+         f'background:var(--{cv});color:#fff;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity var(--transition);white-space:nowrap}}'),
+        ('background:var(--color-ben,#4f8ef7);color:#fff;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity var(--transition)}',
+         f'background:var(--{cv},{bf});color:#fff;border:none;border-radius:var(--radius-sm);font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity var(--transition)}}'),
+        ('background:var(--color-ben); color:#fff; border-radius:20px; padding:1px 8px; font-size:.72rem; font-weight:700; }',
+         f'background:var(--{cv}); color:#fff; border-radius:20px; padding:1px 8px; font-size:.72rem; font-weight:700; }}'),
+        ('var PERSON = "ben";', f'var PERSON = "{pid}";'),
+        ("var TRAV_ID = 'ben';", f"var TRAV_ID = '{pid}';"),
+        ("_tv.indexOf('ben')!==-1", f"_tv.indexOf('{pid}')!==-1"),
+        ("pd.countries=store.getVisitedArray('ben','countries');\n              pd.capitals=store.getVisitedArray('ben','capitals');\n              pd.travellist1=store.getVisitedArray('ben','travellist1');\n              pd.travellist2=store.getVisitedArray('ben','travellist2');\n              pd.unesco=store.getVisitedArray('ben','unesco');\n              pd.animals=store.getVisitedArray('ben','animals');",
+         f"pd.countries=store.getVisitedArray('{pid}','countries');\n              pd.capitals=store.getVisitedArray('{pid}','capitals');\n              pd.travellist1=store.getVisitedArray('{pid}','travellist1');\n              pd.travellist2=store.getVisitedArray('{pid}','travellist2');\n              pd.unesco=store.getVisitedArray('{pid}','unesco');\n              pd.animals=store.getVisitedArray('{pid}','animals');"),
+        ("if(tripStore){ _trips=tripStore.getTrips('ben'); }", f"if(tripStore){{ _trips=tripStore.getTrips('{pid}'); }}"),
+        ("var ben=_refreshMapData();", f"var {pid}=_refreshMapData();"),
+        ("var cm=buildMap(res[0],res[1],res[2],res[3],ben);", f"var cm=buildMap(res[0],res[1],res[2],res[3],{pid});"),
+        ("ben=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ben);renderMap(cm);", f"{pid}=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],{pid});renderMap(cm);"),
+        ("pd.countries=store.getVisitedArray('ben','countries');\n            pd.capitals=store.getVisitedArray('ben','capitals');\n            pd.travellist1=store.getVisitedArray('ben','travellist1');\n            pd.travellist2=store.getVisitedArray('ben','travellist2');\n          }\n          buildFromVisited({'ben':pd});",
+         f"pd.countries=store.getVisitedArray('{pid}','countries');\n            pd.capitals=store.getVisitedArray('{pid}','capitals');\n            pd.travellist1=store.getVisitedArray('{pid}','travellist1');\n            pd.travellist2=store.getVisitedArray('{pid}','travellist2');\n          }}\n          buildFromVisited({{'{pid}':pd}});"),
+        (f"visited['ben'] = {{\n                  countries:   store.getVisitedArray('ben','countries'),\n                  capitals:    store.getVisitedArray('ben','capitals'),\n                  travellist1: store.getVisitedArray('ben','travellist1'),\n                  travellist2: store.getVisitedArray('ben','travellist2'),\n                  unesco:      store.getVisitedArray('ben','unesco'),\n                  animals:     store.getVisitedArray('ben','animals')\n                }};",
+         f"visited['{pid}'] = {{\n                  countries:   store.getVisitedArray('{pid}','countries'),\n                  capitals:    store.getVisitedArray('{pid}','capitals'),\n                  travellist1: store.getVisitedArray('{pid}','travellist1'),\n                  travellist2: store.getVisitedArray('{pid}','travellist2'),\n                  unesco:      store.getVisitedArray('{pid}','unesco'),\n                  animals:     store.getVisitedArray('{pid}','animals')\n                }};"),
+        ("(t.travellers||[]).indexOf('ben') !== -1) homeRec = t;", f"(t.travellers||[]).indexOf('{pid}') !== -1) homeRec = t;"),
+        ("return !t._home && (t.travellers||t.companions||[]).indexOf('ben') !== -1;", f"return !t._home && (t.travellers||t.companions||[]).indexOf('{pid}') !== -1;"),
+        ("Store.getVisitedArray('ben','countries')", f"Store.getVisitedArray('{pid}','countries')"),
+        ("Store.getVisitedArray('ben','capitals')", f"Store.getVisitedArray('{pid}','capitals')"),
+        ("Store.getVisitedArray('ben','travellist1')", f"Store.getVisitedArray('{pid}','travellist1')"),
+        ("Store.getVisitedArray('ben','travellist2')", f"Store.getVisitedArray('{pid}','travellist2')"),
+        ("Store.getVisitedArray('ben','unesco')", f"Store.getVisitedArray('{pid}','unesco')"),
+        ("TripStore.getTrips('ben')", f"TripStore.getTrips('{pid}')"),
+        ("TripStore.load('ben')", f"TripStore.load('{pid}')"),
+        (".indexOf('ben') !== -1;", f".indexOf('{pid}') !== -1;"),
+        (f"var pd=visited['ben']||{{}};", f"var pd=visited['{pid}']||{{}};"),
+        (f"var ben = visited['ben'] || {{}};", f"var {pid} = visited['{pid}'] || {{}};"),
+        ("ben.countries", f"{pid}.countries"),
+        ("ben.capitals", f"{pid}.capitals"),
+        ("ben.travellist1", f"{pid}.travellist1"),
+        ("ben.travellist2", f"{pid}.travellist2"),
+        ("ben.unesco", f"{pid}.unesco"),
+        ("ben.animals", f"{pid}.animals"),
+    ]
+
+for p in PEOPLE:
+    pid = p['id']
+    out = ben
+    for old, new in make_replacements(p):
+        out = out.replace(old, new)
+    # Verify clean
+    remaining = [(i+1, l.strip()[:80]) for i,l in enumerate(out.split('\n'))
+                 if "'ben'" in l and 'data-trav="ben"' not in l and 'rgba(79,142,247' not in l]
+    if remaining:
+        print(f"WARNING {pid}: {len(remaining)} unreplaced 'ben' refs")
+        for ln, txt in remaining: print(f"  L{ln}: {txt}")
+    # Commit
+    url = f'https://api.github.com/repos/{REPO}/contents/pages/{pid}.html'
+    sha = json.loads(urllib.request.urlopen(urllib.request.Request(url,
+        headers={{"Authorization":f"token {{TOKEN}}"}})).read())['sha']
+    payload = json.dumps({{"message": f"Sync {{p['name']}}'s page from ben.html",
+        "content": base64.b64encode(out.encode()).decode(), "sha": sha}}).encode()
+    result = json.loads(urllib.request.urlopen(urllib.request.Request(url,
+        data=payload, method='PUT',
+        headers={{"Authorization":f"token {{TOKEN}}", "Content-Type":"application/json"}})).read())
+    print(f"{{p['name']}}: {{'OK' if 'commit' in result else 'FAILED'}}")
+```
+
+### Person-specific values (for reference)
+
+| Person | ID | Initial | `--color-*` var | Hex | pStats bg |
+|---|---|---|---|---|---|
+| Ben | `ben` | B | `color-ben` | `#4f8ef7` | `rgba(79,142,247,.07)` |
+| Shaz | `shaz` | S | `color-shaz` | `#9b59f5` | `rgba(155,89,245,.07)` |
+| Paul | `paul` | P | `color-paul` | `#3ecf8e` | `rgba(62,207,142,.07)` |
+| Ruth | `ruth` | R | `color-ruth` | `#e05c8e` | `rgba(224,92,142,.07)` |
+
+### If a new pattern is added to ben.html
+
+If you introduce a new hardcoded `'ben'` reference in `ben.html`, add it to the `make_replacements` list in the script above **and** update this section of CLAUDE.md.
+
+---
+
 ---
 
 ## 1. Project Overview
