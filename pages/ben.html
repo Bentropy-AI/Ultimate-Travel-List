@@ -2221,18 +2221,13 @@
         }
 
         /* Load both Store AND TripStore before rendering */
-        var storeReady = false, tripStoreReady = false;
-        function checkReady() {
-          if (storeReady && tripStoreReady) {
-            doRender();
-            Store.onSave(function() { _initDone = false; doRender(); _initDone = true; });
-            TripStore.onSave(function() { _initDone = false; doRender(); _initDone = true; });
-          }
-        }
+        /* Store is already loaded by the Progress tab — don't call load() again
+           as it resets internal state. Just wait for TripStore then render. */
+        Store.onSave(function() { _initDone = false; doRender(); _initDone = true; });
+        TripStore.onSave(function() { _initDone = false; doRender(); _initDone = true; });
 
-        Store.load(function() { storeReady = true; checkReady(); });
-        TripStore.load('ben').then(function() { tripStoreReady = true; checkReady(); })
-                             .catch(function() { tripStoreReady = true; checkReady(); });
+        TripStore.load('ben').then(function() { doRender(); })
+                             .catch(function() { doRender(); });
       }
 
       document.addEventListener('DOMContentLoaded', function() {
