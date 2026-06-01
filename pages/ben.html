@@ -1682,18 +1682,19 @@
           })(),
 
           utlEfficiency: (function() {
+            var nonWorkTrips = benTrips.filter(function(t){ return t.type !== 'Work'; });
             var totalUtl = 0;
-            benTrips.forEach(function(t){
+            nonWorkTrips.forEach(function(t){
               totalUtl += (t.utl1||[]).length + (t.utl2||[]).length;
             });
-            var dated = benTrips.filter(function(t){ return t.start && t.finish; });
+            var dated = nonWorkTrips.filter(function(t){ return t.start && t.finish; });
             var totalDaysDated = dated.reduce(function(s,t){
               return s + Math.round((new Date(t.finish+'T00:00:00')-new Date(t.start+'T00:00:00'))/86400000)+1;
             }, 0);
             return {
               total: totalUtl,
               perDay: totalDaysDated ? (totalUtl / totalDaysDated) : 0,
-              perTrip: benTrips.length ? (totalUtl / benTrips.length) : 0
+              perTrip: nonWorkTrips.length ? (totalUtl / nonWorkTrips.length) : 0
             };
           })(),
 
@@ -2126,6 +2127,7 @@
             '<div class="ins-locs-item"><div class="ins-locs-num">'+perTrip+'</div><div class="ins-locs-lbl">items per trip</div></div>' +
           '</div>' +
           '<div class="ins-sub" style="margin-top:.5rem">'+rating+'</div>' +
+          '<div class="ins-sub" style="margin-top:.3rem;opacity:.6">excluding work trips</div>' +
           '</div>';
       }
 
