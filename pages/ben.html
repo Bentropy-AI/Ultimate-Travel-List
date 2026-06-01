@@ -1312,13 +1312,11 @@
       #insights-grid { padding: 1.5rem 0 2rem; }
 
       .ins-masonry {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        align-items: start;
+        column-count: 3;
+        column-gap: 14px;
       }
-      @media (max-width: 860px) { .ins-masonry { grid-template-columns: repeat(2, 1fr); } }
-      @media (max-width: 540px) { .ins-masonry { grid-template-columns: 1fr; } }
+      @media (max-width: 860px) { .ins-masonry { column-count: 2; } }
+      @media (max-width: 540px) { .ins-masonry { column-count: 1; } }
 
       .ins-card {
         background: var(--color-surface);
@@ -1328,12 +1326,11 @@
         position: relative;
         overflow: hidden;
         transition: border-color .2s, transform .2s;
+        break-inside: avoid;
+        margin-bottom: 14px;
+        display: block;
       }
       .ins-card:hover { border-color: #4f8ef7; transform: translateY(-2px); }
-      .ins-card.span2 { grid-column: span 2; }
-      .ins-card.span3 { grid-column: span 3; }
-      @media (max-width: 860px) { .ins-card.span2 { grid-column: span 2; } .ins-card.span3 { grid-column: span 2; } }
-      @media (max-width: 540px) { .ins-card.span2, .ins-card.span3 { grid-column: span 1; } }
 
       .ins-card::before {
         content: '';
@@ -1545,7 +1542,7 @@
       }
 
       function cardDaysAway(d) {
-        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.blue+'">' +
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
           '<span class="ins-tag">Days on the road</span>' +
           '<div class="ins-hero">'+d.totalDays.toLocaleString()+' <span class="ins-unit">days</span></div>' +
           '<div class="ins-label">That\'s <strong>'+d.totalYears+' years</strong> of your life spent travelling — and counting.</div>' +
@@ -1581,7 +1578,7 @@
             '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+bp+'%;background:'+ACCENTS.amber+'"></div></div>' +
             '<div class="ins-bar-val">'+item.days+'d</div></div>';
         }).join('');
-        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.amber+'">' +
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
           '<span class="ins-tag">Top countries by time spent</span>' +
           '<div class="ins-label" style="margin-bottom:.3rem">Estimated days per destination</div>'+rows+'</div>';
       }
@@ -1615,7 +1612,7 @@
             '<span class="ins-cont-pill-num">'+item.count+'</span>' +
             '<span class="ins-cont-pill-name">'+item.name+'</span></div>';
         }).join('');
-        return '<div class="ins-card span3" style="--ins-accent:'+ACCENTS.teal+'">' +
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
           '<span class="ins-tag">Continent breakdown</span>' +
           '<div class="ins-label" style="margin-bottom:.1rem">Unique countries per continent from trip log</div>' +
           '<div class="ins-cont-grid">'+pills+'</div></div>';
@@ -1655,7 +1652,7 @@
             '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
             '<div class="ins-bar-val">'+pct+'%</div></div>';
         }
-        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.teal+'">' +
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
           '<span class="ins-tag">List completion</span>' +
           '<div class="ins-label" style="margin-bottom:.5rem">Progress across all major travel lists</div>' +
           row('TL I',tl1Pct,ACCENTS.blue)+row('TL II',tl2Pct,ACCENTS.teal)+row('UNESCO',uPct,ACCENTS.amber)+'</div>';
@@ -1707,7 +1704,7 @@
             travellist2: Store.getVisitedArray('ben','travellist2'),
             unesco:      Store.getVisitedArray('ben','unesco')
           };
-          var trips = TripStore.getTrips();
+          var trips = TripStore.getTrips('ben');
           var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
           Promise.all([
             fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
@@ -1721,11 +1718,19 @@
           }).catch(function(err){ console.error('Insights error:', err); });
         }
 
-        Store.load(function() {
-          doRender();
-          Store.onSave(doRender);
-          TripStore.onSave(doRender);
-        });
+        /* Load both Store AND TripStore before rendering */
+        var storeReady = false, tripStoreReady = false;
+        function checkReady() {
+          if (storeReady && tripStoreReady) {
+            doRender();
+            Store.onSave(function() { _initDone = false; doRender(); _initDone = true; });
+            TripStore.onSave(function() { _initDone = false; doRender(); _initDone = true; });
+          }
+        }
+
+        Store.load(function() { storeReady = true; checkReady(); });
+        TripStore.load('ben').then(function() { tripStoreReady = true; checkReady(); })
+                             .catch(function() { tripStoreReady = true; checkReady(); });
       }
 
       document.addEventListener('DOMContentLoaded', function() {
