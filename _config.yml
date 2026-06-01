@@ -1,0 +1,5 @@
+exclude:
+  - CLAUDE.md
+  - README.md
+  - convert_csv.py
+  - app.js
