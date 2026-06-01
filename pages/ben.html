@@ -1503,6 +1503,74 @@
           prevYr=yr;
         });
 
+        /* ── Average trip length + distribution ── */
+        var datedTrips = benTrips.filter(function(t){ return t.start && t.finish; });
+        var allDurations = datedTrips.map(function(t){ return tripDays(t); });
+        var avgTripLen = allDurations.length ? (allDurations.reduce(function(s,d){return s+d;},0)/allDurations.length) : 0;
+        var shortTrips  = allDurations.filter(function(d){return d<=3;}).length;
+        var mediumTrips = allDurations.filter(function(d){return d>3&&d<=10;}).length;
+        var longTrips   = allDurations.filter(function(d){return d>10&&d<=21;}).length;
+        var epicsTrips  = allDurations.filter(function(d){return d>21;}).length;
+
+        /* ── Longest trip ── */
+        var longestTrip = datedTrips.reduce(function(best,t){
+          return tripDays(t) > tripDays(best) ? t : best;
+        }, datedTrips[0] || {});
+        var longestDays = longestTrip.start ? tripDays(longestTrip) : 0;
+        var longestCountries = (longestTrip.countries||[]).join(', ');
+        var longestYear = longestTrip.start ? longestTrip.start.substr(0,4) : '';
+
+        /* ── Favourite month (radial) ── */
+        var monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        var MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        benTrips.forEach(function(t){
+          if(!t.start) return;
+          var m = parseInt(t.start.substr(5,2),10)-1;
+          if(m>=0&&m<12) monthCounts[m]++;
+        });
+        var peakMonthIdx = monthCounts.indexOf(Math.max.apply(null,monthCounts));
+
+        /* ── This year so far ── */
+        var thisYear = currentYear;
+        var thisYearTrips = benTrips.filter(function(t){ return t.start && t.start.substr(0,4) === String(thisYear); });
+        var thisYearDays = thisYearTrips.reduce(function(s,t){ return s+tripDays(t); },0);
+        var thisYearCountries = {};
+        thisYearTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ thisYearCountries[c]=1; }); });
+        var allYearsAvgTrips = benTrips.length / (Object.keys(yearCountries).length || 1);
+        var allYearsAvgDays  = totalDays / (Object.keys(yearCountries).length || 1);
+
+        /* ── Best UTL haul trip ── */
+        var bestUtlTrip = benTrips.reduce(function(best,t){
+          var score = (t.utl1||[]).length + (t.utl2||[]).length;
+          var bestScore = ((best.utl1||[]).length + (best.utl2||[]).length);
+          return score > bestScore ? t : best;
+        }, benTrips[0] || {});
+        var bestUtl1Count = (bestUtlTrip.utl1||[]).length;
+        var bestUtl2Count = (bestUtlTrip.utl2||[]).length;
+        var bestUtlCountries = (bestUtlTrip.countries||[]).join(', ');
+        var bestUtlYear = bestUtlTrip.start ? bestUtlTrip.start.substr(0,4) : '';
+
+        /* ── Capitals ── */
+        var capitalsVisited = (storeData.capitals||[]).length;
+
+        /* ── Next milestones ── */
+        var cv = (storeData.countries||[]).length;
+        var t1v = (storeData.travellist1||[]).length;
+        var t2v = (storeData.travellist2||[]).length;
+        var uv  = (storeData.unesco||[]).length;
+        var capv = capitalsVisited;
+        function nextMilestone(val, targets) {
+          for(var i=0;i<targets.length;i++){ if(val<targets[i]) return {target:targets[i],gap:targets[i]-val}; }
+          return null;
+        }
+        var milestones = [
+          { label:'Countries',  val:cv,  icon:'🌍', m: nextMilestone(cv,  [50,75,100,125,150,175,200]) },
+          { label:'TL I items', val:t1v, icon:'📍', m: nextMilestone(t1v, [100,150,200,250,300,350,400,450,500]) },
+          { label:'TL II items',val:t2v, icon:'📌', m: nextMilestone(t2v, [100,150,200,250,300,350,400,450,500]) },
+          { label:'UNESCO',     val:uv,  icon:'🏛️', m: nextMilestone(uv,  [50,100,150,200,250,300]) },
+          { label:'Capitals',   val:capv,icon:'🏙️', m: nextMilestone(capv,[50,75,100,125,150,175,200]) }
+        ].filter(function(x){ return x.m; });
+
         return {
           totalDays:totalDays, totalYears:totalYears,
           mostVisited:mostVisited, mostVisitedCount:mostVisitedCount,
@@ -1518,7 +1586,19 @@
           countriesTotal:countriesTotal, tl1Total:tl1Total,
           tl2Total:tl2Total, unescoCnt:unescoCnt,
           bestYear:bestYear, bestYearCount:bestYearCount,
-          streak:streak, yearCountries:yearCountries
+          streak:streak, yearCountries:yearCountries,
+          avgTripLen:avgTripLen, shortTrips:shortTrips, mediumTrips:mediumTrips,
+          longTrips:longTrips, epicsTrips:epicsTrips, allDurations:allDurations,
+          longestTrip:longestTrip, longestDays:longestDays,
+          longestCountries:longestCountries, longestYear:longestYear,
+          monthCounts:monthCounts, peakMonthIdx:peakMonthIdx,
+          thisYearTrips:thisYearTrips, thisYearDays:thisYearDays,
+          thisYearCountries:thisYearCountries, thisYear:thisYear,
+          allYearsAvgTrips:allYearsAvgTrips, allYearsAvgDays:allYearsAvgDays,
+          bestUtlTrip:bestUtlTrip, bestUtl1Count:bestUtl1Count,
+          bestUtl2Count:bestUtl2Count, bestUtlCountries:bestUtlCountries,
+          bestUtlYear:bestUtlYear,
+          capitalsVisited:capitalsVisited, milestones:milestones
         };
       }
 
@@ -1675,6 +1755,118 @@
           '<div class="ins-label">Consecutive years with at least one trip abroad</div></div>';
       }
 
+      function cardAvgTripLength(d) {
+        var total = d.allDurations.length || 1;
+        function bar(n, col, label) {
+          var pct = Math.round((n/total)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+n+'</div></div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Average trip length</span>' +
+          '<div class="ins-hero-sm">'+d.avgTripLen.toFixed(1)+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Trip length distribution</div>' +
+          bar(d.shortTrips,  '#7a7f9a', '1–3 days') +
+          bar(d.mediumTrips, ACCENTS.blue,   '4–10 days') +
+          bar(d.longTrips,   ACCENTS.teal,   '11–21 days') +
+          bar(d.epicsTrips,  ACCENTS.gold,   '21+ days') +
+          '</div>';
+      }
+
+      function cardFavouriteMonth(d) {
+        var max = Math.max.apply(null, d.monthCounts) || 1;
+        var MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var bars = d.monthCounts.map(function(cnt, i) {
+          var h = Math.max(3, Math.round((cnt/max)*44));
+          var isPeak = i === d.peakMonthIdx;
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px;background:'+(isPeak?ACCENTS.cyan:'#4f8ef7')+';opacity:'+(isPeak?'1':'.5')+'"></div>' +
+            '<div class="ins-spark-bar-yr">'+MNAMES[i]+'</div></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Favourite travel month</span>' +
+          '<div class="ins-hero-sm">'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.peakMonthIdx]+'</div>' +
+          '<div class="ins-label">'+d.monthCounts[d.peakMonthIdx]+' trips started in this month</div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars" style="height:54px">'+bars+'</div></div>' +
+          '</div>';
+      }
+
+      function cardThisYear(d) {
+        var cCount = Object.keys(d.thisYearCountries).length;
+        var avgT = Math.round(d.allYearsAvgTrips);
+        var avgDy = Math.round(d.allYearsAvgDays);
+        function stat(val, label, avg) {
+          var ahead = val >= avg;
+          return '<div class="ins-locs-item">' +
+            '<div class="ins-locs-num">'+val+'</div>' +
+            '<div class="ins-locs-lbl">'+label+'</div>' +
+            '<div style="font-size:.68rem;margin-top:2px;color:'+(ahead?ACCENTS.teal:ACCENTS.coral)+'">'+
+              (ahead?'▲ ahead of':'▼ below')+' avg ('+avg+')</div>' +
+            '</div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">'+d.thisYear+' so far</span>' +
+          '<div class="ins-locs-row" style="gap:1.2rem;margin-top:.5rem">' +
+            stat(d.thisYearTrips.length, 'trips', avgT) +
+            stat(cCount, 'countries', Math.round(d.allYearsAvgDays/8)) +
+            stat(d.thisYearDays, 'days away', avgDy) +
+          '</div>' +
+          '</div>';
+      }
+
+      function cardLongestTrip(d) {
+        var countries = d.longestCountries.length > 40 ? d.longestCountries.substr(0,38)+'…' : d.longestCountries;
+        var avgLen = d.allDurations.length ? Math.round(d.allDurations.reduce(function(s,x){return s+x;},0)/d.allDurations.length) : 7;
+        var multPct = d.longestDays && avgLen ? Math.round(d.longestDays/avgLen) : 0;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Longest trip ever</span>' +
+          '<div class="ins-hero-sm">'+d.longestDays+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">'+countries+(d.longestYear?' · '+d.longestYear:'')+'</div>' +
+          '<span class="ins-badge" style="background:rgba(246,166,35,.15);color:'+ACCENTS.amber+'">'+multPct+'× your average trip</span>' +
+          '</div>';
+      }
+
+      function cardBestUtl(d) {
+        var total = d.bestUtl1Count + d.bestUtl2Count;
+        var ctry = d.bestUtlCountries.length > 32 ? d.bestUtlCountries.substr(0,30)+'…' : d.bestUtlCountries;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Best UTL haul trip</span>' +
+          '<div class="ins-hero-sm">'+total+' <span class="ins-unit">items ticked</span></div>' +
+          '<div class="ins-label">'+ctry+(d.bestUtlYear?' · '+d.bestUtlYear:'')+'</div>' +
+          '<div class="ins-sub">TL I: '+d.bestUtl1Count+' &nbsp;·&nbsp; TL II: '+d.bestUtl2Count+'</div>' +
+          '</div>';
+      }
+
+      function cardCapitals(d) {
+        var capTotal = d.countriesTotal;
+        var pct = Math.round((d.capitalsVisited/capTotal)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Capitals visited</span>' +
+          '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
+          '<div class="ins-ring-info">' +
+          '<div class="ins-ring-pct">'+d.capitalsVisited+'<span style="color:var(--color-muted);font-size:1rem"> / '+capTotal+'</span></div>' +
+          '<div class="ins-label">'+pct+'% of world capitals</div>' +
+          '</div></div></div>';
+      }
+
+      function cardNextMilestones(d) {
+        var rows = d.milestones.slice(0,5).map(function(item) {
+          var pctDone = Math.round(((item.m.target - item.m.gap) / item.m.target)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label" style="width:100px">'+item.icon+' '+item.label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pctDone+'%;background:'+ACCENTS.blue+'"></div></div>' +
+            '<div class="ins-bar-val" style="width:60px;color:'+ACCENTS.teal+'">'+item.m.gap+' to go</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Next milestones</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Distance to the next round number in each list</div>' +
+          rows +
+          '</div>';
+      }
+
       function renderInsights(d) {
         var html = '<div class="ins-masonry">' +
           cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
@@ -1682,6 +1874,9 @@
           cardContinents(d) +
           cardSoloGroup(d) + cardWorkLeisure(d) +
           cardListProgress(d) + cardLocations(d) + cardStreak(d) +
+          cardAvgTripLength(d) + cardFavouriteMonth(d) + cardThisYear(d) +
+          cardLongestTrip(d) + cardBestUtl(d) + cardCapitals(d) +
+          cardNextMilestones(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
