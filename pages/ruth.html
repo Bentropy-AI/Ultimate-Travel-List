@@ -26,6 +26,7 @@
       <nav class="traveller-tabs tabs-ruth" id="traveller-tabs">
         <button class="traveller-tab active" data-tab="progress">📊 Progress</button>
         <button class="traveller-tab" data-tab="timeline">🗓️ Timeline</button>
+        <button class="traveller-tab" data-tab="insights">✨ Insights</button>
       </nav>
 
       <!-- TAB PANEL: PROGRESS (existing content) -->
@@ -43,7 +44,7 @@
       #map-wrap{width:100%;height:460px;border-radius:var(--radius);overflow:hidden;background:var(--color-bg);border:1px solid var(--color-border)}
       .map-legend{display:flex;align-items:center;gap:14px;margin-top:.75rem;font-size:.78rem;color:var(--color-muted);flex-wrap:wrap}
       .map-legend-scale{display:flex;align-items:center;gap:8px;flex:1;min-width:200px}
-      .map-legend-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#2a0f1a 0%,#8a1a45 33%,#b83a6a 66%,#e05c8e 100%)}
+      .map-legend-bar{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#22263a 0%,#2a5298 33%,#3a78d4 66%,#4f8ef7 100%)}
       .map-legend-label{white-space:nowrap}
       .map-legend-note{display:flex;align-items:center;gap:6px}
       .map-legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
@@ -59,11 +60,11 @@
           <span class="map-legend-label">100%</span>
         </div>
         <div class="map-legend-note">
-          <div class="map-legend-swatch" style="background:#2a0f1a"></div>
+          <div class="map-legend-swatch" style="background:#22263a"></div>
           <span>Not yet visited</span>
         </div>
         <div class="map-legend-note">
-          <div class="map-legend-swatch" style="background:#e05c8e"></div>
+          <div class="map-legend-swatch" style="background:#4f8ef7"></div>
           <span>Fully explored</span>
         </div>
       </div>
@@ -81,11 +82,11 @@
       function getTripDates(countryName){var matched=[];for(var i=0;i<_trips.length;i++){var _tv=_trips[i].travellers||_trips[i].companions||[];var _tc=_trips[i].countries||(_trips[i].country?[_trips[i].country]:[]);if(_tc.indexOf(countryName)!==-1&&_tv.indexOf('ruth')!==-1){var lbl=fmtTripDate(_trips[i].start);if(lbl&&matched.indexOf(lbl)===-1)matched.push(lbl);}}if(!matched.length)return null;matched.sort(function(a,b){return new Date('01-'+b.split('-').reverse().join('-'))-new Date('01-'+a.split('-').reverse().join('-'));});return matched.join('  |  ');}
       function resolveISOs(c,bn){if(NAME_MAP.hasOwnProperty(c)){var m=NAME_MAP[c];if(!m)return[];return Array.isArray(m)?m:[m];}return bn[c]?[bn[c]]:[];}
       function lerp(c1,c2,t){var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255,r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;return(Math.round(r1+(r2-r1)*t)<<16)|(Math.round(g1+(g2-g1)*t)<<8)|Math.round(b1+(b2-b1)*t);}
-      function getColor(p){var C0=0x2a0f1a,C1=0x8a1a45,C2=0xb83a6a,C3=0xe05c8e;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}
-      function buildMap(t1,t2,countries,unescoItems,person){
-        var bn={};countries.forEach(function(c){bn[c.name]=c.id;}); var vU={};(person.unesco||[]).forEach(function(x){vU[x]=1;}); var uByISO={}; (unescoItems||[]).forEach(function(item){var cns=item.country.split(',');cns.forEach(function(cn){cn=cn.trim();var iso=bn[cn]||UNESCO_NM[cn];if(iso){if(!uByISO[iso])uByISO[iso]={total:0,visited:0};uByISO[iso].total++;if(vU[item.id])uByISO[iso].visited++;}});});
+      function getColor(p){var C0=0x22263a,C1=0x2a5298,C2=0x3a78d4,C3=0x4f8ef7;if(p<=0)return C0;if(p<=33)return lerp(C0,C1,p/33);if(p<=66)return lerp(C1,C2,(p-33)/33);return lerp(C2,C3,(p-66)/34);}
+      function buildMap(t1,t2,countries,unescoItems,ben){
+        var bn={};countries.forEach(function(c){bn[c.name]=c.id;}); var vU={};(ruth.unesco||[]).forEach(function(x){vU[x]=1;}); var uByISO={}; (unescoItems||[]).forEach(function(item){var cns=item.country.split(',');cns.forEach(function(cn){cn=cn.trim();var iso=bn[cn]||UNESCO_NM[cn];if(iso){if(!uByISO[iso])uByISO[iso]={total:0,visited:0};uByISO[iso].total++;if(vU[item.id])uByISO[iso].visited++;}});});
         var vC={},vCap={},vT1={},vT2={};
-        (person.countries||[]).forEach(function(x){vC[x]=1;});(person.capitals||[]).forEach(function(x){vCap[x]=1;});(person.travellist1||[]).forEach(function(x){vT1[x]=1;});(person.travellist2||[]).forEach(function(x){vT2[x]=1;});
+        (ruth.countries||[]).forEach(function(x){vC[x]=1;});(ruth.capitals||[]).forEach(function(x){vCap[x]=1;});(ruth.travellist1||[]).forEach(function(x){vT1[x]=1;});(ruth.travellist2||[]).forEach(function(x){vT2[x]=1;});
         var m1={},m2={};
         t1.forEach(function(i){resolveISOs(i.country,bn).forEach(function(iso){if(!m1[iso])m1[iso]={total:0,visited:0};m1[iso].total++;if(vT1[i.id])m1[iso].visited++;});});
         t2.forEach(function(i){resolveISOs(i.country,bn).forEach(function(iso){if(!m2[iso])m2[iso]={total:0,visited:0};m2[iso].total++;if(vT2[i.id])m2[iso].visited++;});});
@@ -101,8 +102,8 @@
       function renderMap(cm){
         var am5=window.am5,am5map=window.am5map,geo=window.am5geodata_worldLow;
         if(!am5||!am5map||!geo)return;
-        if(window._ruthMapRoot){window._ruthMapRoot.dispose();}
-        var root=am5.Root.new('map-wrap');window._ruthMapRoot=root;root.setThemes([]);
+        if(window._benMapRoot){window._benMapRoot.dispose();}
+        var root=am5.Root.new('map-wrap');window._benMapRoot=root;root.setThemes([]);
         var chart=root.container.children.push(am5map.MapChart.new(root,{panX:'rotateX',panY:'translateY',projection:am5map.geoNaturalEarth1(),paddingLeft:0,paddingRight:0,paddingTop:0,paddingBottom:0}));
         chart.chartContainer.set('background',am5.Rectangle.new(root,{fill:am5.color(0x0f1117),fillOpacity:1}));
                 var series=chart.series.push(am5map.MapPolygonSeries.new(root,{geoJSON:geo,exclude:['AQ']}));
@@ -110,7 +111,7 @@
         tt.label.setAll({fill:am5.color(0xe8eaf0),fontSize:12});
         series.mapPolygons.template.setAll({interactive:true,strokeWidth:.4,stroke:am5.color(0x0f1117),tooltip:tt});
         series.mapPolygons.template.adapters.add('tooltipText',function(text,target){var id=target.dataItem&&target.dataItem.get('id');if(!id)return text;var d=cm[id];var label=d?d.name:(target.dataItem.get('name')||id);if(!d&&label!==_homeCountry){return '[bold]'+label+'[/] [#7a7f9a]not yet visited[/]';}
-          if(label===_homeCountry&&!d){return '[bold]'+label+'[/]\n[#f59e0b]Home Country[/]';}var pct=d.pct;var pc=pct>=75?'#3ecf8e':pct>=40?'#f59e0b':'#e05c8e';var ck=function(v){return v?'[#3ecf8e]✔[/]':'[#7a7f9a]✘[/]';};var fr=function(v,t){return t?('[bold]'+v+'/'+t+'[/]'):'[#7a7f9a]-[/]';};var sep='[#2e3350] | [/]';var base='[bold #e8eaf0 fontSize:13]'+label+'[/][#7a7f9a fontSize:11] • '+d.capital+'[/]'+'\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#7a7f9a fontSize:11]Completion [/][bold '+pc+' fontSize:12]'+pct+'%[/]'+'\n'+'[#7a7f9a fontSize:11]Visited [/]'+ck(d.cv)+sep+'[#7a7f9a fontSize:11]Capital [/]'+ck(d.cap)+'\n'+'[#7a7f9a fontSize:11]TL I [/]'+fr(d.t1v,d.t1t)+sep+'[#7a7f9a fontSize:11]TL II [/]'+fr(d.t2v,d.t2t)+'\n'+'[#7a7f9a fontSize:11]UNESCO [/]'+fr(d.uv,d.ut);var tl=getTripDates(label);if(tl){base+='\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#7a7f9a fontSize:11]Timeline[/]'+'\n'+'[bold #c8d0e8 fontSize:11]'+tl+'[/]';}if(label===_homeCountry){base+='\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#f59e0b fontSize:11]Home Country[/]';}return base;});
+          if(label===_homeCountry&&!d){return '[bold]'+label+'[/]\n[#f59e0b]Home Country[/]';}var pct=d.pct;var pc=pct>=75?'#3ecf8e':pct>=40?'#f59e0b':'#4f8ef7';var ck=function(v){return v?'[#3ecf8e]✔[/]':'[#7a7f9a]✘[/]';};var fr=function(v,t){return t?('[bold]'+v+'/'+t+'[/]'):'[#7a7f9a]-[/]';};var sep='[#2e3350] | [/]';var base='[bold #e8eaf0 fontSize:13]'+label+'[/][#7a7f9a fontSize:11] • '+d.capital+'[/]'+'\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#7a7f9a fontSize:11]Completion [/][bold '+pc+' fontSize:12]'+pct+'%[/]'+'\n'+'[#7a7f9a fontSize:11]Visited [/]'+ck(d.cv)+sep+'[#7a7f9a fontSize:11]Capital [/]'+ck(d.cap)+'\n'+'[#7a7f9a fontSize:11]TL I [/]'+fr(d.t1v,d.t1t)+sep+'[#7a7f9a fontSize:11]TL II [/]'+fr(d.t2v,d.t2t)+'\n'+'[#7a7f9a fontSize:11]UNESCO [/]'+fr(d.uv,d.ut);var tl=getTripDates(label);if(tl){base+='\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#7a7f9a fontSize:11]Timeline[/]'+'\n'+'[bold #c8d0e8 fontSize:11]'+tl+'[/]';}if(label===_homeCountry){base+='\n'+'[#555a7a]────────────────────[/]'+'\n'+'[#f59e0b fontSize:11]Home Country[/]';}return base;});
         series.mapPolygons.template.states.create('hover',{strokeWidth:1.5,stroke:am5.color(0xffffff),strokeOpacity:.7});
         series.events.on('datavalidated',function(){series.mapPolygons.each(function(p){var id=p.dataItem&&p.dataItem.get('id');if(!id)return;var d=cm[id];var pct=d?d.pct:undefined;p.set('fill',am5.color(getColor(pct!==undefined?pct:0)));});});
       }
@@ -120,10 +121,12 @@
       loadScripts(SCRIPTS,function(){
         Promise.all([
           fj('travellist1.json'),fj('travellist2.json'),fj('countries.json'),fj('unesco.json'),
-          new Promise(function(resolve){ if(window.TravelApp&&window.TravelApp.Store){ window.TravelApp.Store.load(resolve); } else { resolve(); } })
+          /* Load Store data before rendering map */
+          new Promise(function(resolve){
+            if(window.TravelApp&&window.TravelApp.Store){ window.TravelApp.Store.load(resolve); }
+            else { resolve(); }
+          })
         ]).then(function(res){
-          var personData={};
-          var _td=(res&&res[0])||[];for(var _hi=0;_hi<_td.length;_hi++){if(_td[_hi].id==='ruth'){_homeCountry=_td[_hi].home||'';break;}}
           function _refreshMapData(){
             var store=window.TravelApp&&window.TravelApp.Store;
             var tripStore=window.TravelApp&&window.TravelApp.TripStore;
@@ -139,13 +142,13 @@
             if(tripStore){ _trips=tripStore.getTrips('ruth'); }
             return pd;
           }
-          var personData=_refreshMapData();
-          var cm=buildMap(res[0],res[1],res[2],res[3],personData);
+          var ruth=_refreshMapData();
+          var cm=buildMap(res[0],res[1],res[2],res[3],ruth);
           renderMap(cm);
           if(window.TravelApp&&window.TravelApp.Store){
-            window.TravelApp.Store.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});
+            window.TravelApp.Store.onSave(function(){ruth=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ruth);renderMap(cm);});
           }
-        if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){personData=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],personData);renderMap(cm);});}
+          if(window.TravelApp&&window.TravelApp.TripStore){window.TravelApp.TripStore.onSave(function(){ruth=_refreshMapData();cm=buildMap(res[0],res[1],res[2],res[3],ruth);renderMap(cm);});}
         });
       });
     }());
@@ -252,12 +255,12 @@
         return byName[c]?[byName[c]]:[];
       }
 
-      function buildRows(tl1Items,tl2Items,countries,personData){
+      function buildRows(tl1Items,tl2Items,countries,benData){
         var vC={},vCap={},vT1={},vT2={};
-        (personData.countries||[]).forEach(function(x){vC[x]=1;});
-        (personData.capitals||[]).forEach(function(x){vCap[x]=1;});
-        (personData.travellist1||[]).forEach(function(x){vT1[x]=1;});
-        (personData.travellist2||[]).forEach(function(x){vT2[x]=1;});
+        (benData.countries||[]).forEach(function(x){vC[x]=1;});
+        (benData.capitals||[]).forEach(function(x){vCap[x]=1;});
+        (benData.travellist1||[]).forEach(function(x){vT1[x]=1;});
+        (benData.travellist2||[]).forEach(function(x){vT2[x]=1;});
         var byName={};
         countries.forEach(function(c){byName[c.name]=c.id;});
         var m1={},m2={};
@@ -375,11 +378,10 @@
           }
           buildFromVisited({'ruth':pd});
         }
-        var _tries=0,_poll=setInterval(function(){
-          if(window.TravelApp&&window.TravelApp.Store){clearInterval(_poll);buildFromStore();}
-          if(++_tries>40){clearInterval(_poll);buildFromStore();}
-        },150);
+        /* Build immediately from cache, then rebuild after remote loads */
+        buildFromStore();
         if(window.TravelApp&&window.TravelApp.Store){
+          window.TravelApp.Store.onRemoteLoad(function(){ buildFromStore(); });
           window.TravelApp.Store.onSave(function(){ buildFromStore(); });
         }
       });
@@ -704,7 +706,7 @@
         var _countries = [], _tl1Items = [], _tl2Items = [];
         var _utl1Selected = [], _utl2Selected = [];
     var _travellersSelected = [];
-    var _TRAVELLERS = [{id:'ben',name:'Ben'},{id:'shaz',name:'Shaz'},{id:'paul',name:'Paul'}];
+    var _TRAVELLERS = [{id:'shaz',name:'Shaz'},{id:'paul',name:'Paul'},{id:'ruth',name:'Ruth'}];
         var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
         function fj(f){ return fetch(rp + 'data/' + f).then(function(r){ return r.json(); }); }
 
@@ -963,7 +965,8 @@
             var canRemove=v!==TRAV_ID;
             return'<span class="tl-companion-tag" data-trav="'+v+'">'+(cn?esc(cn.name):esc(v))+(canRemove?'<button type="button" data-which="travellers" data-i="'+i+'">×</button>':'')+'</span>';
           }
-          return'<span class="tl-tag">'+esc(v)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
+          var displayV=(which==='utl1'||which==='utl2')?function(){var items=which==='utl1'?_tl1Items:_tl2Items;var found=items.find(function(i){return i.id===v||i.name===v||i.title===v;});if(found)return found.name||found.title||v;return v.replace(/-/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});}():v;
+          return'<span class="tl-tag">'+esc(displayV)+'<button type="button" data-which="'+which+'" data-i="'+i+'">×</button></span>';
         }).join('');
       }
               document.getElementById('tf-utl1-tags').addEventListener('click',function(e){var btn=e.target.closest('button');if(!btn)return;_utl1Selected.splice(parseInt(btn.dataset.i,10),1);renderTags('utl1');});
@@ -1172,20 +1175,23 @@
         <div id="tl-missing-wrap" style="display:none"></div>
         <script>
         (function(){
-          var TRAV_ID_M = 'ruth';
           var rp2 = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
           function fj2(f){ return fetch(rp2+'data/'+f).then(function(r){return r.json();}); }
           function esc2(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
           function idToDisplayName(id, items) {
             var found = items.find(function(i){ return i.id === id || i.name === id || i.title === id; });
             if (found) return found.name || found.title || id;
             return id.replace(/-/g,' ').replace(/\b\w/g, function(c){ return c.toUpperCase(); });
           }
+
           function renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items) {
-            var trav = visited[TRAV_ID_M] || {};
+            var ruth = visited['ruth'] || {};
+
+            /* --- Countries --- */
             var isoToName = {};
             countries.forEach(function(c){ isoToName[c.id] = c.name; });
-            var visitedCountries = (trav.countries || []).map(function(iso){ return isoToName[iso] || iso; });
+            var visitedCountries = (ruth.countries || []).map(function(iso){ return isoToName[iso] || iso; });
             var loggedCountries = {};
             trips.forEach(function(t){
               (t.countries || (t.country ? [t.country] : [])).forEach(function(c){ loggedCountries[c] = true; });
@@ -1193,10 +1199,12 @@
             /* Home country always counts as logged */
             loggedCountries['United Kingdom'] = true;
             var missingCountries = visitedCountries.filter(function(n){ return !loggedCountries[n]; }).sort();
-            var visitedTl1 = trav.travellist1 || [];
+
+            /* --- UTL I --- */
+            var visitedTl1 = ruth.travellist1 || [];
             var loggedTl1 = {};
             trips.forEach(function(t){ (t.utl1 || []).forEach(function(id){ loggedTl1[id] = true; }); });
-            /* Home record UTL1 values may be stored as names - mark both id and name as logged */
+            /* Home record UTL1 values may be stored as names — mark both id and name as logged */
             (homeRec ? (homeRec.utl1 || []) : []).forEach(function(val){
               loggedTl1[val] = true;
               var found = tl1Items.find(function(i){ return i.name === val || i.title === val || i.id === val; });
@@ -1207,10 +1215,12 @@
               return !loggedTl1[id] && !loggedTl1[name];
             }).map(function(id){ return { id:id, name: idToDisplayName(id, tl1Items) }; })
               .sort(function(a,b){ return a.name.localeCompare(b.name); });
-            var visitedTl2 = trav.travellist2 || [];
+
+            /* --- UTL II --- */
+            var visitedTl2 = ruth.travellist2 || [];
             var loggedTl2 = {};
             trips.forEach(function(t){ (t.utl2 || []).forEach(function(id){ loggedTl2[id] = true; }); });
-            /* Home record UTL2 values may be stored as names - mark both id and name as logged */
+            /* Home record UTL2 values may be stored as names — mark both id and name as logged */
             (homeRec ? (homeRec.utl2 || []) : []).forEach(function(val){
               loggedTl2[val] = true;
               var found = tl2Items.find(function(i){ return i.name === val || i.title === val || i.id === val; });
@@ -1221,26 +1231,30 @@
               return !loggedTl2[id] && !loggedTl2[name];
             }).map(function(id){ return { id:id, name: idToDisplayName(id, tl2Items) }; })
               .sort(function(a,b){ return a.name.localeCompare(b.name); });
-            function makeGroup(title, icon, items) {
+
+            function makeGroup(title, icon, items, nameFn) {
               var rows = items.length
                 ? items.map(function(item){
                     return '<tr><td>'+esc2(typeof item === 'string' ? item : item.name)+'</td></tr>';
                   }).join('')
-                : '<tr><td class="tl-missing-empty">All logged ✓</td></tr>';
+                : '<tr><td colspan="2" class="tl-missing-empty">All logged ✓</td></tr>';
               return '<div class="tl-missing-group">'
                 + '<div class="tl-missing-group-header">'+icon+' '+esc2(title)
                 + '<span class="tl-missing-count">'+items.length+'</span></div>'
                 + '<table class="tl-missing-table"><tbody>'+rows+'</tbody></table>'
                 + '</div>';
             }
+
             var html = makeGroup('Countries', '🌍', missingCountries)
               + makeGroup('UTL I Items', '⭐', missingTl1)
               + makeGroup('UTL II Items', '🌟', missingTl2);
+
             document.getElementById('tl-missing-loading').style.display = 'none';
             var wrap = document.getElementById('tl-missing-wrap');
             wrap.innerHTML = html;
             wrap.style.display = 'flex';
           }
+
           function load() {
             Promise.all([
               fj2('countries.json'), fj2('travellist1.json'), fj2('travellist2.json')
@@ -1250,40 +1264,930 @@
               var tripStore = window.TravelApp && window.TravelApp.TripStore;
               var visited = {};
               if (store) {
-                visited[TRAV_ID_M] = {
-                  countries:   store.getVisitedArray(TRAV_ID_M,'countries'),
-                  capitals:    store.getVisitedArray(TRAV_ID_M,'capitals'),
-                  travellist1: store.getVisitedArray(TRAV_ID_M,'travellist1'),
-                  travellist2: store.getVisitedArray(TRAV_ID_M,'travellist2'),
-                  unesco:      store.getVisitedArray(TRAV_ID_M,'unesco'),
-                  animals:     store.getVisitedArray(TRAV_ID_M,'animals')
+                visited['ruth'] = {
+                  countries:   store.getVisitedArray('ruth','countries'),
+                  capitals:    store.getVisitedArray('ruth','capitals'),
+                  travellist1: store.getVisitedArray('ruth','travellist1'),
+                  travellist2: store.getVisitedArray('ruth','travellist2'),
+                  unesco:      store.getVisitedArray('ruth','unesco'),
+                  animals:     store.getVisitedArray('ruth','animals')
                 };
               }
               var allTrips = tripStore ? tripStore.getAllTrips() : [];
               var homeRec = null;
               allTrips.forEach(function(t){
-                if (t._home && (t.travellers||[]).indexOf(TRAV_ID_M) !== -1) homeRec = t;
+                if (t._home && (t.travellers||[]).indexOf('ruth') !== -1) homeRec = t;
               });
               var trips = allTrips.filter(function(t){
-                return !t._home && (t.travellers||t.companions||[]).indexOf(TRAV_ID_M) !== -1;
+                return !t._home && (t.travellers||t.companions||[]).indexOf('ruth') !== -1;
               });
               renderMissing(visited, trips, homeRec, countries, tl1Items, tl2Items);
             }).catch(function(e){
               document.getElementById('tl-missing-loading').textContent = 'Could not load data.';
             });
           }
+
+          /* Re-render whenever trips or visited data changes */
           if (window.TravelApp && window.TravelApp.TripStore) {
             window.TravelApp.TripStore.onSave(function(){ load(); });
           }
           if (window.TravelApp && window.TravelApp.Store) {
             window.TravelApp.Store.onSave(function(){ load(); });
           }
+
           load();
         }());
         </script>
       </section>
 
 </div><!-- end tab-panel#timeline -->
+
+    <!-- ============================================================
+         TAB PANEL: INSIGHTS
+    ============================================================ -->
+    <div class="tab-panel" id="tab-insights">
+
+    <style>
+      #insights-loading { text-align:center; padding:3rem; color:var(--color-muted); font-size:.95rem; }
+      #insights-grid { padding: 1.5rem 0 2rem; }
+
+      .ins-masonry {
+        column-count: 3;
+        column-gap: 14px;
+      }
+      @media (max-width: 860px) { .ins-masonry { column-count: 2; } }
+      @media (max-width: 540px) { .ins-masonry { column-count: 1; } }
+
+      .ins-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        position: relative;
+        overflow: hidden;
+        transition: border-color .2s, transform .2s;
+        break-inside: avoid;
+        margin-bottom: 14px;
+        display: block;
+      }
+      .ins-card:hover { border-color: #4f8ef7; transform: translateY(-2px); }
+
+      .ins-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--ins-accent, #4f8ef7);
+        border-radius: 12px 12px 0 0;
+      }
+      .ins-tag {
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--ins-accent, #4f8ef7);
+        opacity: .85;
+        margin-bottom: .35rem;
+        display: block;
+      }
+      .ins-hero {
+        font-size: 3.2rem; font-weight: 800; line-height: 1;
+        color: var(--color-text); letter-spacing: -.03em; margin: .25rem 0 .15rem;
+      }
+      .ins-hero-sm {
+        font-size: 2rem; font-weight: 700; line-height: 1.1;
+        color: var(--color-text); letter-spacing: -.02em; margin: .2rem 0 .1rem;
+      }
+      .ins-unit { font-size: .85rem; color: var(--color-muted); font-weight: 400; }
+      .ins-label { font-size: .82rem; color: var(--color-muted); line-height: 1.4; margin-top: .1rem; }
+      .ins-sub { font-size: .75rem; color: var(--color-muted); margin-top: .4rem; opacity: .8; }
+      .ins-ring-wrap { display: flex; align-items: center; gap: 1.2rem; margin-top: .5rem; }
+      .ins-ring-svg { flex-shrink: 0; }
+      .ins-ring-info { flex: 1; }
+      .ins-ring-pct { font-size: 1.6rem; font-weight: 700; color: var(--color-text); line-height: 1; }
+      .ins-bar-row { display: flex; align-items: center; gap: 8px; margin-top: .55rem; }
+      .ins-bar-label { font-size: .78rem; color: var(--color-muted); width: 90px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ins-bar-track { flex: 1; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; }
+      .ins-bar-fill { height: 100%; border-radius: 3px; background: var(--ins-accent, #4f8ef7); transition: width .6s ease; }
+      .ins-bar-val { font-size: .75rem; color: var(--color-muted); width: 38px; text-align: right; flex-shrink: 0; }
+      .ins-cont-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: .7rem; }
+      .ins-cont-pill { background: var(--color-surface2); border: 1px solid var(--color-border); border-radius: 8px; padding: .5rem .75rem; display: flex; flex-direction: column; gap: 2px; }
+      .ins-cont-pill-name { font-size: .72rem; color: var(--color-muted); }
+      .ins-cont-pill-num { font-size: 1.1rem; font-weight: 700; color: var(--color-text); }
+      .ins-split-track { height: 10px; border-radius: 5px; overflow: hidden; display: flex; margin: .7rem 0 .4rem; }
+      .ins-split-a { transition: width .6s ease; }
+      .ins-split-b { background: var(--color-surface2); flex: 1; }
+      .ins-split-legend { display: flex; gap: 1rem; font-size: .75rem; color: var(--color-muted); }
+      .ins-split-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+      .ins-rank-badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800; flex-shrink: 0; color: var(--color-bg); }
+      .ins-rank-badge.r1 { background: #f6c843; }
+      .ins-rank-badge.r2 { background: #b0bec5; }
+      .ins-rank-badge.r3 { background: #cd7f32; }
+      .ins-rank-country { flex: 1; font-size: .85rem; color: var(--color-text); font-weight: 500; }
+      .ins-rank-val { font-size: .78rem; color: var(--color-muted); }
+      .ins-spark-wrap { margin-top: .7rem; }
+      .ins-spark-bars { display: flex; align-items: flex-end; gap: 5px; height: 42px; }
+      .ins-spark-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+      .ins-spark-bar-fill { width: 100%; background: #4f8ef7; border-radius: 3px 3px 0 0; opacity: .7; min-height: 3px; }
+      .ins-spark-bar-yr { font-size: .62rem; color: var(--color-muted); }
+      .ins-donut-row { display: flex; align-items: center; gap: 1rem; margin-top: .5rem; }
+      .ins-donut-legend { display: flex; flex-direction: column; gap: 6px; }
+      .ins-donut-legend-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--color-muted); }
+      .ins-donut-legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+      .ins-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: .7rem; font-weight: 700; letter-spacing: .04em; margin-top: .3rem; }
+      .ins-locs-row { display: flex; gap: 1.5rem; margin-top: .4rem; align-items: flex-start; flex-wrap: wrap; }
+      .ins-locs-item { display: flex; flex-direction: column; }
+      .ins-locs-num { font-size: 1.8rem; font-weight: 700; color: var(--color-text); line-height: 1; }
+      .ins-locs-lbl { font-size: .72rem; color: var(--color-muted); margin-top: 2px; }
+    </style>
+
+    <section class="section" id="insights-section">
+      <h2 class="section-title">✨ Travel Insights</h2>
+      <div id="insights-loading"><p class="loading-msg">Calculating insights…</p></div>
+      <div id="insights-grid" style="display:none"></div>
+    </section>
+
+    <script>
+    (function() {
+      'use strict';
+
+      var ACCENTS = {
+        blue:   '#4f8ef7', teal:   '#3ecf8e', amber:  '#f6a623',
+        purple: '#9b59f5', pink:   '#e05c8e', cyan:   '#38bdf8',
+        gold:   '#f6c843', coral:  '#e05c5c'
+      };
+
+      function tripDays(t) {
+        if (!t.start || !t.finish) return 1;
+        var s = new Date(t.start + 'T00:00:00');
+        var f = new Date(t.finish + 'T00:00:00');
+        var d = Math.round((f - s) / 86400000) + 1;
+        return d > 0 ? d : 1;
+      }
+
+      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal, countriesArr) {
+        var benTrips = trips.filter(function(t) {
+          return (t.travellers || []).indexOf('ruth') !== -1;
+        });
+
+        /* ── ISO → continent/name lookup from countries.json (authoritative) ── */
+        var isoToContinent = {}, isoToName = {};
+        (countriesArr || []).forEach(function(c) {
+          isoToContinent[c.id] = c.continent;
+          isoToName[c.id] = c.name;
+        });
+
+        var totalDays = 0;
+        benTrips.forEach(function(t) { totalDays += tripDays(t); });
+        var totalYears = (totalDays / 365).toFixed(1);
+
+        var countryCounts = {}, countryDays = {};
+        benTrips.forEach(function(t) {
+          var ctries = t.countries || [];
+          var days = tripDays(t);
+          var perC = ctries.length ? Math.round(days / ctries.length) : days;
+          ctries.forEach(function(c) {
+            countryCounts[c] = (countryCounts[c] || 0) + 1;
+            countryDays[c] = (countryDays[c] || 0) + perC;
+          });
+        });
+
+        var sortedByTrips = Object.keys(countryCounts).sort(function(a,b){ return countryCounts[b]-countryCounts[a]; });
+        var mostVisited = sortedByTrips[0] || '—';
+        var mostVisitedCount = countryCounts[mostVisited] || 0;
+
+        var sortedByDays = Object.keys(countryDays).sort(function(a,b){ return countryDays[b]-countryDays[a]; });
+        var top3Days = sortedByDays.slice(0,3).map(function(c){ return {country:c, days:countryDays[c]}; });
+
+        var currentYear = new Date().getFullYear();
+        var speedYears = [];
+        for (var y = currentYear-5; y < currentYear; y++) speedYears.push(y);
+        var yearCountries = {};
+        benTrips.forEach(function(t) {
+          if (!t.start) return;
+          var yr = parseInt(t.start.substr(0,4), 10);
+          if (!yearCountries[yr]) yearCountries[yr] = {};
+          (t.countries||[]).forEach(function(c){ yearCountries[yr][c]=1; });
+        });
+        var speedData = speedYears.map(function(yr){ return {year:yr, count:Object.keys(yearCountries[yr]||{}).length}; });
+        var avgSpeed = (speedData.reduce(function(s,d){ return s+d.count; },0)/speedData.length).toFixed(1);
+
+        /* ── Store-based continent breakdown (uses ticked ISOs, not trip log) ── */
+        var visitedISOs = storeData.countries || [];
+        var contVisited = {};
+        visitedISOs.forEach(function(iso) {
+          var cont = isoToContinent[iso];
+          if (!cont) return;
+          if (!contVisited[cont]) contVisited[cont] = {};
+          contVisited[cont][iso] = 1;
+        });
+        var contData = Object.keys(contVisited).map(function(c) {
+          return { name: c, count: Object.keys(contVisited[c]).length };
+        }).sort(function(a,b) { return b.count - a.count; });
+
+        var soloTrips = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
+        var groupTrips = benTrips.length - soloTrips;
+
+        var workDays = benTrips.filter(function(t){ return t.type==='Work'; }).reduce(function(s,t){ return s+tripDays(t); },0);
+        var leisureDays = totalDays - workDays;
+        var workTrips = benTrips.filter(function(t){ return t.type==='Work'; }).length;
+        var leisureTrips = benTrips.length - workTrips;
+
+        var allLocs = {};
+        benTrips.forEach(function(t) {
+          if (!t.locations) return;
+          t.locations.split(',').forEach(function(l){ var ll=l.trim(); if(ll) allLocs[ll]=1; });
+        });
+        var uniqueLocs = Object.keys(allLocs).length;
+
+        var allYrs = Object.keys(yearCountries).map(Number);
+        var bestYear = allYrs.reduce(function(best,yr){
+          return Object.keys(yearCountries[yr]||{}).length > Object.keys(yearCountries[best]||{}).length ? yr : best;
+        }, allYrs[0] || currentYear);
+        var bestYearCount = Object.keys(yearCountries[bestYear]||{}).length;
+
+        var allTripYears = allYrs.sort(function(a,b){return a-b;});
+        var streak=0, tempStreak=0, prevYr=null;
+        allTripYears.forEach(function(yr){
+          if(prevYr===null||yr===prevYr+1){tempStreak++;}else{tempStreak=1;}
+          if(tempStreak>streak)streak=tempStreak;
+          prevYr=yr;
+        });
+
+        /* ── Average trip length + distribution ── */
+        var datedTrips = benTrips.filter(function(t){ return t.start && t.finish; });
+        var allDurations = datedTrips.map(function(t){ return tripDays(t); });
+        var avgTripLen = allDurations.length ? (allDurations.reduce(function(s,d){return s+d;},0)/allDurations.length) : 0;
+        var shortTrips  = allDurations.filter(function(d){return d<=3;}).length;
+        var mediumTrips = allDurations.filter(function(d){return d>3&&d<=10;}).length;
+        var longTrips   = allDurations.filter(function(d){return d>10&&d<=21;}).length;
+        var epicsTrips  = allDurations.filter(function(d){return d>21;}).length;
+
+        /* ── Longest trip ── */
+        var longestTrip = datedTrips.reduce(function(best,t){
+          return tripDays(t) > tripDays(best) ? t : best;
+        }, datedTrips[0] || {});
+        var longestDays = longestTrip.start ? tripDays(longestTrip) : 0;
+        var longestCountries = (longestTrip.countries||[]).join(', ');
+        var longestYear = longestTrip.start ? longestTrip.start.substr(0,4) : '';
+
+        /* ── Favourite month (radial) ── */
+        var monthCounts = [0,0,0,0,0,0,0,0,0,0,0,0];
+        var MONTH_NAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        benTrips.forEach(function(t){
+          if(!t.start) return;
+          var m = parseInt(t.start.substr(5,2),10)-1;
+          if(m>=0&&m<12) monthCounts[m]++;
+        });
+        var peakMonthIdx = monthCounts.indexOf(Math.max.apply(null,monthCounts));
+
+        /* ── This year so far ── */
+        var thisYear = currentYear;
+        var thisYearTrips = benTrips.filter(function(t){ return t.start && t.start.substr(0,4) === String(thisYear); });
+        var thisYearDays = thisYearTrips.reduce(function(s,t){ return s+tripDays(t); },0);
+        var thisYearCountries = {};
+        thisYearTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ thisYearCountries[c]=1; }); });
+        var allYearsAvgTrips = benTrips.length / (Object.keys(yearCountries).length || 1);
+        var allYearsAvgDays  = totalDays / (Object.keys(yearCountries).length || 1);
+
+        /* ── Best UTL haul trip ── */
+        var bestUtlTrip = benTrips.reduce(function(best,t){
+          var score = (t.utl1||[]).length + (t.utl2||[]).length;
+          var bestScore = ((best.utl1||[]).length + (best.utl2||[]).length);
+          return score > bestScore ? t : best;
+        }, benTrips[0] || {});
+        var bestUtl1Count = (bestUtlTrip.utl1||[]).length;
+        var bestUtl2Count = (bestUtlTrip.utl2||[]).length;
+        var bestUtlCountries = (bestUtlTrip.countries||[]).join(', ');
+        var bestUtlYear = bestUtlTrip.start ? bestUtlTrip.start.substr(0,4) : '';
+
+        /* ── Capitals ── */
+        var capitalsVisited = (storeData.capitals||[]).length;
+
+        /* ── Next milestones ── */
+        var cv = (storeData.countries||[]).length;
+        var t1v = (storeData.travellist1||[]).length;
+        var t2v = (storeData.travellist2||[]).length;
+        var uv  = (storeData.unesco||[]).length;
+        var capv = capitalsVisited;
+        function nextMilestone(val, targets) {
+          for(var i=0;i<targets.length;i++){ if(val<targets[i]) return {target:targets[i],gap:targets[i]-val}; }
+          return null;
+        }
+        var milestones = [
+          { label:'Countries',  val:cv,  icon:'🌍', m: nextMilestone(cv,  [50,75,100,125,150,175,200]) },
+          { label:'TL I items', val:t1v, icon:'📍', m: nextMilestone(t1v, [100,150,200,250,300,350,400,450,500]) },
+          { label:'TL II items',val:t2v, icon:'📌', m: nextMilestone(t2v, [100,150,200,250,300,350,400,450,500]) },
+          { label:'UNESCO',     val:uv,  icon:'🏛️', m: nextMilestone(uv,  [50,100,150,200,250,300]) },
+          { label:'Capitals',   val:capv,icon:'🏙️', m: nextMilestone(capv,[50,75,100,125,150,175,200]) }
+        ].filter(function(x){ return x.m; });
+
+        return {
+          totalDays:totalDays, totalYears:totalYears,
+          mostVisited:mostVisited, mostVisitedCount:mostVisitedCount,
+          top3Days:top3Days, speedData:speedData, avgSpeed:avgSpeed,
+          contData:contData, soloTrips:soloTrips, groupTrips:groupTrips,
+          workTrips:workTrips, leisureTrips:leisureTrips,
+          workDays:workDays, leisureDays:leisureDays,
+          uniqueLocs:uniqueLocs, benTrips:benTrips,
+          countriesVisited:(storeData.countries||[]).length,
+          tl1Visited:(storeData.travellist1||[]).length,
+          tl2Visited:(storeData.travellist2||[]).length,
+          unescoVisited:(storeData.unesco||[]).length,
+          countriesTotal:countriesTotal, tl1Total:tl1Total,
+          tl2Total:tl2Total, unescoCnt:unescoCnt,
+          bestYear:bestYear, bestYearCount:bestYearCount,
+          streak:streak, yearCountries:yearCountries,
+          avgTripLen:avgTripLen, shortTrips:shortTrips, mediumTrips:mediumTrips,
+          longTrips:longTrips, epicsTrips:epicsTrips, allDurations:allDurations,
+          longestTrip:longestTrip, longestDays:longestDays,
+          longestCountries:longestCountries, longestYear:longestYear,
+          monthCounts:monthCounts, peakMonthIdx:peakMonthIdx,
+          thisYearTrips:thisYearTrips, thisYearDays:thisYearDays,
+          thisYearCountries:thisYearCountries, thisYear:thisYear,
+          allYearsAvgTrips:allYearsAvgTrips, allYearsAvgDays:allYearsAvgDays,
+          bestUtlTrip:bestUtlTrip, bestUtl1Count:bestUtl1Count,
+          bestUtl2Count:bestUtl2Count, bestUtlCountries:bestUtlCountries,
+          bestUtlYear:bestUtlYear,
+          capitalsVisited:capitalsVisited, milestones:milestones,
+
+          /* ── new batch ── */
+          daysSinceLast: (function() {
+            var dated = benTrips.filter(function(t){ return t.finish; })
+              .sort(function(a,b){ return a.finish > b.finish ? -1 : 1; });
+            if (!dated.length) return { days:0, trip:null };
+            var last = dated[0];
+            var f = new Date(last.finish + 'T00:00:00');
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            var days = Math.round((today - f) / 86400000);
+            return { days: days < 0 ? 0 : days, trip: last };
+          })(),
+
+          longestAtHome: (function() {
+            var dated = benTrips.filter(function(t){ return t.start && t.finish; })
+              .sort(function(a,b){ return a.start > b.start ? 1 : -1; });
+            var maxGap = 0;
+            for (var i = 1; i < dated.length; i++) {
+              var prevEnd = new Date(dated[i-1].finish + 'T00:00:00');
+              var nextStart = new Date(dated[i].start + 'T00:00:00');
+              var gap = Math.round((nextStart - prevEnd) / 86400000);
+              if (gap > maxGap) maxGap = gap;
+            }
+            return maxGap;
+          })(),
+
+          yearTripCounts: (function() {
+            var yc = {};
+            benTrips.forEach(function(t) {
+              if (!t.start) return;
+              var yr = t.start.substr(0,4);
+              yc[yr] = (yc[yr]||0) + 1;
+            });
+            return Object.keys(yc).sort().map(function(yr){ return {year:yr, count:yc[yr]}; });
+          })(),
+
+          contDays: (function() {
+            /* Days per continent from trip log (trip log has dates, Store doesn't) */
+            /* but we map continent using isoToContinent so home country is handled */
+            var cd = {};
+            benTrips.forEach(function(t) {
+              var days = (t.start && t.finish)
+                ? Math.round((new Date(t.finish+'T00:00:00') - new Date(t.start+'T00:00:00'))/86400000) + 1
+                : 1;
+              /* Derive continent from countries via ISO lookup, fallback to t.continent */
+              var conts = {};
+              (t.countries||[]).forEach(function(cname) {
+                /* trip log uses names not ISOs - use t.continent as best available */
+              });
+              var cont = t.continent;
+              if (!cont || cont === 'Multi-continent') return;
+              cd[cont] = (cd[cont]||0) + days;
+            });
+            return Object.keys(cd).map(function(c){ return {name:c, days:cd[c]}; })
+              .sort(function(a,b){ return b.days - a.days; });
+          })(),
+
+          explorerRatio: (function() {
+            /* Total visited from Store (authoritative) */
+            var totalVisited = (storeData.countries||[]).length;
+            /* Return visitors derived from trip log */
+            var visits = {};
+            benTrips.forEach(function(t) {
+              (t.countries||[]).forEach(function(c){ visits[c] = (visits[c]||0) + 1; });
+            });
+            var returned = Object.keys(visits).filter(function(c){ return visits[c]>1; }).length;
+            var newOnly = Math.max(0, totalVisited - returned);
+            return { newOnly:newOnly, returned:returned, total:totalVisited };
+          })(),
+
+          utlEfficiency: (function() {
+            var totalUtl = 0;
+            benTrips.forEach(function(t){
+              totalUtl += (t.utl1||[]).length + (t.utl2||[]).length;
+            });
+            var dated = benTrips.filter(function(t){ return t.start && t.finish; });
+            var totalDaysDated = dated.reduce(function(s,t){
+              return s + Math.round((new Date(t.finish+'T00:00:00')-new Date(t.start+'T00:00:00'))/86400000)+1;
+            }, 0);
+            return {
+              total: totalUtl,
+              perDay: totalDaysDated ? (totalUtl / totalDaysDated) : 0,
+              perTrip: benTrips.length ? (totalUtl / benTrips.length) : 0
+            };
+          })(),
+
+          travellerProfile: (function() {
+            var totalC = (storeData.countries||[]).length;
+            var soloT = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
+            var soloRatio = benTrips.length ? soloT/benTrips.length : 0;
+            var contSet = {};
+            benTrips.forEach(function(t){ if(t.continent&&t.continent!=='Multi-continent') contSet[t.continent]=1; });
+            var contCount = Object.keys(contSet).length;
+            var utlTotal = 0;
+            benTrips.forEach(function(t){ utlTotal+=(t.utl1||[]).length+(t.utl2||[]).length; });
+            var workR = benTrips.length ? benTrips.filter(function(t){return t.type==='Work';}).length/benTrips.length : 0;
+            /* Derive type */
+            var type, traits;
+            if (totalC >= 90 && contCount >= 6 && soloRatio < 0.5) {
+              type = 'The World Collector';
+              traits = ['Counts countries like currency','Happiest with a companion','Every continent ticked'];
+            } else if (soloRatio >= 0.5 && utlTotal > 300) {
+              type = 'The Solo List Hunter';
+              traits = ['Travels alone, ticks everything','Methodical and driven','Lists are the destination'];
+            } else if (workR >= 0.35 && totalC >= 50) {
+              type = 'The Accidental Explorer';
+              traits = ['Work trips turned into adventures','Turns layovers into discoveries','Business class, bucket list mindset'];
+            } else if (contCount >= 5 && totalC >= 70) {
+              type = 'The Serial Adventurer';
+              traits = ['Can\'t stay still for long','Collects experiences not things','Home is wherever the bag is'];
+            } else {
+              type = 'The Seasoned Traveller';
+              traits = ['Quality over quantity','Deep dives, not dashes','Knows the good restaurants everywhere'];
+            }
+            return { type:type, traits:traits, totalC:totalC, soloRatio:soloRatio, contCount:contCount };
+          })()
+        };
+      }
+
+      function ringCard(pct, accent, size) {
+        size = size||60;
+        var r=(size-6)/2, circ=2*Math.PI*r, dash=(pct/100)*circ;
+        return '<svg class="ins-ring-svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
+          '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="var(--color-surface2)" stroke-width="5"/>' +
+          '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="'+accent+'" stroke-width="5" stroke-linecap="round"' +
+          ' stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'"' +
+          ' transform="rotate(-90 '+(size/2)+' '+(size/2)+')" /></svg>';
+      }
+
+      function donutSVG(pctA, colA, colB, size) {
+        size=size||70;
+        var r=(size-8)/2, circ=2*Math.PI*r, dashA=(pctA/100)*circ, cx=size/2, cy=size/2;
+        return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
+          '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+colB+'" stroke-width="7"/>' +
+          '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+colA+'" stroke-width="7" stroke-linecap="round"' +
+          ' stroke-dasharray="'+dashA.toFixed(1)+' '+circ.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/></svg>';
+      }
+
+      function cardDaysAway(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">Days on the road</span>' +
+          '<div class="ins-hero">'+d.totalDays.toLocaleString()+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">That\'s <strong>'+d.totalYears+' years</strong> of your life spent travelling — and counting.</div>' +
+          '<div class="ins-sub">'+d.benTrips.length+' trips logged across '+Object.keys(d.yearCountries).length+' different years</div>' +
+          '</div>';
+      }
+
+      function cardCountriesRing(d) {
+        var pct = Math.round((d.countriesVisited/d.countriesTotal)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Countries visited</span>' +
+          '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
+          '<div class="ins-ring-info">' +
+          '<div class="ins-ring-pct">'+d.countriesVisited+'<span style="color:var(--color-muted);font-size:1rem"> / '+d.countriesTotal+'</span></div>' +
+          '<div class="ins-label">'+pct+'% of the world</div></div></div></div>';
+      }
+
+      function cardMostVisited(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Most visited country</span>' +
+          '<div class="ins-hero-sm">'+d.mostVisited+'</div>' +
+          '<div class="ins-label">Visited on <strong>'+d.mostVisitedCount+' separate trips</strong></div>' +
+          '<div class="ins-sub">Home away from home? 🏠</div></div>';
+      }
+
+      function cardTop3Days(d) {
+        var maxD = d.top3Days[0] ? d.top3Days[0].days : 1;
+        var rows = d.top3Days.map(function(item,i){
+          var bp = Math.round((item.days/maxD)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-rank-badge '+['r1','r2','r3'][i]+'">'+(i+1)+'</div>' +
+            '<div class="ins-bar-label" title="'+item.country+'">'+item.country+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+bp+'%;background:'+ACCENTS.amber+'"></div></div>' +
+            '<div class="ins-bar-val">'+item.days+'d</div></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Top countries by time spent</span>' +
+          '<div class="ins-label" style="margin-bottom:.3rem">Estimated days per destination</div>'+rows+'</div>';
+      }
+
+      function cardTravelSpeed(d) {
+        var maxC = Math.max.apply(null, d.speedData.map(function(x){return x.count;})) || 1;
+        var bars = d.speedData.map(function(item){
+          var h = Math.max(4, Math.round((item.count/maxC)*40));
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px"></div>' +
+            '<div class="ins-spark-bar-yr">\''+String(item.year).slice(2)+'</div></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Travel speed</span>' +
+          '<div class="ins-hero-sm">'+d.avgSpeed+' <span class="ins-unit">countries/yr</span></div>' +
+          '<div class="ins-label">5-year average (2021–2025)</div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars">'+bars+'</div></div></div>';
+      }
+
+      function cardBestYear(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Best year ever</span>' +
+          '<div class="ins-hero-sm">'+d.bestYear+'</div>' +
+          '<div class="ins-label"><strong>'+d.bestYearCount+' countries</strong> visited in a single year</div>' +
+          '<span class="ins-badge" style="background:rgba(155,89,245,.15);color:'+ACCENTS.purple+'">Peak explorer</span></div>';
+      }
+
+      function cardContinents(d) {
+        var pills = d.contData.map(function(item){
+          return '<div class="ins-cont-pill">' +
+            '<span class="ins-cont-pill-num">'+item.count+'</span>' +
+            '<span class="ins-cont-pill-name">'+item.name+'</span></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Continent breakdown</span>' +
+          '<div class="ins-label" style="margin-bottom:.1rem">Unique countries per continent from trip log</div>' +
+          '<div class="ins-cont-grid">'+pills+'</div></div>';
+      }
+
+      function cardSoloGroup(d) {
+        var soloP = Math.round((d.soloTrips/d.benTrips.length)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.pink+'">' +
+          '<span class="ins-tag">Solo vs group</span>' +
+          '<div class="ins-donut-row">'+donutSVG(soloP,ACCENTS.pink,'var(--color-border)',68)+
+          '<div class="ins-donut-legend">' +
+          '<div class="ins-donut-legend-item"><span class="ins-donut-legend-swatch" style="background:'+ACCENTS.pink+'"></span>'+d.soloTrips+' solo ('+soloP+'%)</div>' +
+          '<div class="ins-donut-legend-item"><span class="ins-donut-legend-swatch" style="background:var(--color-border)"></span>'+d.groupTrips+' with others</div>' +
+          '</div></div></div>';
+      }
+
+      function cardWorkLeisure(d) {
+        var workPct = Math.round((d.workDays/(d.totalDays||1))*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.coral+'">' +
+          '<span class="ins-tag">Work vs leisure days</span>' +
+          '<div class="ins-split-track">' +
+          '<div class="ins-split-a" style="width:'+workPct+'%;background:'+ACCENTS.coral+'"></div>' +
+          '<div class="ins-split-b"></div></div>' +
+          '<div class="ins-split-legend">' +
+          '<span><span class="ins-split-dot" style="background:'+ACCENTS.coral+'"></span>Work '+workPct+'% ('+d.workDays+'d)</span>' +
+          '<span><span class="ins-split-dot" style="background:var(--color-border)"></span>Leisure '+(100-workPct)+'% ('+d.leisureDays+'d)</span>' +
+          '</div></div>';
+      }
+
+      function cardListProgress(d) {
+        var tl1Pct = Math.round((d.tl1Visited/d.tl1Total)*100);
+        var tl2Pct = Math.round((d.tl2Visited/d.tl2Total)*100);
+        var uPct   = Math.round((d.unescoVisited/d.unescoCnt)*100);
+        function row(label,pct,col){
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+pct+'%</div></div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">List completion</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Progress across all major travel lists</div>' +
+          row('TL I',tl1Pct,ACCENTS.blue)+row('TL II',tl2Pct,ACCENTS.teal)+row('UNESCO',uPct,ACCENTS.amber)+'</div>';
+      }
+
+      function cardLocations(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Places explored</span>' +
+          '<div class="ins-locs-row">' +
+          '<div class="ins-locs-item"><div class="ins-locs-num">'+d.uniqueLocs+'</div><div class="ins-locs-lbl">unique locations</div></div>' +
+          '<div class="ins-locs-item"><div class="ins-locs-num">'+d.benTrips.length+'</div><div class="ins-locs-lbl">trips logged</div></div>' +
+          '</div>' +
+          '<div class="ins-sub" style="margin-top:.5rem">Towns, cities &amp; regions from trip records</div></div>';
+      }
+
+      function cardStreak(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Longest travel streak</span>' +
+          '<div class="ins-hero-sm">'+d.streak+' <span class="ins-unit">years</span></div>' +
+          '<div class="ins-label">Consecutive years with at least one trip abroad</div></div>';
+      }
+
+      function cardAvgTripLength(d) {
+        var total = d.allDurations.length || 1;
+        function bar(n, col, label) {
+          var pct = Math.round((n/total)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+n+'</div></div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Average trip length</span>' +
+          '<div class="ins-hero-sm">'+d.avgTripLen.toFixed(1)+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Trip length distribution</div>' +
+          bar(d.shortTrips,  '#7a7f9a', '1–3 days') +
+          bar(d.mediumTrips, ACCENTS.blue,   '4–10 days') +
+          bar(d.longTrips,   ACCENTS.teal,   '11–21 days') +
+          bar(d.epicsTrips,  ACCENTS.gold,   '21+ days') +
+          '</div>';
+      }
+
+      function cardFavouriteMonth(d) {
+        var max = Math.max.apply(null, d.monthCounts) || 1;
+        var MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var bars = d.monthCounts.map(function(cnt, i) {
+          var h = Math.max(3, Math.round((cnt/max)*44));
+          var isPeak = i === d.peakMonthIdx;
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px;background:'+(isPeak?ACCENTS.cyan:'#4f8ef7')+';opacity:'+(isPeak?'1':'.5')+'"></div>' +
+            '<div class="ins-spark-bar-yr">'+MNAMES[i]+'</div></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Favourite travel month</span>' +
+          '<div class="ins-hero-sm">'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.peakMonthIdx]+'</div>' +
+          '<div class="ins-label">'+d.monthCounts[d.peakMonthIdx]+' trips started in this month</div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars" style="height:54px">'+bars+'</div></div>' +
+          '</div>';
+      }
+
+      function cardThisYear(d) {
+        var cCount = Object.keys(d.thisYearCountries).length;
+        var avgT = Math.round(d.allYearsAvgTrips);
+        var avgDy = Math.round(d.allYearsAvgDays);
+        function stat(val, label, avg) {
+          var ahead = val >= avg;
+          return '<div class="ins-locs-item">' +
+            '<div class="ins-locs-num">'+val+'</div>' +
+            '<div class="ins-locs-lbl">'+label+'</div>' +
+            '<div style="font-size:.68rem;margin-top:2px;color:'+(ahead?ACCENTS.teal:ACCENTS.coral)+'">'+
+              (ahead?'▲ ahead of':'▼ below')+' avg ('+avg+')</div>' +
+            '</div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">'+d.thisYear+' so far</span>' +
+          '<div class="ins-locs-row" style="gap:1.2rem;margin-top:.5rem">' +
+            stat(d.thisYearTrips.length, 'trips', avgT) +
+            stat(cCount, 'countries', Math.round(d.allYearsAvgDays/8)) +
+            stat(d.thisYearDays, 'days away', avgDy) +
+          '</div>' +
+          '</div>';
+      }
+
+      function cardLongestTrip(d) {
+        var countries = d.longestCountries.length > 40 ? d.longestCountries.substr(0,38)+'…' : d.longestCountries;
+        var avgLen = d.allDurations.length ? Math.round(d.allDurations.reduce(function(s,x){return s+x;},0)/d.allDurations.length) : 7;
+        var multPct = d.longestDays && avgLen ? Math.round(d.longestDays/avgLen) : 0;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Longest trip ever</span>' +
+          '<div class="ins-hero-sm">'+d.longestDays+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">'+countries+(d.longestYear?' · '+d.longestYear:'')+'</div>' +
+          '<span class="ins-badge" style="background:rgba(246,166,35,.15);color:'+ACCENTS.amber+'">'+multPct+'× your average trip</span>' +
+          '</div>';
+      }
+
+      function cardBestUtl(d) {
+        var total = d.bestUtl1Count + d.bestUtl2Count;
+        var ctry = d.bestUtlCountries.length > 32 ? d.bestUtlCountries.substr(0,30)+'…' : d.bestUtlCountries;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Best UTL haul trip</span>' +
+          '<div class="ins-hero-sm">'+total+' <span class="ins-unit">items ticked</span></div>' +
+          '<div class="ins-label">'+ctry+(d.bestUtlYear?' · '+d.bestUtlYear:'')+'</div>' +
+          '<div class="ins-sub">TL I: '+d.bestUtl1Count+' &nbsp;·&nbsp; TL II: '+d.bestUtl2Count+'</div>' +
+          '</div>';
+      }
+
+      function cardCapitals(d) {
+        var capTotal = d.countriesTotal;
+        var pct = Math.round((d.capitalsVisited/capTotal)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Capitals visited</span>' +
+          '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
+          '<div class="ins-ring-info">' +
+          '<div class="ins-ring-pct">'+d.capitalsVisited+'<span style="color:var(--color-muted);font-size:1rem"> / '+capTotal+'</span></div>' +
+          '<div class="ins-label">'+pct+'% of world capitals</div>' +
+          '</div></div></div>';
+      }
+
+      function cardNextMilestones(d) {
+        var rows = d.milestones.slice(0,5).map(function(item) {
+          var pctDone = Math.round(((item.m.target - item.m.gap) / item.m.target)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label" style="width:100px">'+item.icon+' '+item.label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pctDone+'%;background:'+ACCENTS.blue+'"></div></div>' +
+            '<div class="ins-bar-val" style="width:60px;color:'+ACCENTS.teal+'">'+item.m.gap+' to go</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Next milestones</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Distance to the next round number in each list</div>' +
+          rows +
+          '</div>';
+      }
+
+      function cardDaysSinceLast(d) {
+        var dl = d.daysSinceLast;
+        var days = dl.days;
+        var trip = dl.trip;
+        var dest = trip ? (trip.countries||[]).slice(0,2).join(', ') : '—';
+        var locs = trip && trip.locations ? trip.locations.split(',').slice(0,2).join(', ') : '';
+        var urgency = days < 14 ? ACCENTS.teal : days < 60 ? ACCENTS.amber : ACCENTS.coral;
+        var msg = days < 7 ? 'Just got back!' : days < 30 ? 'The itch is building…' : days < 90 ? 'Time to plan something.' : 'Overdue for an adventure.';
+        return '<div class="ins-card" style="--ins-accent:'+urgency+'">' +
+          '<span class="ins-tag">Days since last trip</span>' +
+          '<div class="ins-hero" style="color:'+urgency+'">'+days+'</div>' +
+          '<div class="ins-label"><strong>'+dest+'</strong>'+(locs?' · '+locs:'')+'</div>' +
+          '<div class="ins-sub">'+msg+'</div>' +
+          '</div>';
+      }
+
+      function cardLongestAtHome(d) {
+        var months = Math.round(d.longestAtHome / 30.5);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Longest time at home</span>' +
+          '<div class="ins-hero-sm">'+d.longestAtHome+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">That\'s <strong>'+months+' months</strong> — your biggest ever gap between trips</div>' +
+          '<div class="ins-sub">Your average gap between trips is much shorter</div>' +
+          '</div>';
+      }
+
+      function cardIntensityByYear(d) {
+        var ytc = d.yearTripCounts;
+        var maxC = Math.max.apply(null, ytc.map(function(x){ return x.count; })) || 1;
+        var bars = ytc.map(function(item) {
+          var h = Math.max(3, Math.round((item.count / maxC) * 50));
+          var isPeak = item.count === maxC;
+          var shortYr = item.year.slice(2);
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px;background:'+(isPeak?ACCENTS.gold:ACCENTS.blue)+';opacity:'+(isPeak?'1':'.6')+'"></div>' +
+            '<div class="ins-spark-bar-yr">\''+shortYr+'</div>' +
+            '</div>';
+        }).join('');
+        var peakYear = ytc.reduce(function(b,x){ return x.count>b.count?x:b; }, ytc[0]||{year:'—',count:0});
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Travel intensity by year</span>' +
+          '<div class="ins-label" style="margin-bottom:.4rem">Peak: <strong>'+peakYear.count+' trips in '+peakYear.year+'</strong></div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars" style="height:60px">'+bars+'</div></div>' +
+          '</div>';
+      }
+
+      function cardContDays(d) {
+        var maxD = d.contDays[0] ? d.contDays[0].days : 1;
+        var CONT_COLS = { Europe: ACCENTS.blue, Asia: ACCENTS.teal, 'North America': ACCENTS.cyan,
+          'South America': ACCENTS.amber, Africa: ACCENTS.coral, Oceania: ACCENTS.purple };
+        var rows = d.contDays.map(function(item) {
+          var bp = Math.round((item.days / maxD) * 100);
+          var col = CONT_COLS[item.name] || ACCENTS.blue;
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+item.name+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+bp+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+item.days+'d</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">Days per continent</span>' +
+          rows +
+          '</div>';
+      }
+
+      function cardExplorerRatio(d) {
+        var er = d.explorerRatio;
+        var newPct = er.total ? Math.round((er.newOnly / er.total) * 100) : 0;
+        var retPct = 100 - newPct;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Explorer vs loyalist</span>' +
+          '<div class="ins-split-track" style="margin-top:.6rem">' +
+            '<div class="ins-split-a" style="width:'+newPct+'%;background:'+ACCENTS.teal+'"></div>' +
+            '<div class="ins-split-b" style="background:'+ACCENTS.purple+'"></div>' +
+          '</div>' +
+          '<div class="ins-split-legend">' +
+            '<span><span class="ins-split-dot" style="background:'+ACCENTS.teal+'"></span>New: '+er.newOnly+' countries ('+newPct+'%)</span>' +
+            '<span><span class="ins-split-dot" style="background:'+ACCENTS.purple+'"></span>Returned: '+er.returned+' countries ('+retPct+'%)</span>' +
+          '</div>' +
+          '<div class="ins-sub" style="margin-top:.5rem">'+(newPct >= 70 ? 'Mostly an explorer — always seeking new ground.' : newPct >= 50 ? 'A balance of new discovery and old favourites.' : 'You love returning to places you know.')+'</div>' +
+          '</div>';
+      }
+
+      function cardTravellerProfile(d) {
+        var tp = d.travellerProfile;
+        var traitHtml = tp.traits.map(function(t) {
+          return '<div style="font-size:.75rem;color:var(--color-muted);margin-top:3px">· '+t+'</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Traveller profile</span>' +
+          '<div class="ins-hero-sm" style="font-size:1.15rem;margin:.3rem 0 .5rem">'+tp.type+'</div>' +
+          traitHtml +
+          '<div class="ins-sub" style="margin-top:.6rem">'+tp.totalC+' countries · '+tp.contCount+' continents · '+Math.round(tp.soloRatio*100)+'% solo</div>' +
+          '</div>';
+      }
+
+      function cardUtlEfficiency(d) {
+        var eff = d.utlEfficiency;
+        var perDay = eff.perDay.toFixed(2);
+        var perTrip = eff.perTrip.toFixed(1);
+        var rating = eff.perDay >= 0.5 ? 'Elite list hunter 🎯' : eff.perDay >= 0.3 ? 'Solid collector 📍' : 'Quality over quantity 🌍';
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">UTL items per trip day</span>' +
+          '<div class="ins-hero-sm">'+perDay+' <span class="ins-unit">items / day</span></div>' +
+          '<div class="ins-locs-row" style="margin-top:.5rem;gap:1.2rem">' +
+            '<div class="ins-locs-item"><div class="ins-locs-num">'+eff.total+'</div><div class="ins-locs-lbl">total items ticked</div></div>' +
+            '<div class="ins-locs-item"><div class="ins-locs-num">'+perTrip+'</div><div class="ins-locs-lbl">items per trip</div></div>' +
+          '</div>' +
+          '<div class="ins-sub" style="margin-top:.5rem">'+rating+'</div>' +
+          '</div>';
+      }
+
+      function renderInsights(d) {
+        var html = '<div class="ins-masonry">' +
+          cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
+          cardTop3Days(d) + cardTravelSpeed(d) + cardBestYear(d) +
+          cardContinents(d) +
+          cardSoloGroup(d) + cardWorkLeisure(d) +
+          cardListProgress(d) + cardLocations(d) + cardStreak(d) +
+          cardAvgTripLength(d) + cardFavouriteMonth(d) + cardThisYear(d) +
+          cardLongestTrip(d) + cardBestUtl(d) + cardCapitals(d) +
+          cardNextMilestones(d) +
+          cardDaysSinceLast(d) + cardLongestAtHome(d) + cardIntensityByYear(d) +
+          cardContDays(d) + cardExplorerRatio(d) + cardTravellerProfile(d) +
+          cardUtlEfficiency(d) +
+          '</div>';
+        var grid = document.getElementById('insights-grid');
+        var loading = document.getElementById('insights-loading');
+        grid.innerHTML = html;
+        grid.style.display = 'block';
+        if (loading) loading.style.display = 'none';
+      }
+
+      var _initDone = false;
+      function tryInit() {
+        if (_initDone) return;
+        var app = window.TravelApp;
+        if (!app || !app.Store || !app.TripStore) { setTimeout(tryInit, 100); return; }
+        var Store = app.Store, TripStore = app.TripStore;
+
+        function doRender() {
+          var storeData = {
+            countries:   Store.getVisitedArray('ruth','countries'),
+            capitals:    Store.getVisitedArray('ruth','capitals'),
+            travellist1: Store.getVisitedArray('ruth','travellist1'),
+            travellist2: Store.getVisitedArray('ruth','travellist2'),
+            unesco:      Store.getVisitedArray('ruth','unesco')
+          };
+          var trips = TripStore.getTrips('ruth');
+          var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
+          Promise.all([
+            fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
+            fetch(rp+'data/travellist2.json').then(function(r){return r.json();}),
+            fetch(rp+'data/countries.json').then(function(r){return r.json();}),
+            fetch(rp+'data/unesco.json').then(function(r){return r.json();})
+          ]).then(function(res) {
+            var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
+            renderInsights(d);
+            _initDone = true;
+          }).catch(function(err){ console.error('Insights error:', err); });
+        }
+
+        /* Load both Store AND TripStore before rendering */
+        var storeReady = false, tripStoreReady = false;
+        function checkReady() {
+          if (storeReady && tripStoreReady) {
+            doRender();
+            Store.onSave(function() { _initDone = false; doRender(); _initDone = true; });
+            TripStore.onSave(function() { _initDone = false; doRender(); _initDone = true; });
+          }
+        }
+
+        Store.load(function() { storeReady = true; checkReady(); });
+        TripStore.load('ruth').then(function() { tripStoreReady = true; checkReady(); })
+                             .catch(function() { tripStoreReady = true; checkReady(); });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.hash === '#insights') tryInit();
+        var nav = document.getElementById('traveller-tabs');
+        if (nav) {
+          nav.addEventListener('click', function(e) {
+            var btn = e.target.closest ? e.target.closest('.traveller-tab') : e.target;
+            if (btn && btn.dataset && btn.dataset.tab === 'insights') tryInit();
+          });
+        }
+      });
+      setTimeout(function(){ if(window.location.hash==='#insights') tryInit(); }, 300);
+    }());
+    </script>
+
+    </div><!-- end tab-panel#insights -->
+
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
@@ -1292,7 +2196,11 @@
     var app = window.TravelApp;
     var PERSON = "ruth";
     app.renderNav(PERSON);
-    app.loadAllData().then(function(data) {
+    var _cachedData = null;
+    function updateStats(data) {
+      if (data) _cachedData = data;
+      else data = _cachedData;
+      if (!data) return;
       var travellers = data.travellers;
       var countries  = data.countries;
       var animals    = data.animals;
@@ -1311,6 +2219,9 @@
         app.buildStatCard((t.capitals||[]).length,    "/ " + countries.length + " Capitals") +
         app.buildStatCard((t.unesco||[]).length,      "/ " + unesco.length + " UNESCO Sites") +
         app.buildStatCard((t.animals||[]).length,     "/ " + animals.length + " Animals");
+    }
+    app.loadAllData(function(){ updateStats(null); }).then(function(data) {
+      updateStats(data);
     }).catch(function(err) { console.error(err); });
   </script>
 
@@ -1321,14 +2232,21 @@
     var app = window.TravelApp;
     if (!app || !app.Store) { setTimeout(waitForTravelApp, 50); return; }
     var Store = app.Store;
+
+    /* Patch applyRemote onto Store if not present */
     if (!Store.applyRemote) {
       Store.applyRemote = function(visited) {
+        if (!visited || typeof visited !== 'object') return;
+        /* Force re-read from cache by firing onRemoteLoad callbacks */
         if (Store._fireRemote) Store._fireRemote();
       };
     }
+
+    /* Patch loadAllData to fire Store.onRemoteLoad callbacks after remote data arrives */
     var origLoad = app.loadAllData;
     app.loadAllData = function(onRemote) {
       return origLoad(function() {
+        /* After remote GitHub data is applied to travellers[], also notify Store listeners */
         if (Store._fireRemote) Store._fireRemote();
         if (typeof onRemote === 'function') onRemote();
       });
@@ -1386,7 +2304,7 @@
       var tabs = document.querySelectorAll('#traveller-tabs .traveller-tab');
       var panels = document.querySelectorAll('.tab-panel');
       var subtitle = document.getElementById('traveller-subtitle');
-      var tabLabels = { progress: 'Travel Progress', timeline: 'Travel Timeline' };
+      var tabLabels = { progress: 'Travel Progress', timeline: 'Travel Timeline', insights: 'Travel Insights' };
 
       function activateTab(targetId) {
         tabs.forEach(function (t) {
