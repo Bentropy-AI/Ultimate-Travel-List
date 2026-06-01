@@ -1979,19 +1979,41 @@
           '</div></div></div>';
       }
 
-      function cardNextMilestones(d) {
-        var rows = d.milestones.slice(0,5).map(function(item) {
-          var pctDone = Math.round(((item.m.target - item.m.gap) / item.m.target)*100);
-          return '<div class="ins-bar-row">' +
-            '<div class="ins-bar-label" style="width:100px">'+item.icon+' '+item.label+'</div>' +
-            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pctDone+'%;background:'+ACCENTS.blue+'"></div></div>' +
-            '<div class="ins-bar-val" style="width:60px;color:'+ACCENTS.teal+'">'+item.m.gap+' to go</div>' +
-            '</div>';
-        }).join('');
-        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
-          '<span class="ins-tag">Next milestones</span>' +
-          '<div class="ins-label" style="margin-bottom:.5rem">Distance to the next round number in each list</div>' +
-          rows +
+      function cardHalfway(d) {
+        var visited = d.countriesVisited;
+        var total = d.countriesTotal;
+        var halfway = Math.floor(total / 2);
+        var pct = Math.round((visited / total) * 100);
+        var halfwayPct = Math.round((halfway / total) * 100);
+        var pastHalfway = visited >= halfway;
+        var toHalfway = halfway - visited;
+        var accent = pastHalfway ? ACCENTS.teal : ACCENTS.amber;
+        /* Build a track that shows visited, halfway marker, and remaining */
+        var trackHtml =
+          '<div style="position:relative;margin:.8rem 0 .4rem">' +
+            '<div class="ins-bar-track" style="height:10px;border-radius:5px">' +
+              '<div class="ins-bar-fill" style="width:'+pct+'%;background:'+accent+';height:100%;border-radius:5px;transition:width .6s ease"></div>' +
+            '</div>' +
+            '<div style="position:absolute;top:-4px;left:'+halfwayPct+'%;width:2px;height:18px;background:var(--color-muted);opacity:.6"></div>' +
+            '<div style="position:absolute;top:14px;left:'+halfwayPct+'%;transform:translateX(-50%);font-size:.65rem;color:var(--color-muted);white-space:nowrap">halfway ('+halfway+')</div>' +
+          '</div>';
+        var msg, sub;
+        if (visited >= total) {
+          msg = 'Every country visited!';
+          sub = 'You've done it — the full ' + total + '.';
+        } else if (pastHalfway) {
+          msg = 'Past halfway';
+          sub = 'You've visited more than half the world's countries — ' + (visited - halfway) + ' countries past the midpoint.';
+        } else {
+          msg = toHalfway + ' to halfway';
+          sub = 'Halfway is ' + halfway + ' countries. You're ' + toHalfway + ' away.';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+accent+'">' +
+          '<span class="ins-tag">World halfway point</span>' +
+          '<div class="ins-hero-sm" style="color:'+accent+'">'+visited+' <span class="ins-unit">/ '+total+' countries</span></div>' +
+          '<div class="ins-label"><strong>'+msg+'</strong> · '+pct+'% of the world</div>' +
+          trackHtml +
+          '<div class="ins-sub" style="margin-top:1rem">'+sub+'</div>' +
           '</div>';
       }
 
@@ -2116,7 +2138,7 @@
           cardListProgress(d) + cardLocations(d) + cardStreak(d) +
           cardAvgTripLength(d) + cardFavouriteMonth(d) + cardThisYear(d) +
           cardLongestTrip(d) + cardBestUtl(d) + cardCapitals(d) +
-          cardNextMilestones(d) +
+          cardHalfway(d) +
           cardDaysSinceLast(d) + cardLongestAtHome(d) + cardIntensityByYear(d) +
           cardContDays(d) + cardExplorerRatio(d) + cardTravellerProfile(d) +
           cardUtlEfficiency(d) +
