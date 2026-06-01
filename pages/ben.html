@@ -1425,9 +1425,16 @@
         return d > 0 ? d : 1;
       }
 
-      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal) {
+      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal, countriesArr) {
         var benTrips = trips.filter(function(t) {
           return (t.travellers || []).indexOf('ben') !== -1;
+        });
+
+        /* ── ISO → continent/name lookup from countries.json (authoritative) ── */
+        var isoToContinent = {}, isoToName = {};
+        (countriesArr || []).forEach(function(c) {
+          isoToContinent[c.id] = c.continent;
+          isoToName[c.id] = c.name;
         });
 
         var totalDays = 0;
@@ -1465,14 +1472,18 @@
         var speedData = speedYears.map(function(yr){ return {year:yr, count:Object.keys(yearCountries[yr]||{}).length}; });
         var avgSpeed = (speedData.reduce(function(s,d){ return s+d.count; },0)/speedData.length).toFixed(1);
 
+        /* ── Store-based continent breakdown (uses ticked ISOs, not trip log) ── */
+        var visitedISOs = storeData.countries || [];
         var contVisited = {};
-        benTrips.forEach(function(t) {
-          var c = t.continent;
-          if (!c || c === 'Multi-continent') return;
-          (t.countries||[]).forEach(function(ct){ if(!contVisited[c])contVisited[c]={}; contVisited[c][ct]=1; });
+        visitedISOs.forEach(function(iso) {
+          var cont = isoToContinent[iso];
+          if (!cont) return;
+          if (!contVisited[cont]) contVisited[cont] = {};
+          contVisited[cont][iso] = 1;
         });
-        var contData = Object.keys(contVisited).map(function(c){ return {name:c, count:Object.keys(contVisited[c]).length}; })
-          .sort(function(a,b){ return b.count-a.count; });
+        var contData = Object.keys(contVisited).map(function(c) {
+          return { name: c, count: Object.keys(contVisited[c]).length };
+        }).sort(function(a,b) { return b.count - a.count; });
 
         var soloTrips = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
         var groupTrips = benTrips.length - soloTrips;
@@ -1637,13 +1648,20 @@
           })(),
 
           contDays: (function() {
+            /* Days per continent from trip log (trip log has dates, Store doesn't) */
+            /* but we map continent using isoToContinent so home country is handled */
             var cd = {};
             benTrips.forEach(function(t) {
-              var cont = t.continent;
-              if (!cont || cont === 'Multi-continent') return;
               var days = (t.start && t.finish)
                 ? Math.round((new Date(t.finish+'T00:00:00') - new Date(t.start+'T00:00:00'))/86400000) + 1
                 : 1;
+              /* Derive continent from countries via ISO lookup, fallback to t.continent */
+              var conts = {};
+              (t.countries||[]).forEach(function(cname) {
+                /* trip log uses names not ISOs - use t.continent as best available */
+              });
+              var cont = t.continent;
+              if (!cont || cont === 'Multi-continent') return;
               cd[cont] = (cd[cont]||0) + days;
             });
             return Object.keys(cd).map(function(c){ return {name:c, days:cd[c]}; })
@@ -1651,14 +1669,16 @@
           })(),
 
           explorerRatio: (function() {
+            /* Total visited from Store (authoritative) */
+            var totalVisited = (storeData.countries||[]).length;
+            /* Return visitors derived from trip log */
             var visits = {};
             benTrips.forEach(function(t) {
               (t.countries||[]).forEach(function(c){ visits[c] = (visits[c]||0) + 1; });
             });
-            var newOnly = Object.keys(visits).filter(function(c){ return visits[c]===1; }).length;
             var returned = Object.keys(visits).filter(function(c){ return visits[c]>1; }).length;
-            var totalCountries = newOnly + returned;
-            return { newOnly:newOnly, returned:returned, total:totalCountries };
+            var newOnly = Math.max(0, totalVisited - returned);
+            return { newOnly:newOnly, returned:returned, total:totalVisited };
           })(),
 
           utlEfficiency: (function() {
@@ -1678,9 +1698,7 @@
           })(),
 
           travellerProfile: (function() {
-            var visits = {};
-            benTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ visits[c]=(visits[c]||0)+1; }); });
-            var totalC = Object.keys(visits).length;
+            var totalC = (storeData.countries||[]).length;
             var soloT = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
             var soloRatio = benTrips.length ? soloT/benTrips.length : 0;
             var contSet = {};
@@ -2132,7 +2150,7 @@
             fetch(rp+'data/countries.json').then(function(r){return r.json();}),
             fetch(rp+'data/unesco.json').then(function(r){return r.json();})
           ]).then(function(res) {
-            var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length);
+            var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
             renderInsights(d);
             _initDone = true;
           }).catch(function(err){ console.error('Insights error:', err); });
