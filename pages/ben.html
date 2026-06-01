@@ -2192,42 +2192,68 @@
       }
 
       var _initDone = false;
-      function tryInit() {
+      var _tripsLoaded = false;
+      var _storeReady = false;
+
+      function _tryRender() {
         if (_initDone) return;
+        if (!_tripsLoaded) return;
+        var app = window.TravelApp;
+        if (!app || !app.Store || !app.TripStore) return;
+        var Store = app.Store, TripStore = app.TripStore;
+        /* Check Store actually has data */
+        var arr = Store.getVisitedArray('ben','countries');
+        if (!arr || !arr.length) { _storeReady = false; return; }
+        _storeReady = true;
+
+        var storeData = {
+          countries:   Store.getVisitedArray('ben','countries'),
+          capitals:    Store.getVisitedArray('ben','capitals'),
+          travellist1: Store.getVisitedArray('ben','travellist1'),
+          travellist2: Store.getVisitedArray('ben','travellist2'),
+          unesco:      Store.getVisitedArray('ben','unesco')
+        };
+        var trips = TripStore.getTrips('ben');
+        var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
+        Promise.all([
+          fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
+          fetch(rp+'data/travellist2.json').then(function(r){return r.json();}),
+          fetch(rp+'data/countries.json').then(function(r){return r.json();}),
+          fetch(rp+'data/unesco.json').then(function(r){return r.json();})
+        ]).then(function(res) {
+          var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
+          renderInsights(d);
+          _initDone = true;
+        }).catch(function(err){ console.error('Insights error:', err); });
+      }
+
+      function tryInit() {
         var app = window.TravelApp;
         if (!app || !app.Store || !app.TripStore) { setTimeout(tryInit, 100); return; }
         var Store = app.Store, TripStore = app.TripStore;
 
-        function doRender() {
-          var storeData = {
-            countries:   Store.getVisitedArray('ben','countries'),
-            capitals:    Store.getVisitedArray('ben','capitals'),
-            travellist1: Store.getVisitedArray('ben','travellist1'),
-            travellist2: Store.getVisitedArray('ben','travellist2'),
-            unesco:      Store.getVisitedArray('ben','unesco')
-          };
-          var trips = TripStore.getTrips('ben');
-          var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
-          Promise.all([
-            fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
-            fetch(rp+'data/travellist2.json').then(function(r){return r.json();}),
-            fetch(rp+'data/countries.json').then(function(r){return r.json();}),
-            fetch(rp+'data/unesco.json').then(function(r){return r.json();})
-          ]).then(function(res) {
-            var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
-            renderInsights(d);
-            _initDone = true;
-          }).catch(function(err){ console.error('Insights error:', err); });
-        }
+        /* Hook into store events for re-renders */
+        Store.onRemoteLoad(function() { _initDone = false; _tryRender(); });
+        Store.onSave(function() { _initDone = false; _tryRender(); });
+        TripStore.onSave(function() { _initDone = false; _tryRender(); });
 
-        /* Load both Store AND TripStore before rendering */
-        /* Store is already loaded by the Progress tab — don't call load() again
-           as it resets internal state. Just wait for TripStore then render. */
-        Store.onSave(function() { _initDone = false; doRender(); _initDone = true; });
-        TripStore.onSave(function() { _initDone = false; doRender(); _initDone = true; });
-
-        TripStore.load('ben').then(function() { doRender(); })
-                             .catch(function() { doRender(); });
+        /* Load trips, then attempt render (Store may or may not have data yet) */
+        TripStore.load('ben').then(function() {
+          _tripsLoaded = true;
+          _tryRender();
+          /* If store wasn't ready, poll briefly until it is */
+          if (!_storeReady) {
+            var attempts = 0;
+            var poll = setInterval(function() {
+              attempts++;
+              _tryRender();
+              if (_initDone || attempts > 20) clearInterval(poll);
+            }, 500);
+          }
+        }).catch(function() {
+          _tripsLoaded = true;
+          _tryRender();
+        });
       }
 
       document.addEventListener('DOMContentLoaded', function() {
