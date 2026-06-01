@@ -5383,13 +5383,14 @@
       "continent": "Europe",
       "locations": "Amsterdam",
       "start": "2015-06-13",
-      "finish": "2013-06-15",
+      "finish": "2015-06-15",
       "type": "Friends",
+      "utl1": [],
+      "utl2": [],
       "travellers": [
         "shaz"
       ],
-      "utl1": [],
-      "utl2": []
+      "_id": "2015-06-13|Netherlands"
     },
     {
       "countries": [
