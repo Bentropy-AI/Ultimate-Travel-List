@@ -26,6 +26,7 @@
       <nav class="traveller-tabs tabs-ben" id="traveller-tabs">
         <button class="traveller-tab active" data-tab="progress">📊 Progress</button>
         <button class="traveller-tab" data-tab="timeline">🗓️ Timeline</button>
+        <button class="traveller-tab" data-tab="insights">✨ Insights</button>
       </nav>
 
       <!-- TAB PANEL: PROGRESS (existing content) -->
@@ -1300,6 +1301,449 @@
       </section>
 
 </div><!-- end tab-panel#timeline -->
+
+    <!-- ============================================================
+         TAB PANEL: INSIGHTS
+    ============================================================ -->
+    <div class="tab-panel" id="tab-insights">
+
+    <style>
+      #insights-loading { text-align:center; padding:3rem; color:var(--color-muted); font-size:.95rem; }
+      #insights-grid { padding: 1.5rem 0 2rem; }
+
+      .ins-masonry {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+      @media (max-width: 860px) { .ins-masonry { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 540px) { .ins-masonry { grid-template-columns: 1fr; } }
+
+      .ins-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        position: relative;
+        overflow: hidden;
+        transition: border-color .2s, transform .2s;
+      }
+      .ins-card:hover { border-color: #4f8ef7; transform: translateY(-2px); }
+      .ins-card.span2 { grid-column: span 2; }
+      .ins-card.span3 { grid-column: span 3; }
+      @media (max-width: 860px) { .ins-card.span2 { grid-column: span 2; } .ins-card.span3 { grid-column: span 2; } }
+      @media (max-width: 540px) { .ins-card.span2, .ins-card.span3 { grid-column: span 1; } }
+
+      .ins-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--ins-accent, #4f8ef7);
+        border-radius: 12px 12px 0 0;
+      }
+      .ins-tag {
+        font-size: .7rem;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: var(--ins-accent, #4f8ef7);
+        opacity: .85;
+        margin-bottom: .35rem;
+        display: block;
+      }
+      .ins-hero {
+        font-size: 3.2rem; font-weight: 800; line-height: 1;
+        color: var(--color-text); letter-spacing: -.03em; margin: .25rem 0 .15rem;
+      }
+      .ins-hero-sm {
+        font-size: 2rem; font-weight: 700; line-height: 1.1;
+        color: var(--color-text); letter-spacing: -.02em; margin: .2rem 0 .1rem;
+      }
+      .ins-unit { font-size: .85rem; color: var(--color-muted); font-weight: 400; }
+      .ins-label { font-size: .82rem; color: var(--color-muted); line-height: 1.4; margin-top: .1rem; }
+      .ins-sub { font-size: .75rem; color: var(--color-muted); margin-top: .4rem; opacity: .8; }
+      .ins-ring-wrap { display: flex; align-items: center; gap: 1.2rem; margin-top: .5rem; }
+      .ins-ring-svg { flex-shrink: 0; }
+      .ins-ring-info { flex: 1; }
+      .ins-ring-pct { font-size: 1.6rem; font-weight: 700; color: var(--color-text); line-height: 1; }
+      .ins-bar-row { display: flex; align-items: center; gap: 8px; margin-top: .55rem; }
+      .ins-bar-label { font-size: .78rem; color: var(--color-muted); width: 90px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .ins-bar-track { flex: 1; height: 6px; background: var(--color-border); border-radius: 3px; overflow: hidden; }
+      .ins-bar-fill { height: 100%; border-radius: 3px; background: var(--ins-accent, #4f8ef7); transition: width .6s ease; }
+      .ins-bar-val { font-size: .75rem; color: var(--color-muted); width: 38px; text-align: right; flex-shrink: 0; }
+      .ins-cont-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; margin-top: .7rem; }
+      .ins-cont-pill { background: var(--color-surface2); border: 1px solid var(--color-border); border-radius: 8px; padding: .5rem .75rem; display: flex; flex-direction: column; gap: 2px; }
+      .ins-cont-pill-name { font-size: .72rem; color: var(--color-muted); }
+      .ins-cont-pill-num { font-size: 1.1rem; font-weight: 700; color: var(--color-text); }
+      .ins-split-track { height: 10px; border-radius: 5px; overflow: hidden; display: flex; margin: .7rem 0 .4rem; }
+      .ins-split-a { transition: width .6s ease; }
+      .ins-split-b { background: var(--color-surface2); flex: 1; }
+      .ins-split-legend { display: flex; gap: 1rem; font-size: .75rem; color: var(--color-muted); }
+      .ins-split-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+      .ins-rank-badge { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 800; flex-shrink: 0; color: var(--color-bg); }
+      .ins-rank-badge.r1 { background: #f6c843; }
+      .ins-rank-badge.r2 { background: #b0bec5; }
+      .ins-rank-badge.r3 { background: #cd7f32; }
+      .ins-rank-country { flex: 1; font-size: .85rem; color: var(--color-text); font-weight: 500; }
+      .ins-rank-val { font-size: .78rem; color: var(--color-muted); }
+      .ins-spark-wrap { margin-top: .7rem; }
+      .ins-spark-bars { display: flex; align-items: flex-end; gap: 5px; height: 42px; }
+      .ins-spark-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+      .ins-spark-bar-fill { width: 100%; background: #4f8ef7; border-radius: 3px 3px 0 0; opacity: .7; min-height: 3px; }
+      .ins-spark-bar-yr { font-size: .62rem; color: var(--color-muted); }
+      .ins-donut-row { display: flex; align-items: center; gap: 1rem; margin-top: .5rem; }
+      .ins-donut-legend { display: flex; flex-direction: column; gap: 6px; }
+      .ins-donut-legend-item { display: flex; align-items: center; gap: 6px; font-size: .78rem; color: var(--color-muted); }
+      .ins-donut-legend-swatch { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+      .ins-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: .7rem; font-weight: 700; letter-spacing: .04em; margin-top: .3rem; }
+      .ins-locs-row { display: flex; gap: 1.5rem; margin-top: .4rem; align-items: flex-start; flex-wrap: wrap; }
+      .ins-locs-item { display: flex; flex-direction: column; }
+      .ins-locs-num { font-size: 1.8rem; font-weight: 700; color: var(--color-text); line-height: 1; }
+      .ins-locs-lbl { font-size: .72rem; color: var(--color-muted); margin-top: 2px; }
+    </style>
+
+    <section class="section" id="insights-section">
+      <h2 class="section-title">✨ Travel Insights</h2>
+      <div id="insights-loading"><p class="loading-msg">Calculating insights…</p></div>
+      <div id="insights-grid" style="display:none"></div>
+    </section>
+
+    <script>
+    (function() {
+      'use strict';
+
+      var ACCENTS = {
+        blue:   '#4f8ef7', teal:   '#3ecf8e', amber:  '#f6a623',
+        purple: '#9b59f5', pink:   '#e05c8e', cyan:   '#38bdf8',
+        gold:   '#f6c843', coral:  '#e05c5c'
+      };
+
+      function tripDays(t) {
+        if (!t.start || !t.finish) return 1;
+        var s = new Date(t.start + 'T00:00:00');
+        var f = new Date(t.finish + 'T00:00:00');
+        var d = Math.round((f - s) / 86400000) + 1;
+        return d > 0 ? d : 1;
+      }
+
+      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal) {
+        var benTrips = trips.filter(function(t) {
+          return (t.travellers || []).indexOf('ben') !== -1;
+        });
+
+        var totalDays = 0;
+        benTrips.forEach(function(t) { totalDays += tripDays(t); });
+        var totalYears = (totalDays / 365).toFixed(1);
+
+        var countryCounts = {}, countryDays = {};
+        benTrips.forEach(function(t) {
+          var ctries = t.countries || [];
+          var days = tripDays(t);
+          var perC = ctries.length ? Math.round(days / ctries.length) : days;
+          ctries.forEach(function(c) {
+            countryCounts[c] = (countryCounts[c] || 0) + 1;
+            countryDays[c] = (countryDays[c] || 0) + perC;
+          });
+        });
+
+        var sortedByTrips = Object.keys(countryCounts).sort(function(a,b){ return countryCounts[b]-countryCounts[a]; });
+        var mostVisited = sortedByTrips[0] || '—';
+        var mostVisitedCount = countryCounts[mostVisited] || 0;
+
+        var sortedByDays = Object.keys(countryDays).sort(function(a,b){ return countryDays[b]-countryDays[a]; });
+        var top3Days = sortedByDays.slice(0,3).map(function(c){ return {country:c, days:countryDays[c]}; });
+
+        var currentYear = new Date().getFullYear();
+        var speedYears = [];
+        for (var y = currentYear-5; y < currentYear; y++) speedYears.push(y);
+        var yearCountries = {};
+        benTrips.forEach(function(t) {
+          if (!t.start) return;
+          var yr = parseInt(t.start.substr(0,4), 10);
+          if (!yearCountries[yr]) yearCountries[yr] = {};
+          (t.countries||[]).forEach(function(c){ yearCountries[yr][c]=1; });
+        });
+        var speedData = speedYears.map(function(yr){ return {year:yr, count:Object.keys(yearCountries[yr]||{}).length}; });
+        var avgSpeed = (speedData.reduce(function(s,d){ return s+d.count; },0)/speedData.length).toFixed(1);
+
+        var contVisited = {};
+        benTrips.forEach(function(t) {
+          var c = t.continent;
+          if (!c || c === 'Multi-continent') return;
+          (t.countries||[]).forEach(function(ct){ if(!contVisited[c])contVisited[c]={}; contVisited[c][ct]=1; });
+        });
+        var contData = Object.keys(contVisited).map(function(c){ return {name:c, count:Object.keys(contVisited[c]).length}; })
+          .sort(function(a,b){ return b.count-a.count; });
+
+        var soloTrips = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
+        var groupTrips = benTrips.length - soloTrips;
+
+        var workDays = benTrips.filter(function(t){ return t.type==='Work'; }).reduce(function(s,t){ return s+tripDays(t); },0);
+        var leisureDays = totalDays - workDays;
+        var workTrips = benTrips.filter(function(t){ return t.type==='Work'; }).length;
+        var leisureTrips = benTrips.length - workTrips;
+
+        var allLocs = {};
+        benTrips.forEach(function(t) {
+          if (!t.locations) return;
+          t.locations.split(',').forEach(function(l){ var ll=l.trim(); if(ll) allLocs[ll]=1; });
+        });
+        var uniqueLocs = Object.keys(allLocs).length;
+
+        var allYrs = Object.keys(yearCountries).map(Number);
+        var bestYear = allYrs.reduce(function(best,yr){
+          return Object.keys(yearCountries[yr]||{}).length > Object.keys(yearCountries[best]||{}).length ? yr : best;
+        }, allYrs[0] || currentYear);
+        var bestYearCount = Object.keys(yearCountries[bestYear]||{}).length;
+
+        var allTripYears = allYrs.sort(function(a,b){return a-b;});
+        var streak=0, tempStreak=0, prevYr=null;
+        allTripYears.forEach(function(yr){
+          if(prevYr===null||yr===prevYr+1){tempStreak++;}else{tempStreak=1;}
+          if(tempStreak>streak)streak=tempStreak;
+          prevYr=yr;
+        });
+
+        return {
+          totalDays:totalDays, totalYears:totalYears,
+          mostVisited:mostVisited, mostVisitedCount:mostVisitedCount,
+          top3Days:top3Days, speedData:speedData, avgSpeed:avgSpeed,
+          contData:contData, soloTrips:soloTrips, groupTrips:groupTrips,
+          workTrips:workTrips, leisureTrips:leisureTrips,
+          workDays:workDays, leisureDays:leisureDays,
+          uniqueLocs:uniqueLocs, benTrips:benTrips,
+          countriesVisited:(storeData.countries||[]).length,
+          tl1Visited:(storeData.travellist1||[]).length,
+          tl2Visited:(storeData.travellist2||[]).length,
+          unescoVisited:(storeData.unesco||[]).length,
+          countriesTotal:countriesTotal, tl1Total:tl1Total,
+          tl2Total:tl2Total, unescoCnt:unescoCnt,
+          bestYear:bestYear, bestYearCount:bestYearCount,
+          streak:streak, yearCountries:yearCountries
+        };
+      }
+
+      function ringCard(pct, accent, size) {
+        size = size||60;
+        var r=(size-6)/2, circ=2*Math.PI*r, dash=(pct/100)*circ;
+        return '<svg class="ins-ring-svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
+          '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="var(--color-surface2)" stroke-width="5"/>' +
+          '<circle cx="'+(size/2)+'" cy="'+(size/2)+'" r="'+r+'" fill="none" stroke="'+accent+'" stroke-width="5" stroke-linecap="round"' +
+          ' stroke-dasharray="'+dash.toFixed(1)+' '+circ.toFixed(1)+'"' +
+          ' transform="rotate(-90 '+(size/2)+' '+(size/2)+')" /></svg>';
+      }
+
+      function donutSVG(pctA, colA, colB, size) {
+        size=size||70;
+        var r=(size-8)/2, circ=2*Math.PI*r, dashA=(pctA/100)*circ, cx=size/2, cy=size/2;
+        return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
+          '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+colB+'" stroke-width="7"/>' +
+          '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+colA+'" stroke-width="7" stroke-linecap="round"' +
+          ' stroke-dasharray="'+dashA.toFixed(1)+' '+circ.toFixed(1)+'" transform="rotate(-90 '+cx+' '+cy+')"/></svg>';
+      }
+
+      function cardDaysAway(d) {
+        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">Days on the road</span>' +
+          '<div class="ins-hero">'+d.totalDays.toLocaleString()+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">That\'s <strong>'+d.totalYears+' years</strong> of your life spent travelling — and counting.</div>' +
+          '<div class="ins-sub">'+d.benTrips.length+' trips logged across '+Object.keys(d.yearCountries).length+' different years</div>' +
+          '</div>';
+      }
+
+      function cardCountriesRing(d) {
+        var pct = Math.round((d.countriesVisited/d.countriesTotal)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Countries visited</span>' +
+          '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
+          '<div class="ins-ring-info">' +
+          '<div class="ins-ring-pct">'+d.countriesVisited+'<span style="color:var(--color-muted);font-size:1rem"> / '+d.countriesTotal+'</span></div>' +
+          '<div class="ins-label">'+pct+'% of the world</div></div></div></div>';
+      }
+
+      function cardMostVisited(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Most visited country</span>' +
+          '<div class="ins-hero-sm">'+d.mostVisited+'</div>' +
+          '<div class="ins-label">Visited on <strong>'+d.mostVisitedCount+' separate trips</strong></div>' +
+          '<div class="ins-sub">Home away from home? 🏠</div></div>';
+      }
+
+      function cardTop3Days(d) {
+        var maxD = d.top3Days[0] ? d.top3Days[0].days : 1;
+        var rows = d.top3Days.map(function(item,i){
+          var bp = Math.round((item.days/maxD)*100);
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-rank-badge '+['r1','r2','r3'][i]+'">'+(i+1)+'</div>' +
+            '<div class="ins-bar-label" title="'+item.country+'">'+item.country+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+bp+'%;background:'+ACCENTS.amber+'"></div></div>' +
+            '<div class="ins-bar-val">'+item.days+'d</div></div>';
+        }).join('');
+        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Top countries by time spent</span>' +
+          '<div class="ins-label" style="margin-bottom:.3rem">Estimated days per destination</div>'+rows+'</div>';
+      }
+
+      function cardTravelSpeed(d) {
+        var maxC = Math.max.apply(null, d.speedData.map(function(x){return x.count;})) || 1;
+        var bars = d.speedData.map(function(item){
+          var h = Math.max(4, Math.round((item.count/maxC)*40));
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px"></div>' +
+            '<div class="ins-spark-bar-yr">\''+String(item.year).slice(2)+'</div></div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Travel speed</span>' +
+          '<div class="ins-hero-sm">'+d.avgSpeed+' <span class="ins-unit">countries/yr</span></div>' +
+          '<div class="ins-label">5-year average (2021–2025)</div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars">'+bars+'</div></div></div>';
+      }
+
+      function cardBestYear(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Best year ever</span>' +
+          '<div class="ins-hero-sm">'+d.bestYear+'</div>' +
+          '<div class="ins-label"><strong>'+d.bestYearCount+' countries</strong> visited in a single year</div>' +
+          '<span class="ins-badge" style="background:rgba(155,89,245,.15);color:'+ACCENTS.purple+'">Peak explorer</span></div>';
+      }
+
+      function cardContinents(d) {
+        var pills = d.contData.map(function(item){
+          return '<div class="ins-cont-pill">' +
+            '<span class="ins-cont-pill-num">'+item.count+'</span>' +
+            '<span class="ins-cont-pill-name">'+item.name+'</span></div>';
+        }).join('');
+        return '<div class="ins-card span3" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Continent breakdown</span>' +
+          '<div class="ins-label" style="margin-bottom:.1rem">Unique countries per continent from trip log</div>' +
+          '<div class="ins-cont-grid">'+pills+'</div></div>';
+      }
+
+      function cardSoloGroup(d) {
+        var soloP = Math.round((d.soloTrips/d.benTrips.length)*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.pink+'">' +
+          '<span class="ins-tag">Solo vs group</span>' +
+          '<div class="ins-donut-row">'+donutSVG(soloP,ACCENTS.pink,'var(--color-border)',68)+
+          '<div class="ins-donut-legend">' +
+          '<div class="ins-donut-legend-item"><span class="ins-donut-legend-swatch" style="background:'+ACCENTS.pink+'"></span>'+d.soloTrips+' solo ('+soloP+'%)</div>' +
+          '<div class="ins-donut-legend-item"><span class="ins-donut-legend-swatch" style="background:var(--color-border)"></span>'+d.groupTrips+' with others</div>' +
+          '</div></div></div>';
+      }
+
+      function cardWorkLeisure(d) {
+        var workPct = Math.round((d.workDays/(d.totalDays||1))*100);
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.coral+'">' +
+          '<span class="ins-tag">Work vs leisure days</span>' +
+          '<div class="ins-split-track">' +
+          '<div class="ins-split-a" style="width:'+workPct+'%;background:'+ACCENTS.coral+'"></div>' +
+          '<div class="ins-split-b"></div></div>' +
+          '<div class="ins-split-legend">' +
+          '<span><span class="ins-split-dot" style="background:'+ACCENTS.coral+'"></span>Work '+workPct+'% ('+d.workDays+'d)</span>' +
+          '<span><span class="ins-split-dot" style="background:var(--color-border)"></span>Leisure '+(100-workPct)+'% ('+d.leisureDays+'d)</span>' +
+          '</div></div>';
+      }
+
+      function cardListProgress(d) {
+        var tl1Pct = Math.round((d.tl1Visited/d.tl1Total)*100);
+        var tl2Pct = Math.round((d.tl2Visited/d.tl2Total)*100);
+        var uPct   = Math.round((d.unescoVisited/d.unescoCnt)*100);
+        function row(label,pct,col){
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+label+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+pct+'%</div></div>';
+        }
+        return '<div class="ins-card span2" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">List completion</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Progress across all major travel lists</div>' +
+          row('TL I',tl1Pct,ACCENTS.blue)+row('TL II',tl2Pct,ACCENTS.teal)+row('UNESCO',uPct,ACCENTS.amber)+'</div>';
+      }
+
+      function cardLocations(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Places explored</span>' +
+          '<div class="ins-locs-row">' +
+          '<div class="ins-locs-item"><div class="ins-locs-num">'+d.uniqueLocs+'</div><div class="ins-locs-lbl">unique locations</div></div>' +
+          '<div class="ins-locs-item"><div class="ins-locs-num">'+d.benTrips.length+'</div><div class="ins-locs-lbl">trips logged</div></div>' +
+          '</div>' +
+          '<div class="ins-sub" style="margin-top:.5rem">Towns, cities &amp; regions from trip records</div></div>';
+      }
+
+      function cardStreak(d) {
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Longest travel streak</span>' +
+          '<div class="ins-hero-sm">'+d.streak+' <span class="ins-unit">years</span></div>' +
+          '<div class="ins-label">Consecutive years with at least one trip abroad</div></div>';
+      }
+
+      function renderInsights(d) {
+        var html = '<div class="ins-masonry">' +
+          cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
+          cardTop3Days(d) + cardTravelSpeed(d) + cardBestYear(d) +
+          cardContinents(d) +
+          cardSoloGroup(d) + cardWorkLeisure(d) +
+          cardListProgress(d) + cardLocations(d) + cardStreak(d) +
+          '</div>';
+        var grid = document.getElementById('insights-grid');
+        var loading = document.getElementById('insights-loading');
+        grid.innerHTML = html;
+        grid.style.display = 'block';
+        if (loading) loading.style.display = 'none';
+      }
+
+      var _initDone = false;
+      function tryInit() {
+        if (_initDone) return;
+        var app = window.TravelApp;
+        if (!app || !app.Store || !app.TripStore) { setTimeout(tryInit, 100); return; }
+        var Store = app.Store, TripStore = app.TripStore;
+
+        function doRender() {
+          var storeData = {
+            countries:   Store.getVisitedArray('ben','countries'),
+            travellist1: Store.getVisitedArray('ben','travellist1'),
+            travellist2: Store.getVisitedArray('ben','travellist2'),
+            unesco:      Store.getVisitedArray('ben','unesco')
+          };
+          var trips = TripStore.getTrips();
+          var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
+          Promise.all([
+            fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
+            fetch(rp+'data/travellist2.json').then(function(r){return r.json();}),
+            fetch(rp+'data/countries.json').then(function(r){return r.json();}),
+            fetch(rp+'data/unesco.json').then(function(r){return r.json();})
+          ]).then(function(res) {
+            var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length);
+            renderInsights(d);
+            _initDone = true;
+          }).catch(function(err){ console.error('Insights error:', err); });
+        }
+
+        Store.load(function() {
+          doRender();
+          Store.onSave(doRender);
+          TripStore.onSave(doRender);
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.hash === '#insights') tryInit();
+        var nav = document.getElementById('traveller-tabs');
+        if (nav) {
+          nav.addEventListener('click', function(e) {
+            var btn = e.target.closest ? e.target.closest('.traveller-tab') : e.target;
+            if (btn && btn.dataset && btn.dataset.tab === 'insights') tryInit();
+          });
+        }
+      });
+      setTimeout(function(){ if(window.location.hash==='#insights') tryInit(); }, 300);
+    }());
+    </script>
+
+    </div><!-- end tab-panel#insights -->
+
     </div>
   </main>
   <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
@@ -1416,7 +1860,7 @@
       var tabs = document.querySelectorAll('#traveller-tabs .traveller-tab');
       var panels = document.querySelectorAll('.tab-panel');
       var subtitle = document.getElementById('traveller-subtitle');
-      var tabLabels = { progress: 'Travel Progress', timeline: 'Travel Timeline' };
+      var tabLabels = { progress: 'Travel Progress', timeline: 'Travel Timeline', insights: 'Travel Insights' };
 
       function activateTab(targetId) {
         tabs.forEach(function (t) {
