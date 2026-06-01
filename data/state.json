@@ -3987,19 +3987,20 @@
       "continent": "Europe",
       "locations": "Tirana, Shkodar, Berat, Sarande, Gjirokaster, Skopje, Pristina",
       "start": "2020-09-01",
-      "finish": "2020-10-14",
+      "finish": "2020-09-14",
       "type": "Travel",
-      "travellers": [
-        "ben",
-        "shaz"
-      ],
       "utl1": [
         "butrint",
         "sveti-jovan"
       ],
       "utl2": [
         "butrint"
-      ]
+      ],
+      "travellers": [
+        "ben",
+        "shaz"
+      ],
+      "_id": "2020-09-01|Albania,Kosovo,North Macedonia"
     },
     {
       "countries": [
