@@ -1627,14 +1627,18 @@
           longestAtHome: (function() {
             var dated = benTrips.filter(function(t){ return t.start && t.finish; })
               .sort(function(a,b){ return a.start > b.start ? 1 : -1; });
-            var maxGap = 0;
+            var maxGap = 0, gapFrom = null, gapTo = null;
             for (var i = 1; i < dated.length; i++) {
               var prevEnd = new Date(dated[i-1].finish + 'T00:00:00');
               var nextStart = new Date(dated[i].start + 'T00:00:00');
               var gap = Math.round((nextStart - prevEnd) / 86400000);
-              if (gap > maxGap) maxGap = gap;
+              if (gap > maxGap) {
+                maxGap = gap;
+                gapFrom = dated[i-1].finish;
+                gapTo = dated[i].start;
+              }
             }
-            return maxGap;
+            return { days: maxGap, from: gapFrom, to: gapTo };
           })(),
 
           yearTripCounts: (function() {
@@ -2101,11 +2105,13 @@
         var countries = d.longestCountries.length > 40 ? d.longestCountries.substr(0,38)+'…' : d.longestCountries;
         var avgLen = d.allDurations.length ? Math.round(d.allDurations.reduce(function(s,x){return s+x;},0)/d.allDurations.length) : 7;
         var multPct = d.longestDays && avgLen ? Math.round(d.longestDays/avgLen) : 0;
+        var ctryCount = (d.longestTrip && d.longestTrip.countries) ? d.longestTrip.countries.length : 0;
+        var ctryNote = ctryCount > 1 ? ' · ' + ctryCount + ' countries' : '';
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
           '<span class="ins-tag">Longest trip ever</span>' +
           '<div class="ins-hero-sm">'+d.longestDays+' <span class="ins-unit">days</span></div>' +
           '<div class="ins-label">'+countries+(d.longestYear?' · '+d.longestYear:'')+'</div>' +
-          '<span class="ins-badge" style="background:rgba(246,166,35,.15);color:'+ACCENTS.amber+'">'+multPct+'× your average trip</span>' +
+          '<div class="ins-sub">'+multPct+'× average trip length'+ctryNote+'</div>' +
           '</div>';
       }
 
@@ -2187,12 +2193,23 @@
       }
 
       function cardLongestAtHome(d) {
-        var months = Math.round(d.longestAtHome / 30.5);
+        var lah = d.longestAtHome;
+        var days = lah.days || lah; /* backwards compat */
+        var months = Math.round(days / 30.5);
+        var dateSpan = '';
+        if (lah.from && lah.to) {
+          var fmt = function(s) {
+            var months_short = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var parts = s.split('-');
+            return months_short[parseInt(parts[1],10)-1] + ' ' + parts[0];
+          };
+          dateSpan = '<div class="ins-sub">' + fmt(lah.from) + ' — ' + fmt(lah.to) + '</div>';
+        }
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
           '<span class="ins-tag">Longest time at home</span>' +
-          '<div class="ins-hero-sm">'+d.longestAtHome+' <span class="ins-unit">days</span></div>' +
-          '<div class="ins-label">That\'s <strong>'+months+' months</strong> — your biggest ever gap between trips</div>' +
-          '<div class="ins-sub">Your average gap between trips is much shorter</div>' +
+          '<div class="ins-hero-sm">'+days+' <span class="ins-unit">days</span></div>' +
+          '<div class="ins-label">That\'s <strong>'+months+' months</strong> — biggest ever gap between trips</div>' +
+          dateSpan +
           '</div>';
       }
 
