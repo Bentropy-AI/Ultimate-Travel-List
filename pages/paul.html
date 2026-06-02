@@ -1702,20 +1702,32 @@
           })(),
 
           bestUtlCountry: (function() {
-            var utlByCountry = {};
-            benTrips.forEach(function(t) {
-              var items = (t.utl1||[]).length + (t.utl2||[]).length;
-              if (!items) return;
-              (t.countries||[]).forEach(function(c) {
-                utlByCountry[c] = (utlByCountry[c]||0) + items;
+            /* Use item-level country attribution from reference data (window._insightsRefData).
+               Each TL item has a country field — count visited items per country directly.
+               This avoids the multi-country trip attribution problem. */
+            var ref = window._insightsRefData;
+            if (!ref) return [];
+            var tl1By = ref.tl1ByCountry || {};
+            var tl2By = ref.tl2ByCountry || {};
+            var visitedTl1Set = {};
+            (storeData.travellist1||[]).forEach(function(id){ visitedTl1Set[id]=1; });
+            var visitedTl2Set = {};
+            (storeData.travellist2||[]).forEach(function(id){ visitedTl2Set[id]=1; });
+            var byCountry = {};
+            Object.keys(tl1By).forEach(function(country) {
+              tl1By[country].forEach(function(id) {
+                if (visitedTl1Set[id]) byCountry[country] = (byCountry[country]||0) + 1;
               });
             });
-            var sorted = Object.keys(utlByCountry).sort(function(a,b){
-              return utlByCountry[b] - utlByCountry[a];
+            Object.keys(tl2By).forEach(function(country) {
+              tl2By[country].forEach(function(id) {
+                if (visitedTl2Set[id]) byCountry[country] = (byCountry[country]||0) + 1;
+              });
             });
-            return sorted.slice(0,5).map(function(c){
-              return {country:c, count:utlByCountry[c]};
-            });
+            return Object.keys(byCountry)
+              .sort(function(a,b){ return byCountry[b]-byCountry[a]; })
+              .slice(0,5)
+              .map(function(c){ return {country:c, count:byCountry[c]}; });
           })(),
 
           furthestTrip: (function() {
