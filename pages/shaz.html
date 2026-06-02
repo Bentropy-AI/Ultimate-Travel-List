@@ -1287,15 +1287,33 @@
             });
           }
 
-          /* Re-render whenever trips or visited data changes */
-          if (window.TravelApp && window.TravelApp.TripStore) {
-            window.TravelApp.TripStore.onSave(function(){ load(); });
+          /* travel.js is loaded further down the page, so window.TravelApp may not
+             exist yet when this inline script first runs. Wait for it before loading,
+             then subscribe so the section re-renders when remote data / saves arrive. */
+          function init() {
+            var TA = window.TravelApp;
+            if (TA && TA.Store) {
+              TA.Store.onRemoteLoad(function(){ load(); });   /* re-render when remote visited data arrives */
+              TA.Store.onSave(function(){ load(); });          /* re-render after a save */
+              TA.Store.load();                                 /* ensure visited data is fetched (load() never triggers this -> no loop) */
+            }
+            if (TA && TA.TripStore) {
+              TA.TripStore.onSave(function(){ load(); });
+              TA.TripStore.load('shaz').then(function(){ load(); }); /* ensure trips are fetched, then render */
+            }
+            load();   /* initial paint from whatever is already cached */
           }
-          if (window.TravelApp && window.TravelApp.Store) {
-            window.TravelApp.Store.onSave(function(){ load(); });
+          function ready() {
+            return window.TravelApp && window.TravelApp.Store && window.TravelApp.TripStore;
           }
-
-          load();
+          if (ready()) {
+            init();
+          } else {
+            var _waitTA = setInterval(function(){
+              if (ready()) { clearInterval(_waitTA); init(); }
+            }, 50);
+            setTimeout(function(){ clearInterval(_waitTA); }, 15000);
+          }
         }());
         </script>
       </section>
