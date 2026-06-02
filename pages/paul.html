@@ -1754,6 +1754,48 @@
             return { seasons:s, total:total, fav:fav };
           })(),
 
+          completedCountries: (function() {
+            /* Fully completed = visited + capital + ALL TL1 items + ALL TL2 items for that country */
+            /* Needs countries/TL1/TL2 arrays - stored on window after Promise.all resolves */
+            /* We calculate this lazily using window._insightsRefData set in doRender */
+            var ref = window._insightsRefData;
+            if (!ref) return { completed:[], nearMiss:[] };
+            var isoToName = ref.isoToName;
+            var nameToIso = ref.nameToIso;
+            var tl1ByCountry = ref.tl1ByCountry;
+            var tl2ByCountry = ref.tl2ByCountry;
+            var visitedISOs    = storeData.countries  || [];
+            var visitedCaps    = storeData.capitals   || [];
+            var visitedTl1     = storeData.travellist1|| [];
+            var visitedTl2     = storeData.travellist2|| [];
+            var visitedCapSet  = {};
+            visitedCaps.forEach(function(iso){ visitedCapSet[iso]=1; });
+            var visitedTl1Set  = {};
+            visitedTl1.forEach(function(id){ visitedTl1Set[id]=1; });
+            var visitedTl2Set  = {};
+            visitedTl2.forEach(function(id){ visitedTl2Set[id]=1; });
+            var completed = [], nearMiss = [];
+            visitedISOs.forEach(function(iso) {
+              var name = isoToName[iso];
+              if (!name) return;
+              if (!visitedCapSet[iso]) return;
+              var t1items = tl1ByCountry[name] || [];
+              var t2items = tl2ByCountry[name] || [];
+              if (!t1items.length && !t2items.length) return;
+              var t1miss = t1items.filter(function(id){ return !visitedTl1Set[id]; });
+              var t2miss = t2items.filter(function(id){ return !visitedTl2Set[id]; });
+              var totalMiss = t1miss.length + t2miss.length;
+              if (totalMiss === 0) {
+                completed.push(name);
+              } else if (totalMiss <= 2) {
+                nearMiss.push({ country:name, missing:totalMiss });
+              }
+            });
+            completed.sort();
+            nearMiss.sort(function(a,b){ return a.missing - b.missing; });
+            return { completed:completed, nearMiss:nearMiss.slice(0,5) };
+          })(),
+
           longestRevisitGap: (function() {
             var countryVisits = {};
             benTrips.forEach(function(t) {
@@ -2318,6 +2360,38 @@
           '</div>';
       }
 
+      function cardCompletedCountries(d) {
+        var cc = d.completedCountries;
+        var completed = cc.completed || [];
+        var nearMiss  = cc.nearMiss  || [];
+        var count = completed.length;
+        if (!count && !nearMiss.length) return '';
+
+        var pillsHtml = completed.map(function(name) {
+          return '<span style="display:inline-block;padding:2px 8px;margin:2px;border-radius:4px;' +
+            'font-size:.72rem;font-weight:600;background:rgba(62,207,142,.15);color:'+ACCENTS.teal+'">' +
+            name + '</span>';
+        }).join('');
+
+        var nearHtml = nearMiss.length ? (
+          '<div class="ins-sub" style="margin-top:.7rem;opacity:.9">Almost there:</div>' +
+          nearMiss.map(function(item) {
+            return '<div style="font-size:.75rem;color:var(--color-muted);margin-top:2px">' +
+              '· ' + item.country + ' (' + item.missing + ' item' + (item.missing>1?'s':'') + ' away)</div>';
+          }).join('')
+        ) : '';
+
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">100% completed countries</span>' +
+          '<div class="ins-hero-sm">'+count+' <span class="ins-unit">countries</span></div>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">' +
+            'Visited + capital + all TL I &amp; TL II items ticked' +
+          '</div>' +
+          '<div>'+pillsHtml+'</div>' +
+          nearHtml +
+          '</div>';
+      }
+
       function renderInsights(d) {
         var html = '<div class="ins-masonry">' +
           cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
@@ -2332,7 +2406,7 @@
           cardContDays(d) + cardExplorerRatio(d) + cardTravellerProfile(d) +
           cardUtlEfficiency(d) + cardLongestRevisit(d) +
           cardNewCountriesPerYear(d) + cardBestUtlCountry(d) +
-          cardFurthestTrip(d) + cardSeasonBreakdown(d) +
+          cardFurthestTrip(d) + cardSeasonBreakdown(d) + cardCompletedCountries(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
@@ -2371,6 +2445,18 @@
           fetch(rp+'data/countries.json').then(function(r){return r.json();}),
           fetch(rp+'data/unesco.json').then(function(r){return r.json();})
         ]).then(function(res) {
+          var isoToName = {}, nameToIso = {}, tl1ByCountry = {}, tl2ByCountry = {};
+          res[2].forEach(function(c){ isoToName[c.id]=c.name; nameToIso[c.name]=c.id; });
+          res[0].forEach(function(item){
+            if(!tl1ByCountry[item.country]) tl1ByCountry[item.country]=[];
+            tl1ByCountry[item.country].push(item.id);
+          });
+          res[1].forEach(function(item){
+            if(!tl2ByCountry[item.country]) tl2ByCountry[item.country]=[];
+            tl2ByCountry[item.country].push(item.id);
+          });
+          window._insightsRefData = { isoToName:isoToName, nameToIso:nameToIso,
+            tl1ByCountry:tl1ByCountry, tl2ByCountry:tl2ByCountry };
           var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
           renderInsights(d);
           _initDone = true;
