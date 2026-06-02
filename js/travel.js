@@ -108,12 +108,19 @@ var _flushCallbacks = [];
 function _fetchRemote() {
   if (_fetchPromise) return _fetchPromise;
 
-  /* Raw content endpoint - no auth needed for public repo reads */
-  var rawUrl = 'https://raw.githubusercontent.com/' + _GH_OWNER + '/' + _GH_REPO + '/main/' + _GH_FILE + '?_=' + Date.now();
+  /* Use GitHub Contents API when authenticated (bypasses CDN cache).
+     Fall back to raw.githubusercontent.com for unauthenticated reads. */
+  var useApi = isAuthenticated();
+  var fetchUrl = useApi
+    ? _GH_API
+    : 'https://raw.githubusercontent.com/' + _GH_OWNER + '/' + _GH_REPO + '/main/' + _GH_FILE + '?_=' + Date.now();
+  var fetchOpts = useApi
+    ? { headers: { 'Authorization': 'token ' + _GH_PAT, 'Accept': 'application/vnd.github.v3.raw' } }
+    : {};
 
-  _fetchPromise = fetch(rawUrl)
+  _fetchPromise = fetch(fetchUrl, fetchOpts)
     .then(function(r) {
-      if (!r.ok) throw new Error('GitHub raw fetch failed: ' + r.status);
+      if (!r.ok) throw new Error('GitHub fetch failed: ' + r.status);
       return r.json();
     })
     .then(function(data) {
