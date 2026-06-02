@@ -1909,21 +1909,72 @@
           })(),
 
           timezones: (function() {
-            var TZ = {
-              'Russia':11,'Canada':6,'United States':6,'Australia':3,'Brazil':4,'Mexico':4,
-              'Indonesia':3,'Kazakhstan':2,'Mongolia':2,'New Zealand':2,'Chile':2,'Denmark':2,
-              'Ecuador':2,'Fiji':2
+            /* UTC offset per country (capital city standard time, not DST).
+               Each offset is a unique timezone — visited = yes/no for each slot. */
+            var ISO_UTC = {
+              'AD':1,'AE':4,'AF':4.5,'AG':-4,'AL':1,'AM':4,'AO':1,'AR':-3,'AT':1,'AU':10,
+              'AZ':4,'BA':1,'BB':-4,'BD':6,'BE':1,'BF':0,'BG':2,'BH':3,'BJ':1,'BO':-4,
+              'BR':-3,'BS':-5,'BT':6,'BW':2,'BY':3,'BZ':-6,'CA':-5,'CD':1,'CH':1,'CL':-3,
+              'CM':1,'CN':8,'CO':-5,'CR':-6,'CU':-5,'CY':2,'CZ':1,'DE':1,'DK':1,'DO':-4,
+              'DZ':1,'EC':-5,'EE':2,'EG':2,'ER':3,'ES':1,'ET':3,'FI':2,'FJ':12,'FR':1,
+              'GA':1,'GB':0,'GE':4,'GH':0,'GI':1,'GN':0,'GQ':1,'GR':2,'GT':-6,'GW':0,
+              'HN':-6,'HR':1,'HT':-5,'HU':1,'ID':7,'IE':0,'IL':2,'IN':5.5,'IQ':3,'IR':3.5,
+              'IS':0,'IT':1,'JM':-5,'JO':2,'JP':9,'KE':3,'KG':6,'KH':7,'KR':9,'KW':3,
+              'KZ':6,'LA':7,'LB':2,'LC':-4,'LI':1,'LK':5.5,'LR':0,'LS':2,'LT':2,'LU':1,
+              'LV':2,'LY':2,'MA':1,'MC':1,'MD':2,'ME':1,'MG':3,'MK':1,'ML':0,'MM':6.5,
+              'MN':8,'MO':8,'MR':0,'MT':1,'MU':4,'MV':5,'MW':2,'MX':-6,'MY':8,'MZ':2,
+              'NA':2,'NE':1,'NG':1,'NI':-6,'NL':1,'NO':1,'NP':5.75,'NZ':12,'OM':4,
+              'PA':-5,'PE':-5,'PG':10,'PH':8,'PK':5,'PL':1,'PT':0,'PY':-4,'QA':3,
+              'RO':2,'RS':1,'RU':3,'RW':2,'SA':3,'SE':1,'SG':8,'SI':1,'SK':1,'SL':0,
+              'SM':1,'SN':0,'SO':3,'SS':3,'SV':-6,'SY':2,'SZ':2,'TD':1,'TG':0,'TH':7,
+              'TJ':5,'TN':1,'TO':13,'TR':3,'TT':-4,'TZ':3,'UA':2,'UG':3,'US':-5,
+              'UY':-3,'UZ':5,'VA':1,'VE':-4,'VN':7,'VU':11,'YE':3,'ZA':2,'ZM':2,'ZW':2,
+              'GB-SCT':0,'GB-WLS':0,'GB-NIR':0,'GL':-3,'XK':1,'TW':8
             };
-            var visited = {};
-            benTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ visited[c]=1; }); });
-            var total = 0, multi = [];
-            Object.keys(visited).forEach(function(c){
-              var tz = TZ[c] || 1;
-              total += tz;
-              if (tz > 1) multi.push({ country:c, tz:tz });
+            /* Example country name per offset (for labels) */
+            var OFFSET_EXAMPLE = {
+              '-12':'Baker Is.','-11':'Samoa','-10':'Hawaii','-9.5':'Marquesas',
+              '-9':'Alaska','-8':'Los Angeles','-7':'Denver','-6':'Mexico City',
+              '-5':'New York','-4':'Barbados','-3.5':'Newfoundland','-3':'Buenos Aires',
+              '-2':'South Georgia','-1':'Cape Verde','0':'London',
+              '1':'Paris','2':'Athens','3':'Moscow','3.5':'Tehran','4':'Dubai',
+              '4.5':'Kabul','5':'Karachi','5.5':'Delhi','5.75':'Kathmandu',
+              '6':'Dhaka','6.5':'Yangon','7':'Bangkok','8':'Singapore',
+              '9':'Tokyo','9.5':'Adelaide','10':'Sydney','10.5':'Lord Howe',
+              '11':'Vladivostok','12':'Auckland','13':'Samoa (W)','14':'Line Is.'
+            };
+            /* All inhabited offsets in order */
+            var ALL_OFFSETS = [-12,-11,-10,-9.5,-9,-8,-7,-6,-5,-4,-3.5,-3,-2,-1,0,
+              1,2,3,3.5,4,4.5,5,5.5,5.75,6,6.5,7,8,9,9.5,10,10.5,11,12,13,14];
+            /* Build visited offset set from Store ISO codes */
+            var visitedISOs = storeData.countries || [];
+            var visitedOffsets = {};
+            /* Also collect example country name per offset */
+            var offsetExample = {};
+            /* Use isoToName from countriesArr */
+            var isoToName2 = {};
+            (countriesArr||[]).forEach(function(c){ isoToName2[c.id]=c.name; });
+            visitedISOs.forEach(function(iso) {
+              var off = ISO_UTC[iso];
+              if (off !== undefined) {
+                visitedOffsets[off] = 1;
+                if (!offsetExample[off]) offsetExample[off] = isoToName2[iso] || iso;
+              }
             });
-            multi.sort(function(a,b){ return b.tz - a.tz; });
-            return { total:total, countries: Object.keys(visited).length, multi:multi.slice(0,4) };
+            var visitedCount = Object.keys(visitedOffsets).length;
+            var slots = ALL_OFFSETS.map(function(off) {
+              var visited = !!visitedOffsets[off];
+              var label = (off >= 0 ? 'UTC+' : 'UTC') + off;
+              if (off === Math.floor(off)) label = (off >= 0 ? 'UTC+' : 'UTC') + off;
+              else label = 'UTC' + (off > 0 ? '+' : '') + off;
+              return {
+                offset: off,
+                visited: visited,
+                label: label,
+                example: visited ? (offsetExample[off] || '') : (OFFSET_EXAMPLE[String(off)] || '')
+              };
+            });
+            return { slots:slots, visitedCount:visitedCount, total:ALL_OFFSETS.length };
           })(),
 
           longestRevisitGap: (function() {
@@ -2474,17 +2525,45 @@
 
       function cardTimezones(d) {
         var tz = d.timezones;
-        var multiHtml = tz.multi.length ? (
-          '<div class="ins-sub" style="margin-top:.5rem">Incl. ' +
-          tz.multi.map(function(m){ return m.country+' ('+m.tz+')'; }).join(', ') +
-          '</div>'
-        ) : '';
-        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.pink+'">' +
-          '<span class="ins-tag">Timezones experienced</span>' +
-          '<div class="ins-hero-sm">~'+tz.total+' <span class="ins-unit">timezones</span></div>' +
-          '<div class="ins-label">Estimated across <strong>'+tz.countries+'</strong> visited countries</div>' +
-          multiHtml +
-          '<div class="ins-sub" style="margin-top:.3rem;opacity:.6">Estimate — some countries span multiple zones</div>' +
+        /* Build the timeline bar */
+        var slots = tz.slots;
+        var bars = slots.map(function(s) {
+          var col = s.visited ? ACCENTS.teal : 'var(--color-border)';
+          var textCol = s.visited ? ACCENTS.teal : 'var(--color-muted)';
+          /* Tooltip on hover via title attr */
+          var tipText = s.label + (s.example ? ': ' + s.example : '');
+          /* Highlight whole-hour offsets with labels, compact for half-hours */
+          var isHalf = (s.offset !== Math.floor(s.offset));
+          var labelHtml = isHalf ? '' :
+            '<div style="font-size:.55rem;color:'+textCol+';margin-top:2px;white-space:nowrap;overflow:hidden;text-align:center">' +
+              (s.offset >= 0 ? '+' : '') + s.offset +
+            '</div>';
+          return '<div title="'+tipText+'" style="flex:'+(isHalf?'0.6':'1')+';display:flex;flex-direction:column;align-items:center;cursor:default">' +
+            '<div style="width:100%;height:14px;background:'+col+';border-radius:2px;margin:0 1px;opacity:'+(s.visited?'1':'.3')+'"></div>' +
+            labelHtml +
+          '</div>';
+        }).join('');
+
+        /* Which ones are still missing - whole hour only for readability */
+        var missing = slots.filter(function(s){ return !s.visited && s.offset === Math.floor(s.offset); });
+        var missingHtml = missing.length
+          ? '<div class="ins-sub" style="margin-top:.6rem">Not yet: ' +
+            missing.slice(0,5).map(function(s){ return s.label+(s.example?' ('+s.example+')':''); }).join(', ') +
+            (missing.length > 5 ? ' +' + (missing.length-5) + ' more' : '') +
+            '</div>'
+          : '';
+
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Timezones visited</span>' +
+          '<div class="ins-hero-sm">'+tz.visitedCount+' <span class="ins-unit">of '+tz.total+'</span></div>' +
+          '<div class="ins-label" style="margin-bottom:.6rem">Unique UTC offsets — green = visited, grey = not yet</div>' +
+          '<div style="display:flex;align-items:flex-end;width:100%;gap:0">' + bars + '</div>' +
+          '<div style="display:flex;justify-content:space-between;margin-top:3px">' +
+            '<span style="font-size:.6rem;color:var(--color-muted)">UTC−12</span>' +
+            '<span style="font-size:.6rem;color:var(--color-muted)">UTC+0</span>' +
+            '<span style="font-size:.6rem;color:var(--color-muted)">UTC+14</span>' +
+          '</div>' +
+          missingHtml +
           '</div>';
       }
 
