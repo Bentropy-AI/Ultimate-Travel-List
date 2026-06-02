@@ -1681,6 +1681,79 @@
             return { newOnly:newOnly, returned:returned, total:totalVisited };
           })(),
 
+          newCountriesPerYear: (function() {
+            var seen = {};
+            var byYear = {};
+            var sorted = benTrips.filter(function(t){ return t.start; })
+              .slice().sort(function(a,b){ return a.start > b.start ? 1 : -1; });
+            sorted.forEach(function(t) {
+              var yr = t.start.substr(0,4);
+              (t.countries||[]).forEach(function(c) {
+                if (!seen[c]) {
+                  seen[c] = 1;
+                  byYear[yr] = (byYear[yr]||0) + 1;
+                }
+              });
+            });
+            var years = Object.keys(byYear).sort();
+            var data = years.map(function(yr){ return {year:yr, count:byYear[yr]}; });
+            var peak = data.reduce(function(b,x){ return x.count>b.count?x:b; }, data[0]||{year:'',count:0});
+            return { data:data, peak:peak };
+          })(),
+
+          bestUtlCountry: (function() {
+            var utlByCountry = {};
+            benTrips.forEach(function(t) {
+              var items = (t.utl1||[]).length + (t.utl2||[]).length;
+              if (!items) return;
+              (t.countries||[]).forEach(function(c) {
+                utlByCountry[c] = (utlByCountry[c]||0) + items;
+              });
+            });
+            var sorted = Object.keys(utlByCountry).sort(function(a,b){
+              return utlByCountry[b] - utlByCountry[a];
+            });
+            return sorted.slice(0,5).map(function(c){
+              return {country:c, count:utlByCountry[c]};
+            });
+          })(),
+
+          furthestTrip: (function() {
+            var DISTANCES = {
+              'New Zealand':18000,'Australia':17000,'Chile':11700,'Argentina':11500,
+              'Philippines':11000,'Indonesia':11000,'Fiji':16000,'Papua New Guinea':14500,
+              'Brazil':9200,'Peru':10200,'South Africa':9600,'Mozambique':9400,
+              'Japan':9500,'South Korea':9200,'China':8200,'Vietnam':9100,
+              'Thailand':9500,'Malaysia':10500,'Singapore':10800,'Taiwan':9800,
+              'New Caledonia':17000,'Vanuatu':16500,'Samoa':16500,'Tonga':16200,
+              'United States':7000,'Canada':6700,'Mexico':8700,'Cuba':7500
+            };
+            var best = null;
+            benTrips.forEach(function(t) {
+              (t.countries||[]).forEach(function(c) {
+                var d = DISTANCES[c];
+                if (d && (!best || d > best.distance)) {
+                  best = { country:c, distance:d, year: t.start ? t.start.substr(0,4) : '' };
+                }
+              });
+            });
+            return best;
+          })(),
+
+          seasonBreakdown: (function() {
+            var s = {Spring:0, Summer:0, Autumn:0, Winter:0};
+            var NAMES = ['Winter','Winter','Spring','Spring','Spring','Summer',
+                         'Summer','Summer','Autumn','Autumn','Autumn','Winter'];
+            benTrips.forEach(function(t) {
+              if (!t.start) return;
+              var m = parseInt(t.start.substr(5,2),10) - 1;
+              s[NAMES[m]]++;
+            });
+            var total = s.Spring + s.Summer + s.Autumn + s.Winter;
+            var fav = Object.keys(s).reduce(function(b,k){ return s[k]>s[b]?k:b; }, 'Spring');
+            return { seasons:s, total:total, fav:fav };
+          })(),
+
           longestRevisitGap: (function() {
             var countryVisits = {};
             benTrips.forEach(function(t) {
@@ -2170,6 +2243,81 @@
           '</div>';
       }
 
+      function cardNewCountriesPerYear(d) {
+        var data = d.newCountriesPerYear.data;
+        var peak = d.newCountriesPerYear.peak;
+        var max = peak.count || 1;
+        var bars = data.map(function(item) {
+          var h = Math.max(3, Math.round((item.count / max) * 50));
+          var isPeak = item.year === peak.year;
+          return '<div class="ins-spark-bar-col">' +
+            '<div class="ins-spark-bar-fill" style="height:'+h+'px;background:'+(isPeak?ACCENTS.teal:ACCENTS.blue)+';opacity:'+(isPeak?'1':'.55')+'"></div>' +
+            '<div class="ins-spark-bar-yr">'+item.year.slice(2)+'</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">New countries per year</span>' +
+          '<div class="ins-hero-sm">'+peak.count+' <span class="ins-unit">in '+peak.year+'</span></div>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Best year for first-time discoveries</div>' +
+          '<div class="ins-spark-wrap"><div class="ins-spark-bars" style="height:60px">'+bars+'</div></div>' +
+          '</div>';
+      }
+
+      function cardBestUtlCountry(d) {
+        var list = d.bestUtlCountry;
+        if (!list || !list.length) return '';
+        var max = list[0].count;
+        var rows = list.map(function(item, i) {
+          var bp = Math.round((item.count / max) * 100);
+          var badges = ['r1','r2','r3','r4','r5'];
+          return '<div class="ins-bar-row">' +
+            '<div class="ins-rank-badge '+badges[i]+'" style="background:'+(i===0?ACCENTS.gold:i===1?'#b0bec5':'#cd7f32')+'">'+( i+1)+'</div>' +
+            '<div class="ins-bar-label" title="'+item.country+'">'+item.country+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+bp+'%;background:'+ACCENTS.amber+'"></div></div>' +
+            '<div class="ins-bar-val">'+item.count+'</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Most productive country</span>' +
+          '<div class="ins-label" style="margin-bottom:.4rem">UTL items ticked across all visits</div>' +
+          rows +
+          '</div>';
+      }
+
+      function cardFurthestTrip(d) {
+        var f = d.furthestTrip;
+        if (!f) return '';
+        var km = f.distance.toLocaleString();
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.purple+'">' +
+          '<span class="ins-tag">Furthest trip from home</span>' +
+          '<div class="ins-hero-sm">'+f.country+'</div>' +
+          '<div class="ins-label">Approx. <strong>'+km+' km</strong> from the UK</div>' +
+          '<div class="ins-sub">First visited in '+f.year+'</div>' +
+          '</div>';
+      }
+
+      function cardSeasonBreakdown(d) {
+        var sb = d.seasonBreakdown;
+        var COLS = { Spring:ACCENTS.teal, Summer:ACCENTS.gold, Autumn:ACCENTS.amber, Winter:ACCENTS.cyan };
+        var ICONS = { Spring:'🌱', Summer:'☀', Autumn:'🍂', Winter:'❄' };
+        var total = sb.total || 1;
+        var pills = ['Spring','Summer','Autumn','Winter'].map(function(s) {
+          var pct = Math.round((sb.seasons[s] / total) * 100);
+          var isFav = s === sb.fav;
+          return '<div style="flex:1;text-align:center;padding:.5rem .3rem;border-radius:8px;background:'+(isFav?'rgba(79,142,247,.08)':'transparent')+';border:1px solid '+(isFav?ACCENTS.blue:'transparent')+'">' +
+            '<div style="font-size:1.1rem">'+ICONS[s]+'</div>' +
+            '<div style="font-size:.95rem;font-weight:700;color:'+COLS[s]+'">'+pct+'%</div>' +
+            '<div style="font-size:.68rem;color:var(--color-muted)">'+s+'</div>' +
+            '<div style="font-size:.68rem;color:var(--color-muted)">'+sb.seasons[s]+' trips</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Favourite travel season</span>' +
+          '<div class="ins-label" style="margin-bottom:.6rem">Trips by time of year — <strong>'+sb.fav+'</strong> edges it</div>' +
+          '<div style="display:flex;gap:6px">'+pills+'</div>' +
+          '</div>';
+      }
+
       function renderInsights(d) {
         var html = '<div class="ins-masonry">' +
           cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
@@ -2183,6 +2331,8 @@
           cardDaysSinceLast(d) + cardLongestAtHome(d) + cardIntensityByYear(d) +
           cardContDays(d) + cardExplorerRatio(d) + cardTravellerProfile(d) +
           cardUtlEfficiency(d) + cardLongestRevisit(d) +
+          cardNewCountriesPerYear(d) + cardBestUtlCountry(d) +
+          cardFurthestTrip(d) + cardSeasonBreakdown(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
