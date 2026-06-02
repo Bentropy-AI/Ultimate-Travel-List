@@ -1431,7 +1431,6 @@
         "taj-mahal",
         "great-wall-of-china",
         "habana-vieja",
-        "yosemite-national-park",
         "fez-medina",
         "machu-picchu",
         "temple-mount-al-haram-ash-sharif",
@@ -5707,25 +5706,9 @@
         "shaz"
       ],
       "utl1": [
-        "British Museum",
-        "York Minster",
-        "Tower of London",
-        "Lake District National Park",
-        "Roman Baths",
-        "St Paul's Cathedral",
-        "Tate Modern",
-        "Canterbury Cathedral"
+        "British Museum"
       ],
-      "utl2": [
-        "British Museum",
-        "Lake District National Park",
-        "Roman Baths",
-        "Stonehenge",
-        "Tate Modern",
-        "Tower of London",
-        "St Paul's Cathedral",
-        "York Minster"
-      ]
+      "utl2": []
     },
     {
       "countries": [
