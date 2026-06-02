@@ -4021,7 +4021,9 @@
       "type": "Travel",
       "utl1": [
         "schilthorn",
-        "aletsch"
+        "aletsch",
+        "Eiger",
+        "Jungfraujoch"
       ],
       "utl2": [
         "jungfraujoch"
