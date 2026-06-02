@@ -109,13 +109,15 @@ function _fetchRemote() {
   if (_fetchPromise) return _fetchPromise;
 
   /* Use GitHub Contents API when authenticated (bypasses CDN cache).
+     The API envelope includes the SHA we need for writes — extracted here
+     so there is no race condition between read and first save.
      Fall back to raw.githubusercontent.com for unauthenticated reads. */
   var useApi = isAuthenticated();
   var fetchUrl = useApi
     ? _GH_API
     : 'https://raw.githubusercontent.com/' + _GH_OWNER + '/' + _GH_REPO + '/main/' + _GH_FILE + '?_=' + Date.now();
   var fetchOpts = useApi
-    ? { headers: { 'Authorization': 'token ' + _GH_PAT, 'Accept': 'application/vnd.github.v3.raw' } }
+    ? { headers: { 'Authorization': 'token ' + _GH_PAT } }
     : {};
 
   _fetchPromise = fetch(fetchUrl, fetchOpts)
@@ -123,13 +125,23 @@ function _fetchRemote() {
       if (!r.ok) throw new Error('GitHub fetch failed: ' + r.status);
       return r.json();
     })
-    .then(function(data) {
+    .then(function(envelope) {
+      var data;
+      if (useApi && envelope.content && envelope.sha) {
+        /* API envelope: extract SHA and decode base64 content */
+        _fileSHA = envelope.sha;
+        try { localStorage.setItem(_SHA_KEY, _fileSHA); } catch(e) {}
+        var decoded = atob(envelope.content.replace(/\n/g, ''));
+        data = JSON.parse(decoded);
+      } else {
+        /* Raw response: still refresh SHA separately */
+        data = envelope;
+        if (isAuthenticated()) { _refreshSHA(); }
+      }
       _remoteRecord.visited = data.visited || {};
       _remoteRecord.trips   = _normaliseTrips(data.trips || []);
       _remoteLoaded = true;
       _fetchPromise = null;
-      /* Also fetch the SHA we need for writes - only if authenticated */
-      if (isAuthenticated()) { _refreshSHA(); }
       return _remoteRecord;
     })
     .catch(function(e) {
