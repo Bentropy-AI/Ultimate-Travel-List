@@ -104,6 +104,8 @@ var _fileSHA      = (function(){ try{ return localStorage.getItem('utl_gh_sha') 
 var _fetchPromise = null;
 var _pushTimer    = null;
 var _flushCallbacks = [];
+var _visitedDirty = false;  /* true while a visited save is in flight */
+var _tripsDirty   = false;  /* true while a trip save is in flight */
 
 function _fetchRemote() {
   if (_fetchPromise) return _fetchPromise;
@@ -117,8 +119,8 @@ function _fetchRemote() {
       return r.json();
     })
     .then(function(data) {
-      _remoteRecord.visited = data.visited || {};
-      _remoteRecord.trips   = _normaliseTrips(data.trips || []);
+      if (!_visitedDirty) { _remoteRecord.visited = data.visited || {}; }
+      if (!_tripsDirty)   { _remoteRecord.trips   = _normaliseTrips(data.trips || []); }
       _remoteLoaded = true;
       _fetchPromise = null;
       /* Also fetch the SHA we need for writes - only if authenticated */
@@ -186,6 +188,8 @@ function _pushRemote(notify) {
         _fileSHA = d.content.sha;
         try { localStorage.setItem(_SHA_KEY, _fileSHA); } catch(e) {}
       }
+      _visitedDirty = false;
+      _tripsDirty   = false;
       if (typeof notify === 'function') notify('ok', 'Saved \u2713');
       _flushCallbacks.forEach(function(cb){ try{ cb('ok'); } catch(e){} });
     });
@@ -326,6 +330,7 @@ var Store = (function() {
   }
 
   function _persist() {
+    _visitedDirty = true;
     _remoteRecord.visited = _buildVisited();
     _cacheSave(_remoteRecord.visited);
     _schedulePush(_notify);
@@ -466,6 +471,7 @@ var TripStore = (function() {
     if (!isAuthenticated()) { showLoginModal(); return; }
     _tripsCache = trips;
     _cacheSave(_tripsCache);
+    _tripsDirty = true;
     _remoteRecord.trips = _tripsCache;
     _schedulePush(function(status) {
       for (var i = 0; i < _callbacks.length; i++) {
