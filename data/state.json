@@ -4020,10 +4020,8 @@
       "finish": "2020-09-01",
       "type": "Travel",
       "utl1": [
-        "jungfraujoch",
         "schilthorn",
-        "aletsch",
-        "Eiger"
+        "aletsch"
       ],
       "utl2": [
         "jungfraujoch"
