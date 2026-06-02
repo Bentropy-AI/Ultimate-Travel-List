@@ -4019,19 +4019,20 @@
       "start": "2020-08-27",
       "finish": "2020-09-01",
       "type": "Travel",
+      "utl1": [
+        "jungfraujoch",
+        "schilthorn",
+        "aletsch",
+        "Eiger"
+      ],
+      "utl2": [
+        "jungfraujoch"
+      ],
       "travellers": [
         "ben",
         "shaz"
       ],
-      "utl1": [
-        "jungfraujoch",
-        "jungfraujoch",
-        "schilthorn",
-        "aletsch"
-      ],
-      "utl2": [
-        "jungfraujoch"
-      ]
+      "_id": "2020-08-27|Switzerland,Liechtenstein"
     },
     {
       "countries": [
