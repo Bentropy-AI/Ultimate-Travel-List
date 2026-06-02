@@ -142,6 +142,11 @@ function _fetchRemote() {
       _remoteRecord.trips   = _normaliseTrips(data.trips || []);
       _remoteLoaded = true;
       _fetchPromise = null;
+      /* Ensure SHA is populated from cache if not already set by envelope parsing */
+      if (!_fileSHA) {
+        try { _fileSHA = localStorage.getItem(_SHA_KEY) || null; } catch(e) {}
+        if (!_fileSHA && isAuthenticated()) { _refreshSHA(); }
+      }
       return _remoteRecord;
     })
     .catch(function(e) {
@@ -210,7 +215,11 @@ function _pushRemote(notify) {
     });
   }
 
-  /* Get fresh SHA if we don't have one */
+  /* Get fresh SHA if we don't have one.
+     Use cached localStorage SHA as immediate fallback before async refresh. */
+  if (!_fileSHA) {
+    try { _fileSHA = localStorage.getItem(_SHA_KEY) || null; } catch(e) {}
+  }
   var shaPromise = _fileSHA
     ? Promise.resolve(_fileSHA)
     : _refreshSHA();
