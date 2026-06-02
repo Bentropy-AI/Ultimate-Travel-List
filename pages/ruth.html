@@ -1830,6 +1830,102 @@
             return { completed:completed, nearMiss:nearMiss.slice(0,5) };
           })(),
 
+          travelCareer: (function() {
+            var sorted = benTrips.filter(function(t){ return t.start; })
+              .slice().sort(function(a,b){ return a.start > b.start ? 1 : -1; });
+            if (!sorted.length) return { years:0, firstDate:'', firstCountry:'', firstYear:'' };
+            var first = sorted[0];
+            var firstDate = new Date(first.start + 'T00:00:00');
+            var today = new Date();
+            var years = (today - firstDate) / (365.25 * 86400000);
+            var firstCountry = (first.countries||[])[0] || '';
+            return {
+              years: Math.floor(years),
+              yearsExact: years.toFixed(1),
+              firstDate: first.start,
+              firstCountry: firstCountry,
+              firstYear: first.start.substr(0,4)
+            };
+          })(),
+
+          continentFirstVisits: (function() {
+            /* Use isoToContinent from countriesArr for accuracy on multi-continent trips */
+            var CONT_EMOJI = {
+              'Europe':'🇪🇺', 'Asia':'🌏', 'Africa':'🌍',
+              'North America':'🌎', 'South America':'🌎',
+              'Oceania':'🌊', 'Antarctica':'🧊'
+            };
+            var sorted = benTrips.filter(function(t){ return t.start; })
+              .slice().sort(function(a,b){ return a.start > b.start ? 1 : -1; });
+            var contFirst = {};
+            /* Build name->continent from countriesArr */
+            var nameToContinent = {};
+            (countriesArr || []).forEach(function(c){ nameToContinent[c.name] = c.continent; });
+            sorted.forEach(function(t) {
+              (t.countries||[]).forEach(function(cname) {
+                var cont = nameToContinent[cname];
+                if (cont && !contFirst[cont]) {
+                  contFirst[cont] = { year: t.start.substr(0,4), country: cname, date: t.start };
+                }
+              });
+            });
+            var ORDER = ['Asia','Africa','Europe','South America','North America','Oceania','Antarctica'];
+            return ORDER.filter(function(c){ return contFirst[c]; })
+              .map(function(c){ return { continent:c, year:contFirst[c].year, country:contFirst[c].country, emoji: CONT_EMOJI[c]||'🌐' }; })
+              .sort(function(a,b){ return a.year > b.year ? 1 : -1; });
+          })(),
+
+          hemispheres: (function() {
+            /* Country-level hemisphere attribution */
+            var SOUTH = { 'Australia':1,'New Zealand':1,'Fiji':1,'Papua New Guinea':1,'Indonesia':1,
+              'Timor-Leste':1,'East Timor':1,'Vanuatu':1,'Argentina':1,'Chile':1,'Uruguay':1,
+              'Paraguay':1,'Brazil':1,'Bolivia':1,'Peru':1,'Ecuador':1,'Colombia':1,
+              'South Africa':1,'Namibia':1,'Botswana':1,'Zimbabwe':1,'Mozambique':1,
+              'Madagascar':1,'Tanzania':1,'Zambia':1,'Malawi':1,'Angola':1,'Rwanda':1,
+              'Burundi':1,'Lesotho':1,'Eswatini':1 };
+            var WEST = { 'Iceland':1,'Ireland':1,'United Kingdom':1,'Portugal':1,
+              'Senegal':1,'Mali':1,'Guinea-Bissau':1,'Guinea':1,'Sierra Leone':1,
+              'Liberia':1,'Ivory Coast':1,'Ghana':1,'Togo':1,'Benin':1,'Nigeria':1,
+              'Cameroon':1,'Angola':1,'Namibia':1,
+              'Canada':1,'United States':1,'Mexico':1,'Guatemala':1,'Belize':1,
+              'Honduras':1,'El Salvador':1,'Nicaragua':1,'Costa Rica':1,'Panama':1,
+              'Cuba':1,'Jamaica':1,'Haiti':1,'Dominican Republic':1,'Barbados':1,
+              'Saint Lucia':1,'Trinidad and Tobago':1,'Grenada':1,'Antigua and Barbuda':1,
+              'Colombia':1,'Venezuela':1,'Brazil':1,'Ecuador':1,'Peru':1,'Bolivia':1,
+              'Chile':1,'Argentina':1,'Uruguay':1,'Paraguay':1 };
+            var visited = {};
+            benTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ visited[c]=1; }); });
+            var n=0,s=0,e=0,w=0;
+            Object.keys(visited).forEach(function(c){
+              if (SOUTH[c]) s++; else n++;
+              if (WEST[c]) w++; else e++;
+            });
+            var total = n + s;
+            return { north:n, south:s, east:e, west:w,
+              northPct: total ? Math.round((n/total)*100) : 0,
+              southPct: total ? Math.round((s/total)*100) : 0,
+              eastPct: total ? Math.round(((e)/(e+w))*100) : 0,
+              westPct: total ? Math.round(((w)/(e+w))*100) : 0 };
+          })(),
+
+          timezones: (function() {
+            var TZ = {
+              'Russia':11,'Canada':6,'United States':6,'Australia':3,'Brazil':4,'Mexico':4,
+              'Indonesia':3,'Kazakhstan':2,'Mongolia':2,'New Zealand':2,'Chile':2,'Denmark':2,
+              'Ecuador':2,'Fiji':2
+            };
+            var visited = {};
+            benTrips.forEach(function(t){ (t.countries||[]).forEach(function(c){ visited[c]=1; }); });
+            var total = 0, multi = [];
+            Object.keys(visited).forEach(function(c){
+              var tz = TZ[c] || 1;
+              total += tz;
+              if (tz > 1) multi.push({ country:c, tz:tz });
+            });
+            multi.sort(function(a,b){ return b.tz - a.tz; });
+            return { total:total, countries: Object.keys(visited).length, multi:multi.slice(0,4) };
+          })(),
+
           longestRevisitGap: (function() {
             var countryVisits = {};
             benTrips.forEach(function(t) {
@@ -2318,6 +2414,80 @@
           '</div>';
       }
 
+      function cardTravelCareer(d) {
+        var tc = d.travelCareer;
+        var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        var parts = tc.firstDate ? tc.firstDate.split('-') : [];
+        var dateStr = parts.length === 3 ? MONTHS[parseInt(parts[1],10)-1] + ' ' + parts[0] : tc.firstYear;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.gold+'">' +
+          '<span class="ins-tag">Travel career</span>' +
+          '<div class="ins-hero" style="color:'+ACCENTS.gold+'">'+tc.years+' <span class="ins-unit">years</span></div>' +
+          '<div class="ins-label">Travelling since <strong>'+dateStr+'</strong>'+(tc.firstCountry?' — first trip to '+tc.firstCountry:'')+'</div>' +
+          '<div class="ins-sub">'+tc.yearsExact+' years and counting</div>' +
+          '</div>';
+      }
+
+      function cardContinentFirstVisits(d) {
+        var CONT_COLS = {
+          'Asia': ACCENTS.teal, 'Africa': ACCENTS.amber, 'Europe': ACCENTS.blue,
+          'South America': ACCENTS.coral, 'North America': ACCENTS.cyan,
+          'Oceania': ACCENTS.purple, 'Antarctica': '#b0bec5'
+        };
+        var rows = d.continentFirstVisits.map(function(item) {
+          var col = CONT_COLS[item.continent] || ACCENTS.blue;
+          return '<div style="display:flex;align-items:center;gap:10px;margin-top:.5rem">' +
+            '<div style="font-size:1.1rem;width:22px;text-align:center">'+item.emoji+'</div>' +
+            '<div style="flex:1">' +
+              '<div style="font-size:.82rem;font-weight:500;color:var(--color-text)">'+item.continent+'</div>' +
+              '<div style="font-size:.72rem;color:var(--color-muted)">via '+item.country+'</div>' +
+            '</div>' +
+            '<div style="font-size:.9rem;font-weight:700;color:'+col+'">'+item.year+'</div>' +
+          '</div>';
+        }).join('');
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">First steps on each continent</span>' +
+          rows +
+          '</div>';
+      }
+
+      function cardHemispheres(d) {
+        var h = d.hemispheres;
+        function splitBar(aLabel, aPct, aCol, bLabel, bPct, bCol, aVal, bVal) {
+          return '<div style="margin-bottom:.7rem">' +
+            '<div class="ins-split-track" style="margin:.3rem 0 .25rem">' +
+              '<div class="ins-split-a" style="width:'+aPct+'%;background:'+aCol+'"></div>' +
+              '<div class="ins-split-b" style="background:'+bCol+'"></div>' +
+            '</div>' +
+            '<div class="ins-split-legend">' +
+              '<span><span class="ins-split-dot" style="background:'+aCol+'"></span>'+aLabel+' '+aPct+'% ('+aVal+')</span>' +
+              '<span><span class="ins-split-dot" style="background:'+bCol+'"></span>'+bLabel+' '+bPct+'% ('+bVal+')</span>' +
+            '</div>' +
+          '</div>';
+        }
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.cyan+'">' +
+          '<span class="ins-tag">Hemisphere split</span>' +
+          '<div class="ins-label" style="margin-bottom:.4rem">Countries visited by hemisphere</div>' +
+          splitBar('North', h.northPct, ACCENTS.blue, 'South', h.southPct, ACCENTS.teal, h.north+' countries', h.south+' countries') +
+          splitBar('East', h.eastPct, ACCENTS.amber, 'West', h.westPct, ACCENTS.purple, h.east+' countries', h.west+' countries') +
+          '</div>';
+      }
+
+      function cardTimezones(d) {
+        var tz = d.timezones;
+        var multiHtml = tz.multi.length ? (
+          '<div class="ins-sub" style="margin-top:.5rem">Incl. ' +
+          tz.multi.map(function(m){ return m.country+' ('+m.tz+')'; }).join(', ') +
+          '</div>'
+        ) : '';
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.pink+'">' +
+          '<span class="ins-tag">Timezones experienced</span>' +
+          '<div class="ins-hero-sm">~'+tz.total+' <span class="ins-unit">timezones</span></div>' +
+          '<div class="ins-label">Estimated across <strong>'+tz.countries+'</strong> visited countries</div>' +
+          multiHtml +
+          '<div class="ins-sub" style="margin-top:.3rem;opacity:.6">Estimate — some countries span multiple zones</div>' +
+          '</div>';
+      }
+
       function cardLongestRevisit(d) {
         var g = d.longestRevisitGap;
         if (!g) return '';
@@ -2454,6 +2624,8 @@
           cardUtlEfficiency(d) + cardLongestRevisit(d) +
           cardNewCountriesPerYear(d) + cardBestUtlCountry(d) +
           cardFurthestTrip(d) + cardSeasonBreakdown(d) + cardCompletedCountries(d) +
+          cardTravelCareer(d) + cardContinentFirstVisits(d) +
+          cardHemispheres(d) + cardTimezones(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
