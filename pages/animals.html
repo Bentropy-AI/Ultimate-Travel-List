@@ -162,8 +162,8 @@ function renderTable() {
   var hRow2 = '<tr class="subheader">' +
     '<th style="width:32px">#</th>' +
     '<th>Species</th>' +
-    '<th style="width:72px">Class</th>' +
     '<th style="width:90px">Family</th>' +
+    '<th style="width:72px">Class</th>' +
     '<th>Continents Found</th>';
   for (var shi = 0; shi < TCOUNT; shi++) {
     hRow2 += '<th class="sub-col" style="width:50px;border-left:2px solid ' + _travellers[shi].color + '33">Spotted</th>';
@@ -180,8 +180,8 @@ function renderTable() {
     rows += '<tr>';
     rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
     rows += '<td class="animal-name">' + item.name + '</td>';
-    rows += '<td><span class="class-badge ' + classCSS(item.class) + '">' + (item.class || '') + '</span></td>';
     rows += '<td class="family-col">' + (item.family || '') + '</td>';
+    rows += '<td><span class="class-badge ' + classCSS(item.class) + '">' + (item.class || '') + '</span></td>';
     rows += '<td class="continents-col">' + conts + '</td>';
     for (var tdi = 0; tdi < TCOUNT; tdi++) {
       var tdv = _travellers[tdi];
