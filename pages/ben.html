@@ -1443,7 +1443,7 @@
         return d > 0 ? d : 1;
       }
 
-      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal, countriesArr) {
+      function buildInsights(trips, storeData, tl1Total, tl2Total, unescoCnt, countriesTotal, countriesArr, d_animalsArr) {
         var benTrips = trips.filter(function(t) {
           return (t.travellers || []).indexOf('ben') !== -1;
         });
@@ -1500,7 +1500,50 @@
           contVisited[cont][iso] = 1;
         });
         var contData = Object.keys(contVisited).map(function(c) {
-          return { name: c, count: Object.keys(contVisited[c]).length };
+  
+        /* ─── WILDLIFE INSIGHTS DATA ─── */
+        var _animalsArr   = d_animalsArr || [];
+        var _animalsTotal = _animalsArr.length;
+        var _visitedAnimals = storeData.animals || [];
+        var _visitedSet = {};
+        _visitedAnimals.forEach(function(id){ _visitedSet[id]=true; });
+
+        var _byClass = {};
+        _animalsArr.forEach(function(a) {
+          if (!_byClass[a.class]) _byClass[a.class] = {spotted:0,total:0};
+          _byClass[a.class].total++;
+          if (_visitedSet[a.id]) _byClass[a.class].spotted++;
+        });
+
+        var _contCounts = {};
+        _animalsArr.forEach(function(a) {
+          if (!_visitedSet[a.id]) return;
+          (a.continents||[]).forEach(function(c){
+            _contCounts[c] = (_contCounts[c]||0) + 1;
+          });
+        });
+
+        var _topCont = null, _topContN = 0;
+        // Only count actual geographic continents, not "All Oceans" / "All Continents"
+        var GEO_CONTS = ['Africa','Asia','Europe','North America','South America','Oceania','Antarctica','Arctic'];
+        GEO_CONTS.forEach(function(c){
+          if ((_contCounts[c]||0) > _topContN) { _topContN=_contCounts[c]; _topCont=c; }
+        });
+
+        var BIG5_IDS = ['african-lion','leopard','black-rhino','white-rhino','african-elephant','buffalo'];
+        var _big5Spotted = BIG5_IDS.filter(function(id){ return !!_visitedSet[id]; });
+
+        var animalsData = _animalsTotal ? {
+          total:             _animalsTotal,
+          spotted:           _visitedAnimals.length,
+          pct:               Math.round((_visitedAnimals.length/_animalsTotal)*100),
+          byClass:           _byClass,
+          continentsUnlocked:_contCounts,
+          topContinent:      _topCont ? {name:_topCont, count:_topContN} : null,
+          big5:              _big5Spotted
+        } : null;
+
+        return { name: c, count: Object.keys(contVisited[c]).length };
         }).sort(function(a,b) { return b.count - a.count; });
 
         var soloTrips = benTrips.filter(function(t){ return (t.travellers||[]).length===1; }).length;
@@ -1612,6 +1655,7 @@
           tl1Visited:(storeData.travellist1||[]).length,
           tl2Visited:(storeData.travellist2||[]).length,
           unescoVisited:(storeData.unesco||[]).length,
+          animalsData:animalsData,
           countriesTotal:countriesTotal, tl1Total:tl1Total,
           tl2Total:tl2Total, unescoCnt:unescoCnt,
           bestYear:bestYear, bestYearCount:bestYearCount,
@@ -2688,6 +2732,110 @@
           '</div>';
       }
 
+
+      /* ─── WILDLIFE CARD HELPERS ─── */
+
+      function cardAnimalsSpotted(d) {
+        if (!d.animalsData) return '';
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">Animals spotted</span>' +
+          '<div class="ins-hero">'+d.animalsData.spotted+' <span class="ins-unit">species</span></div>' +
+          '<div class="ins-label">Out of <strong>'+d.animalsData.total+' iconic wildlife species</strong> on the list</div>' +
+          '<div class="ins-sub">Keep exploring 🌍</div>' +
+          '</div>';
+      }
+
+      function cardAnimalsPct(d) {
+        if (!d.animalsData) return '';
+        var pct = d.animalsData.pct;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
+          '<span class="ins-tag">% of wildlife list</span>' +
+          '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
+          '<div class="ins-ring-info">' +
+          '<div class="ins-ring-pct">'+d.animalsData.spotted+'<span style="color:var(--color-muted);font-size:1rem"> / '+d.animalsData.total+'</span></div>' +
+          '<div class="ins-label">'+pct+'% of the list spotted</div></div></div>' +
+          '</div>';
+      }
+
+      function cardFavSafariContinent(d) {
+        if (!d.animalsData || !d.animalsData.topContinent) return '';
+        var top = d.animalsData.topContinent;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Favourite safari continent</span>' +
+          '<div class="ins-hero-sm">'+top.name+'</div>' +
+          '<div class="ins-label"><strong>'+top.count+' species</strong> spotted here</div>' +
+          '<div class="ins-sub">Most productive wildlife continent 🦁</div>' +
+          '</div>';
+      }
+
+      function cardAnimalsContsUnlocked(d) {
+        if (!d.animalsData) return '';
+        var conts = d.animalsData.continentsUnlocked;
+        var ALL_CONTS = ['Africa','Asia','Europe','North America','South America','Oceania','Antarctica','Arctic','All Oceans'];
+        var html = '<div class="ins-cont-grid">';
+        ALL_CONTS.forEach(function(c) {
+          var n = conts[c] || 0;
+          var active = n > 0;
+          html += '<div class="ins-cont-pill" style="'+(active?'border-color:'+ACCENTS.amber+';background:rgba(246,166,35,0.08)':'')+'">' +
+            '<div class="ins-cont-pill-name">'+c+'</div>' +
+            '<div class="ins-cont-pill-num" style="'+(active?'color:'+ACCENTS.amber:'color:var(--color-muted)')+'">'+
+            (active ? n+' sp.' : '—')+'</div></div>';
+        });
+        html += '</div>';
+        var unlocked = Object.keys(conts).filter(function(k){ return conts[k]>0; }).length;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Wildlife continents unlocked</span>' +
+          '<div class="ins-hero">'+unlocked+' <span class="ins-unit">/ '+ALL_CONTS.length+'</span></div>' +
+          html+'</div>';
+      }
+
+      function cardClassBreakdown(d) {
+        if (!d.animalsData) return '';
+        var classes = d.animalsData.byClass;
+        var CLASS_COLOURS = {Mammal:ACCENTS.blue,Bird:ACCENTS.amber,Reptile:ACCENTS.teal,Fish:ACCENTS.cyan,Insect:ACCENTS.purple,Invertebrate:ACCENTS.coral};
+        var maxN = 0;
+        Object.keys(classes).forEach(function(c){ if(classes[c].spotted>maxN) maxN=classes[c].spotted; });
+        var rows = '';
+        var ORDER = ['Mammal','Bird','Reptile','Fish','Insect','Invertebrate'];
+        ORDER.forEach(function(cls) {
+          if (!classes[cls]) return;
+          var col = CLASS_COLOURS[cls] || ACCENTS.blue;
+          var pct = maxN ? Math.round((classes[cls].spotted/maxN)*100) : 0;
+          rows += '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label">'+cls+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
+            '<div class="ins-bar-val">'+classes[cls].spotted+'/'+classes[cls].total+'</div></div>';
+        });
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
+          '<span class="ins-tag">Class breakdown</span>' +
+          rows+'</div>';
+      }
+
+      function cardBig5(d) {
+        if (!d.animalsData) return '';
+        var big5 = d.animalsData.big5;
+        var BIG5_NAMES = {
+          'african-lion':'Lion','leopard':'Leopard',
+          'black-rhino':'Black Rhino','white-rhino':'White Rhino',
+          'african-elephant':'Elephant','buffalo':'Buffalo'
+        };
+        var spotted = big5.filter(function(id){ return id; }).length;
+        var rows = '';
+        Object.keys(BIG5_NAMES).forEach(function(id) {
+          var seen = big5.indexOf(id) !== -1;
+          rows += '<div style="display:flex;align-items:center;gap:8px;margin-top:.4rem">' +
+            '<span style="font-size:.9rem">'+(seen?'✅':'⬜')+'</span>' +
+            '<span style="font-size:.82rem;color:'+(seen?'var(--color-text)':'var(--color-muted)')+'">'+BIG5_NAMES[id]+'</span>' +
+            '</div>';
+        });
+        var allDone = spotted === 6;
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.coral+'">' +
+          '<span class="ins-tag">Big 5</span>' +
+          '<div class="ins-hero">'+spotted+' <span class="ins-unit">/ 6</span></div>' +
+          (allDone ? '<div class="ins-badge" style="background:rgba(224,92,92,0.15);color:'+ACCENTS.coral+'">Complete! 🏆</div>' : '') +
+          rows+'</div>';
+      }
+
       function renderInsights(d) {
         var html = '<div class="ins-masonry">' +
           cardDaysAway(d) + cardCountriesRing(d) + cardMostVisited(d) +
@@ -2705,6 +2853,9 @@
           cardFurthestTrip(d) + cardSeasonBreakdown(d) + cardCompletedCountries(d) +
           cardTravelCareer(d) + cardContinentFirstVisits(d) +
           cardHemispheres(d) + cardTimezones(d) +
+          cardAnimalsSpotted(d) + cardAnimalsPct(d) +
+          cardFavSafariContinent(d) + cardAnimalsContsUnlocked(d) +
+          cardClassBreakdown(d) + cardBig5(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
@@ -2733,7 +2884,8 @@
           capitals:    Store.getVisitedArray('ben','capitals'),
           travellist1: Store.getVisitedArray('ben','travellist1'),
           travellist2: Store.getVisitedArray('ben','travellist2'),
-          unesco:      Store.getVisitedArray('ben','unesco')
+          unesco:      Store.getVisitedArray('ben','unesco'),
+          animals:     Store.getVisitedArray('ben','animals')
         };
         var trips = TripStore.getTrips('ben');
         var rp = (window.location.pathname.indexOf('/pages/') !== -1) ? '../' : './';
@@ -2741,7 +2893,8 @@
           fetch(rp+'data/travellist1.json').then(function(r){return r.json();}),
           fetch(rp+'data/travellist2.json').then(function(r){return r.json();}),
           fetch(rp+'data/countries.json').then(function(r){return r.json();}),
-          fetch(rp+'data/unesco.json').then(function(r){return r.json();})
+          fetch(rp+'data/unesco.json').then(function(r){return r.json();}),
+          fetch(rp+'data/animals.json').then(function(r){return r.json();})
         ]).then(function(res) {
           var isoToName = {}, nameToIso = {}, tl1ByCountry = {}, tl2ByCountry = {};
           res[2].forEach(function(c){ isoToName[c.id]=c.name; nameToIso[c.name]=c.id; });
@@ -2755,7 +2908,7 @@
           });
           window._insightsRefData = { isoToName:isoToName, nameToIso:nameToIso,
             tl1ByCountry:tl1ByCountry, tl2ByCountry:tl2ByCountry };
-          var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2]);
+          var d = buildInsights(trips, storeData, res[0].length, res[1].length, res[3].length, res[2].length, res[2], res[4]);
           renderInsights(d);
           _initDone = true;
         }).catch(function(err){ console.error('Insights error:', err); });
