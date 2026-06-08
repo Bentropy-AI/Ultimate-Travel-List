@@ -1,52 +1,885 @@
 [
-  { "id": "african-elephant",   "name": "African Elephant",        "class": "Mammal",  "family": "Elephant",   "continents": ["Africa"] },
-  { "id": "african-lion",       "name": "African Lion",            "class": "Mammal",  "family": "Cat",        "continents": ["Africa"] },
-  { "id": "african-wild-dog",   "name": "African Wild Dog",        "class": "Mammal",  "family": "Dog",        "continents": ["Africa"] },
-  { "id": "american-bison",     "name": "American Bison",          "class": "Mammal",  "family": "Cattle",     "continents": ["North America"] },
-  { "id": "arctic-fox",         "name": "Arctic Fox",              "class": "Mammal",  "family": "Dog",        "continents": ["Europe", "Asia", "North America"] },
-  { "id": "bengal-tiger",       "name": "Bengal Tiger",            "class": "Mammal",  "family": "Cat",        "continents": ["Asia"] },
-  { "id": "black-rhino",        "name": "Black Rhinoceros",        "class": "Mammal",  "family": "Rhinoceros", "continents": ["Africa"] },
-  { "id": "blue-whale",         "name": "Blue Whale",              "class": "Mammal",  "family": "Whale",      "continents": ["All Oceans"] },
-  { "id": "bald-eagle",         "name": "Bald Eagle",              "class": "Bird",    "family": "Eagle",      "continents": ["North America"] },
-  { "id": "cheetah",            "name": "Cheetah",                 "class": "Mammal",  "family": "Cat",        "continents": ["Africa", "Asia"] },
-  { "id": "chimpanzee",         "name": "Chimpanzee",              "class": "Mammal",  "family": "Ape",        "continents": ["Africa"] },
-  { "id": "giant-panda",        "name": "Giant Panda",             "class": "Mammal",  "family": "Bear",       "continents": ["Asia"] },
-  { "id": "giraffe",            "name": "Giraffe",                 "class": "Mammal",  "family": "Giraffe",    "continents": ["Africa"] },
-  { "id": "gorilla",            "name": "Mountain Gorilla",        "class": "Mammal",  "family": "Ape",        "continents": ["Africa"] },
-  { "id": "great-white-shark",  "name": "Great White Shark",       "class": "Fish",    "family": "Shark",      "continents": ["All Oceans"] },
-  { "id": "grizzly-bear",       "name": "Grizzly Bear",            "class": "Mammal",  "family": "Bear",       "continents": ["North America"] },
-  { "id": "hippopotamus",       "name": "Hippopotamus",            "class": "Mammal",  "family": "Hippo",      "continents": ["Africa"] },
-  { "id": "humpback-whale",     "name": "Humpback Whale",          "class": "Mammal",  "family": "Whale",      "continents": ["All Oceans"] },
-  { "id": "jaguar",             "name": "Jaguar",                  "class": "Mammal",  "family": "Cat",        "continents": ["South America", "North America"] },
-  { "id": "kangaroo",           "name": "Kangaroo",                "class": "Mammal",  "family": "Kangaroo",   "continents": ["Oceania"] },
-  { "id": "komodo-dragon",      "name": "Komodo Dragon",           "class": "Reptile", "family": "Monitor",    "continents": ["Asia"] },
-  { "id": "leopard",            "name": "Leopard",                 "class": "Mammal",  "family": "Cat",        "continents": ["Africa", "Asia"] },
-  { "id": "manta-ray",          "name": "Manta Ray",               "class": "Fish",    "family": "Ray",        "continents": ["All Oceans"] },
-  { "id": "monarch-butterfly",  "name": "Monarch Butterfly",       "class": "Insect",  "family": "Butterfly",  "continents": ["North America", "South America"] },
-  { "id": "narwhal",            "name": "Narwhal",                 "class": "Mammal",  "family": "Whale",      "continents": ["Arctic"] },
-  { "id": "nile-crocodile",     "name": "Nile Crocodile",          "class": "Reptile", "family": "Crocodile",  "continents": ["Africa"] },
-  { "id": "orangutan",          "name": "Orangutan",               "class": "Mammal",  "family": "Ape",        "continents": ["Asia"] },
-  { "id": "orca",               "name": "Orca (Killer Whale)",     "class": "Mammal",  "family": "Dolphin",    "continents": ["All Oceans"] },
-  { "id": "ostrich",            "name": "Ostrich",                 "class": "Bird",    "family": "Ostrich",    "continents": ["Africa"] },
-  { "id": "peregrine-falcon",   "name": "Peregrine Falcon",        "class": "Bird",    "family": "Falcon",     "continents": ["All Continents"] },
-  { "id": "polar-bear",         "name": "Polar Bear",              "class": "Mammal",  "family": "Bear",       "continents": ["Arctic"] },
-  { "id": "puffin",             "name": "Puffin",                  "class": "Bird",    "family": "Auk",        "continents": ["Europe", "North America"] },
-  { "id": "red-panda",          "name": "Red Panda",               "class": "Mammal",  "family": "Red Panda",  "continents": ["Asia"] },
-  { "id": "saltwater-crocodile","name": "Saltwater Crocodile",     "class": "Reptile", "family": "Crocodile",  "continents": ["Asia", "Oceania"] },
-  { "id": "sea-turtle",         "name": "Sea Turtle",              "class": "Reptile", "family": "Sea Turtle", "continents": ["All Oceans"] },
-  { "id": "snow-leopard",       "name": "Snow Leopard",            "class": "Mammal",  "family": "Cat",        "continents": ["Asia"] },
-  { "id": "snowy-owl",          "name": "Snowy Owl",               "class": "Bird",    "family": "Owl",        "continents": ["Europe", "Asia", "North America", "Arctic"] },
-  { "id": "sumatran-tiger",     "name": "Sumatran Tiger",          "class": "Mammal",  "family": "Cat",        "continents": ["Asia"] },
-  { "id": "walrus",             "name": "Walrus",                  "class": "Mammal",  "family": "Walrus",     "continents": ["Arctic"] },
-  { "id": "wandering-albatross","name": "Wandering Albatross",     "class": "Bird",    "family": "Albatross",  "continents": ["All Oceans"] },
-  { "id": "white-rhino",        "name": "White Rhinoceros",        "class": "Mammal",  "family": "Rhinoceros", "continents": ["Africa"] },
-  { "id": "wolf",               "name": "Grey Wolf",               "class": "Mammal",  "family": "Dog",        "continents": ["Europe", "Asia", "North America"] },
-  { "id": "zebra",              "name": "Zebra",                   "class": "Mammal",  "family": "Horse",      "continents": ["Africa"] },
-  { "id": "flamingo",           "name": "Flamingo",                "class": "Bird",    "family": "Flamingo",   "continents": ["Africa", "South America", "Europe", "Asia"] },
-  { "id": "galapagos-tortoise", "name": "Galápagos Giant Tortoise","class": "Reptile", "family": "Tortoise",   "continents": ["South America"] },
-  { "id": "meerkat",            "name": "Meerkat",                 "class": "Mammal",  "family": "Mongoose",   "continents": ["Africa"] },
-  { "id": "platypus",           "name": "Platypus",                "class": "Mammal",  "family": "Platypus",   "continents": ["Oceania"] },
-  { "id": "emperor-penguin",    "name": "Emperor Penguin",         "class": "Bird",    "family": "Penguin",    "continents": ["Antarctica"] },
-  { "id": "golden-eagle",       "name": "Golden Eagle",            "class": "Bird",    "family": "Eagle",      "continents": ["Europe", "Asia", "North America"] },
-  { "id": "capybara",           "name": "Capybara",                "class": "Mammal",  "family": "Capybara",   "continents": ["South America"] }
+  {
+    "id": "aardvark",
+    "name": "Aardvark",
+    "class": "Mammal",
+    "family": "Aardvark",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "african-elephant",
+    "name": "African Elephant",
+    "class": "Mammal",
+    "family": "Elephant",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "african-lion",
+    "name": "African Lion",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "african-wild-dog",
+    "name": "African Wild Dog",
+    "class": "Mammal",
+    "family": "Dog",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "alligator",
+    "name": "Alligator",
+    "class": "Reptile",
+    "family": "Alligator",
+    "continents": [
+      "North America",
+      "Asia"
+    ]
+  },
+  {
+    "id": "american-bison",
+    "name": "American Bison",
+    "class": "Mammal",
+    "family": "Cattle",
+    "continents": [
+      "North America"
+    ]
+  },
+  {
+    "id": "anaconda",
+    "name": "Anaconda",
+    "class": "Reptile",
+    "family": "Boa",
+    "continents": [
+      "South America"
+    ]
+  },
+  {
+    "id": "andean-condor",
+    "name": "Andean Condor",
+    "class": "Bird",
+    "family": "Condor",
+    "continents": [
+      "South America"
+    ]
+  },
+  {
+    "id": "arctic-fox",
+    "name": "Arctic Fox",
+    "class": "Mammal",
+    "family": "Dog",
+    "continents": [
+      "Europe",
+      "Asia",
+      "North America"
+    ]
+  },
+  {
+    "id": "armadillo",
+    "name": "Armadillo",
+    "class": "Mammal",
+    "family": "Armadillo",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "asian-elephant",
+    "name": "Asian Elephant",
+    "class": "Mammal",
+    "family": "Elephant",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "bald-eagle",
+    "name": "Bald Eagle",
+    "class": "Bird",
+    "family": "Eagle",
+    "continents": [
+      "North America"
+    ]
+  },
+  {
+    "id": "bengal-tiger",
+    "name": "Bengal Tiger",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "black-rhino",
+    "name": "Black Rhinoceros",
+    "class": "Mammal",
+    "family": "Rhinoceros",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "blue-whale",
+    "name": "Blue Whale",
+    "class": "Mammal",
+    "family": "Whale",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "buffalo",
+    "name": "Buffalo",
+    "class": "Mammal",
+    "family": "Cattle",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "capybara",
+    "name": "Capybara",
+    "class": "Mammal",
+    "family": "Capybara",
+    "continents": [
+      "South America"
+    ]
+  },
+  {
+    "id": "chameleon",
+    "name": "Chameleon",
+    "class": "Reptile",
+    "family": "Chameleon",
+    "continents": [
+      "Africa",
+      "Asia",
+      "Europe"
+    ]
+  },
+  {
+    "id": "cheetah",
+    "name": "Cheetah",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Africa",
+      "Asia"
+    ]
+  },
+  {
+    "id": "chimpanzee",
+    "name": "Chimpanzee",
+    "class": "Mammal",
+    "family": "Ape",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "clownfish",
+    "name": "Clownfish",
+    "class": "Fish",
+    "family": "Damselfish",
+    "continents": [
+      "Asia",
+      "Oceania"
+    ]
+  },
+  {
+    "id": "crab",
+    "name": "Crab",
+    "class": "Invertebrate",
+    "family": "Crab",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "echidna",
+    "name": "Echidna",
+    "class": "Mammal",
+    "family": "Echidna",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "emperor-penguin",
+    "name": "Emperor Penguin",
+    "class": "Bird",
+    "family": "Penguin",
+    "continents": [
+      "Antarctica"
+    ]
+  },
+  {
+    "id": "emu",
+    "name": "Emu",
+    "class": "Bird",
+    "family": "Emu",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "flamingo",
+    "name": "Flamingo",
+    "class": "Bird",
+    "family": "Flamingo",
+    "continents": [
+      "Africa",
+      "South America",
+      "Europe",
+      "Asia"
+    ]
+  },
+  {
+    "id": "galapagos-tortoise",
+    "name": "Galápagos Giant Tortoise",
+    "class": "Reptile",
+    "family": "Tortoise",
+    "continents": [
+      "South America"
+    ]
+  },
+  {
+    "id": "giant-panda",
+    "name": "Giant Panda",
+    "class": "Mammal",
+    "family": "Bear",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "gibbon",
+    "name": "Gibbon",
+    "class": "Mammal",
+    "family": "Ape",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "giraffe",
+    "name": "Giraffe",
+    "class": "Mammal",
+    "family": "Giraffe",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "golden-eagle",
+    "name": "Golden Eagle",
+    "class": "Bird",
+    "family": "Eagle",
+    "continents": [
+      "Europe",
+      "Asia",
+      "North America"
+    ]
+  },
+  {
+    "id": "great-barracuda",
+    "name": "Great Barracuda",
+    "class": "Fish",
+    "family": "Barracuda",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "great-white-shark",
+    "name": "Great White Shark",
+    "class": "Fish",
+    "family": "Shark",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "wolf",
+    "name": "Grey Wolf",
+    "class": "Mammal",
+    "family": "Dog",
+    "continents": [
+      "Europe",
+      "Asia",
+      "North America"
+    ]
+  },
+  {
+    "id": "grizzly-bear",
+    "name": "Grizzly Bear",
+    "class": "Mammal",
+    "family": "Bear",
+    "continents": [
+      "North America"
+    ]
+  },
+  {
+    "id": "heron",
+    "name": "Heron",
+    "class": "Bird",
+    "family": "Heron",
+    "continents": [
+      "North America",
+      "South America",
+      "Europe",
+      "Africa",
+      "Asia"
+    ]
+  },
+  {
+    "id": "hippopotamus",
+    "name": "Hippopotamus",
+    "class": "Mammal",
+    "family": "Hippo",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "howler-monkey",
+    "name": "Howler Monkey",
+    "class": "Mammal",
+    "family": "Monkey",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "hummingbird",
+    "name": "Hummingbird",
+    "class": "Bird",
+    "family": "Hummingbird",
+    "continents": [
+      "North America",
+      "South America"
+    ]
+  },
+  {
+    "id": "humpback-whale",
+    "name": "Humpback Whale",
+    "class": "Mammal",
+    "family": "Whale",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "iguana",
+    "name": "Iguana",
+    "class": "Reptile",
+    "family": "Iguana",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "jaguar",
+    "name": "Jaguar",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "jellyfish",
+    "name": "Jellyfish",
+    "class": "Invertebrate",
+    "family": "Jellyfish",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "kangaroo",
+    "name": "Kangaroo",
+    "class": "Mammal",
+    "family": "Kangaroo",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "king-cobra",
+    "name": "King Cobra",
+    "class": "Reptile",
+    "family": "Cobra",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "kiwi",
+    "name": "Kiwi",
+    "class": "Bird",
+    "family": "Kiwi",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "koala",
+    "name": "Koala",
+    "class": "Mammal",
+    "family": "Koala",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "komodo-dragon",
+    "name": "Komodo Dragon",
+    "class": "Reptile",
+    "family": "Monitor",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "lemur",
+    "name": "Lemur",
+    "class": "Mammal",
+    "family": "Lemur",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "leopard",
+    "name": "Leopard",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Africa",
+      "Asia"
+    ]
+  },
+  {
+    "id": "manatee",
+    "name": "Manatee",
+    "class": "Mammal",
+    "family": "Manatee",
+    "continents": [
+      "North America",
+      "South America",
+      "Africa"
+    ]
+  },
+  {
+    "id": "manta-ray",
+    "name": "Manta Ray",
+    "class": "Fish",
+    "family": "Ray",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "meerkat",
+    "name": "Meerkat",
+    "class": "Mammal",
+    "family": "Mongoose",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "monarch-butterfly",
+    "name": "Monarch Butterfly",
+    "class": "Insect",
+    "family": "Butterfly",
+    "continents": [
+      "North America",
+      "South America"
+    ]
+  },
+  {
+    "id": "mongoose",
+    "name": "Mongoose",
+    "class": "Mammal",
+    "family": "Mongoose",
+    "continents": [
+      "Africa",
+      "Asia",
+      "Europe"
+    ]
+  },
+  {
+    "id": "moose",
+    "name": "Moose",
+    "class": "Mammal",
+    "family": "Deer",
+    "continents": [
+      "North America",
+      "Europe",
+      "Asia"
+    ]
+  },
+  {
+    "id": "mountain-goat",
+    "name": "Mountain Goat",
+    "class": "Mammal",
+    "family": "Cattle",
+    "continents": [
+      "North America"
+    ]
+  },
+  {
+    "id": "gorilla",
+    "name": "Mountain Gorilla",
+    "class": "Mammal",
+    "family": "Ape",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "narwhal",
+    "name": "Narwhal",
+    "class": "Mammal",
+    "family": "Whale",
+    "continents": [
+      "Arctic"
+    ]
+  },
+  {
+    "id": "nile-crocodile",
+    "name": "Nile Crocodile",
+    "class": "Reptile",
+    "family": "Crocodile",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "octopus",
+    "name": "Octopus",
+    "class": "Invertebrate",
+    "family": "Octopus",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "orangutan",
+    "name": "Orangutan",
+    "class": "Mammal",
+    "family": "Ape",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "orca",
+    "name": "Orca (Killer Whale)",
+    "class": "Mammal",
+    "family": "Dolphin",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "ostrich",
+    "name": "Ostrich",
+    "class": "Bird",
+    "family": "Ostrich",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "pangolin",
+    "name": "Pangolin",
+    "class": "Mammal",
+    "family": "Pangolin",
+    "continents": [
+      "Africa",
+      "Asia"
+    ]
+  },
+  {
+    "id": "peacock",
+    "name": "Peacock",
+    "class": "Bird",
+    "family": "Pheasant",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "pelican",
+    "name": "Pelican",
+    "class": "Bird",
+    "family": "Pelican",
+    "continents": [
+      "North America",
+      "South America",
+      "Europe",
+      "Africa",
+      "Asia",
+      "Oceania"
+    ]
+  },
+  {
+    "id": "peregrine-falcon",
+    "name": "Peregrine Falcon",
+    "class": "Bird",
+    "family": "Falcon",
+    "continents": [
+      "All Continents"
+    ]
+  },
+  {
+    "id": "platypus",
+    "name": "Platypus",
+    "class": "Mammal",
+    "family": "Platypus",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "polar-bear",
+    "name": "Polar Bear",
+    "class": "Mammal",
+    "family": "Bear",
+    "continents": [
+      "Arctic"
+    ]
+  },
+  {
+    "id": "praying-mantis",
+    "name": "Praying Mantis",
+    "class": "Insect",
+    "family": "Mantis",
+    "continents": [
+      "Africa",
+      "Asia",
+      "Europe",
+      "North America",
+      "South America"
+    ]
+  },
+  {
+    "id": "puffin",
+    "name": "Puffin",
+    "class": "Bird",
+    "family": "Auk",
+    "continents": [
+      "Europe",
+      "North America"
+    ]
+  },
+  {
+    "id": "red-panda",
+    "name": "Red Panda",
+    "class": "Mammal",
+    "family": "Red Panda",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "reindeer",
+    "name": "Reindeer",
+    "class": "Mammal",
+    "family": "Deer",
+    "continents": [
+      "Europe",
+      "Asia",
+      "North America",
+      "Arctic"
+    ]
+  },
+  {
+    "id": "resplendent-quetzal",
+    "name": "Resplendent Quetzal",
+    "class": "Bird",
+    "family": "Trogon",
+    "continents": [
+      "North America"
+    ]
+  },
+  {
+    "id": "saltwater-crocodile",
+    "name": "Saltwater Crocodile",
+    "class": "Reptile",
+    "family": "Crocodile",
+    "continents": [
+      "Asia",
+      "Oceania"
+    ]
+  },
+  {
+    "id": "sea-lion",
+    "name": "Sea Lion",
+    "class": "Mammal",
+    "family": "Sea Lion",
+    "continents": [
+      "North America",
+      "South America",
+      "Oceania",
+      "Asia"
+    ]
+  },
+  {
+    "id": "sea-otter",
+    "name": "Sea Otter",
+    "class": "Mammal",
+    "family": "Weasel",
+    "continents": [
+      "North America",
+      "Asia"
+    ]
+  },
+  {
+    "id": "sea-turtle",
+    "name": "Sea Turtle",
+    "class": "Reptile",
+    "family": "Sea Turtle",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "sloth",
+    "name": "Sloth",
+    "class": "Mammal",
+    "family": "Sloth",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "snow-leopard",
+    "name": "Snow Leopard",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "snowy-owl",
+    "name": "Snowy Owl",
+    "class": "Bird",
+    "family": "Owl",
+    "continents": [
+      "Europe",
+      "Asia",
+      "North America",
+      "Arctic"
+    ]
+  },
+  {
+    "id": "squid",
+    "name": "Squid",
+    "class": "Invertebrate",
+    "family": "Squid",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "sumatran-tiger",
+    "name": "Sumatran Tiger",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "Asia"
+    ]
+  },
+  {
+    "id": "toucan",
+    "name": "Toucan",
+    "class": "Bird",
+    "family": "Toucan",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
+    "id": "walrus",
+    "name": "Walrus",
+    "class": "Mammal",
+    "family": "Walrus",
+    "continents": [
+      "Arctic"
+    ]
+  },
+  {
+    "id": "wandering-albatross",
+    "name": "Wandering Albatross",
+    "class": "Bird",
+    "family": "Albatross",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "whale-shark",
+    "name": "Whale Shark",
+    "class": "Fish",
+    "family": "Shark",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
+    "id": "white-rhino",
+    "name": "White Rhinoceros",
+    "class": "Mammal",
+    "family": "Rhinoceros",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "wildebeest",
+    "name": "Wildebeest",
+    "class": "Mammal",
+    "family": "Cattle",
+    "continents": [
+      "Africa"
+    ]
+  },
+  {
+    "id": "wombat",
+    "name": "Wombat",
+    "class": "Mammal",
+    "family": "Wombat",
+    "continents": [
+      "Oceania"
+    ]
+  },
+  {
+    "id": "zebra",
+    "name": "Zebra",
+    "class": "Mammal",
+    "family": "Horse",
+    "continents": [
+      "Africa"
+    ]
+  }
 ]
