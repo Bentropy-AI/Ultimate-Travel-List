@@ -5764,6 +5764,22 @@
         "ben"
       ],
       "_id": "mq503lsll3ehf4bgx"
+    },
+    {
+      "countries": [
+        "Spain"
+      ],
+      "continent": "Europe",
+      "locations": "Lanzarote",
+      "start": "2012-07-07",
+      "finish": "2012-07-14",
+      "type": "Friends",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "ben"
+      ],
+      "_id": "mq506kyl3m87189odx6"
     }
   ]
 }
