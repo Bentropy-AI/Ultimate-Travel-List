@@ -1628,8 +1628,10 @@
           if ((_contCounts[c]||0) > _topContN) { _topContN=_contCounts[c]; _topCont=c; }
         });
 
-        var BIG5_IDS = ['african-lion','leopard','black-rhino','white-rhino','african-elephant','buffalo'];
+        var BIG5_IDS = ['african-lion','leopard','african-elephant','buffalo'];
         var _big5Spotted = BIG5_IDS.filter(function(id){ return !!_visitedSet[id]; });
+        /* Rhino counts as one entry — tick if either black or white seen */
+        if (_visitedSet['black-rhino'] || _visitedSet['white-rhino']) _big5Spotted.push('rhino');
 
         var animalsData = _animalsTotal ? {
           total:             _animalsTotal,
@@ -2814,8 +2816,7 @@
         var BIG5 = [
           {id:'african-lion',label:'Lion'},
           {id:'leopard',label:'Leopard'},
-          {id:'black-rhino',label:'Black Rhinoceros'},
-          {id:'white-rhino',label:'White Rhinoceros'},
+          {id:'rhino',label:'Rhinoceros'},
           {id:'african-elephant',label:'Elephant'},
           {id:'buffalo',label:'Buffalo'}
         ];
@@ -2827,11 +2828,33 @@
             '<span style="font-size:.82rem;color:'+(seen?'var(--color-text)':'var(--color-muted)')+'">'+a.label+'</span>' +
             '</div>';
         }).join('');
-        var allDone = spotted === 6;
+        var allDone = spotted === 5;
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.coral+'">' +
           '<span class="ins-tag">Big 5</span>' +
-          '<div class="ins-hero">'+spotted+' <span class="ins-unit">/ 6</span></div>' +
+          '<div class="ins-hero">'+spotted+' <span class="ins-unit">/ 5</span></div>' +
           (allDone ? '<div class="ins-badge" style="background:rgba(224,92,92,0.15);color:'+ACCENTS.coral+'">Complete! 🏆</div>' : '') +
+          rows+'</div>';
+      }
+
+      function cardSightingsPerContinent(d) {
+        if (!d.animalsData) return '';
+        var conts = d.animalsData.continentsUnlocked;
+        var ORDER = ['Africa','Asia','North America','South America','Europe','Oceania','Antarctica','Arctic','All Oceans'];
+        var maxN = 0;
+        ORDER.forEach(function(c){ if ((conts[c]||0) > maxN) maxN = conts[c]; });
+        if (!maxN) return '';
+        var rows = '';
+        ORDER.forEach(function(c) {
+          var n = conts[c] || 0;
+          if (!n) return;
+          var pct = Math.round((n / maxN) * 100);
+          rows += '<div class="ins-bar-row">' +
+            '<div class="ins-bar-label" style="width:110px">'+c+'</div>' +
+            '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+ACCENTS.amber+'"></div></div>' +
+            '<div class="ins-bar-val">'+n+'</div></div>';
+        });
+        return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
+          '<span class="ins-tag">Sightings per continent</span>' +
           rows+'</div>';
       }
 
@@ -2854,7 +2877,7 @@
           cardHemispheres(d) + cardTimezones(d) +
           cardAnimalsSpotted(d) + cardAnimalsPct(d) +
           cardFavSafariContinent(d) + cardAnimalsContsUnlocked(d) +
-          cardClassBreakdown(d) + cardBig5(d) +
+          cardClassBreakdown(d) + cardBig5(d) + cardSightingsPerContinent(d) +
           '</div>';
         var grid = document.getElementById('insights-grid');
         var loading = document.getElementById('insights-loading');
