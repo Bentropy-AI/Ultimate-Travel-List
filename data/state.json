@@ -5796,6 +5796,22 @@
         "ben"
       ],
       "_id": "mq50cqdw3qszn9idu93"
+    },
+    {
+      "countries": [
+        "Thailand"
+      ],
+      "continent": "Asia",
+      "locations": "Bangkok, Ko Phi Phi, Ko Samui, Ko Pha Ngan, Phuket\nWith Graham (and Becky in Ko Phi Phi and Phuket)",
+      "start": "2011-11-05",
+      "finish": "2011-11-19",
+      "type": "Friends",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "ben"
+      ],
+      "_id": "mq50fv4kvz1062euo8"
     }
   ]
 }
