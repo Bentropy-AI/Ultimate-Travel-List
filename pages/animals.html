@@ -1,72 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animals — Ultimate Travel List</title>
-  <link rel="stylesheet" href="../css/styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animals — Ultimate Travel List</title>
+<link rel="stylesheet" href="../css/styles.css">
+<style>
+/* ---- Progress pills ---- */
+.progress-summary { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+.prog-pill { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius); padding:0.75rem 1rem; flex:1; min-width:180px; }
+.prog-pill .pill-name { font-size:0.8rem; font-weight:700; margin-bottom:0.5rem; }
+.prog-pill .pill-stats { display:flex; gap:1rem; font-size:0.75rem; color:var(--color-muted); margin-bottom:0.4rem; }
+.prog-pill .pill-stats span b { font-weight:700; }
+
+/* ---- Table ---- */
+.animals-table { width:100%; border-collapse:collapse; font-size:0.82rem; table-layout:fixed; min-width:680px; }
+.animals-table th, .animals-table td { padding:0.5rem 0.6rem; text-align:left; border-bottom:1px solid var(--color-border); vertical-align:middle; }
+.animals-table thead tr:first-child th { background:var(--color-surface2); font-weight:700; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--color-muted); }
+.animals-table thead tr.subheader th { background:var(--color-surface); font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; border-bottom:2px solid var(--color-border); padding:0.35rem 0.6rem; }
+.animals-table tbody tr:hover td { background:var(--color-surface2); }
+.animals-table td.animal-name { font-weight:600; color:var(--color-text); }
+.animals-table td.region-col { color:var(--color-muted); font-size:0.75rem; }
+
+/* ---- Category badges ---- */
+.cat-badge { display:inline-block; padding:0.15rem 0.45rem; border-radius:3px; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; }
+.cat-mammal   { background:rgba(79,142,247,0.15);  color:#4f8ef7;  border:1px solid rgba(79,142,247,0.3); }
+.cat-bird     { background:rgba(255,200,60,0.15);   color:#e8b840;  border:1px solid rgba(255,200,60,0.3); }
+.cat-reptile  { background:rgba(62,207,142,0.15);  color:#3ecf8e;  border:1px solid rgba(62,207,142,0.3); }
+.cat-fish     { background:rgba(0,190,255,0.15);    color:#00beff;  border:1px solid rgba(0,190,255,0.3); }
+.cat-insect   { background:rgba(155,89,245,0.15);  color:#9b59f5;  border:1px solid rgba(155,89,245,0.3); }
+
+/* ---- Per-traveller tick ---- */
+.cc-check { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; font-size:0.7rem; font-weight:700; cursor:pointer; transition:all 0.15s ease; user-select:none; }
+.cc-check:hover { transform:scale(1.2); }
+.cc-check.no  { background:rgba(46,51,80,0.4); color:var(--color-muted); border:1px solid var(--color-border); }
+.cc-check.no:hover { opacity:0.6; }
+.cc-check.yes[data-trav="ben"]  { background:rgba(79,142,247,0.2);  color:#4f8ef7;  border:1px solid #4f8ef7; }
+.cc-check.yes[data-trav="shaz"] { background:rgba(155,89,245,0.2); color:#9b59f5; border:1px solid #9b59f5; }
+.cc-check.yes[data-trav="paul"] { background:rgba(62,207,142,0.2);  color:#3ecf8e;  border:1px solid #3ecf8e; }
+.cc-check.yes[data-trav="ruth"] { background:rgba(224,92,142,0.2);  color:#e05c8e;  border:1px solid #e05c8e; }
+.traveller-header { text-align:center !important; }
+.sub-col { text-align:center !important; }
+
+/* ---- Save toast ---- */
+.save-toast { position:fixed; bottom:1.5rem; right:1.5rem; padding:0.6rem 1.2rem; border-radius:var(--radius); font-size:0.8rem; font-weight:600; opacity:0; transform:translateY(10px); transition:all 0.3s ease; pointer-events:none; z-index:999; }
+.save-toast.show { opacity:1; transform:translateY(0); }
+.save-toast.ok  { background:var(--color-success); color:#fff; }
+.save-toast.err { background:#e05c5c; color:#fff; }
+</style>
 </head>
 <body class="page-wrapper">
-  <nav class="site-nav"><div class="nav-inner"></div></nav>
-  <header class="page-hero">
-    <h1>&#128006; Animals</h1>
-    <p>Iconic wildlife species spotted in the wild</p>
-  </header>
-  <main>
-    <div class="page-hero" style="border-top:none;padding:4rem 1.25rem 5rem">
-      <div style="font-size:3.5rem;margin-bottom:1rem">&#128679;</div>
-      <h2 style="font-size:clamp(1.4rem,3vw,2rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:0.6rem">Coming Soon</h2>
-      <p style="color:var(--color-muted);font-size:1rem;max-width:420px;margin:0 auto">This page is under construction and will be available shortly.</p>
-    </div>
-  </main>
-  <footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
-  <script src="../js/travel.js"></script>
-  <script>
-    window.TravelApp.renderNav('animals');
-  </script>
+<nav class="site-nav"><div class="nav-inner"></div></nav>
+<header class="page-hero">
+  <h1>&#128006; Animals</h1>
+  <p>Iconic wildlife species spotted in the wild</p>
+</header>
+<main>
+  <div class="container">
 
-  <!-- Auth Login Modal -->
-  <div id="auth-modal-backdrop">
-    <div id="auth-modal">
-      <h3>&#128275; Edit Mode</h3>
-      <p>Enter the password to enable editing</p>
-      <input type="password" id="auth-password-input" placeholder="Password..." autocomplete="current-password">
-      <div id="auth-error"></div>
-      <div class="auth-modal-btns">
-        <button id="auth-cancel-btn" onclick="document.getElementById('auth-modal-backdrop').classList.remove('open')">Cancel</button>
-        <button id="auth-submit-btn">Unlock</button>
+    <section class="section">
+      <h2 class="section-title">Family Progress</h2>
+      <div class="progress-summary" id="progressSummary"><p class="loading-msg">Loading&hellip;</p></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section-title">Wildlife Tracker</h2>
+      <div class="filter-bar" id="filterBar">
+        <input class="search-input" type="search" id="searchInput" placeholder="Search species, region&hellip;">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Mammal">Mammals</button>
+        <button class="filter-btn" data-filter="Bird">Birds</button>
+        <button class="filter-btn" data-filter="Reptile">Reptiles</button>
+        <button class="filter-btn" data-filter="Fish">Fish</button>
+        <button class="filter-btn" data-filter="Insect">Insects</button>
       </div>
+      <div style="overflow-x:auto">
+        <table class="animals-table" id="animalsTable">
+          <thead id="animalsHead"></thead>
+          <tbody id="animalsBody"><tr><td colspan="20" style="text-align:center;padding:2rem;color:var(--color-muted)">Loading&hellip;</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<div class="save-toast ok" id="saveToast">Saved &#10003;</div>
+
+<footer class="site-footer"><p>Ultimate Travel List &copy; 2026</p></footer>
+<script src="../js/travel.js"></script>
+<script>
+var app = window.TravelApp;
+var Store = app.Store;
+app.renderNav('animals');
+
+Store.onSave(function(status, msg) {
+  var el = document.getElementById('saveToast');
+  el.textContent = msg;
+  el.className = 'save-toast show ' + status;
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function() { el.classList.remove('show'); }, 1800);
+});
+
+var _travellers, _allAnimals;
+var currentFilter = 'all';
+var searchTerm = '';
+
+function catClass(cat) {
+  var map = { 'Mammal':'cat-mammal','Bird':'cat-bird','Reptile':'cat-reptile','Fish':'cat-fish','Insect':'cat-insect' };
+  return map[cat] || 'cat-mammal';
+}
+
+function getFiltered() {
+  var result = [];
+  for (var i = 0; i < _allAnimals.length; i++) {
+    var a = _allAnimals[i];
+    var ms = !searchTerm
+      || a.name.toLowerCase().indexOf(searchTerm) !== -1
+      || (a.region && a.region.toLowerCase().indexOf(searchTerm) !== -1)
+      || (a.category && a.category.toLowerCase().indexOf(searchTerm) !== -1);
+    var mf = currentFilter === 'all' || a.category === currentFilter;
+    if (ms && mf) result.push(a);
+  }
+  return result;
+}
+
+function renderSummary() {
+  var html = '';
+  for (var i = 0; i < _travellers.length; i++) {
+    var tv = _travellers[i];
+    var count = Store.getVisitedCount(tv.id, 'animals');
+    var total = _allAnimals.length;
+    var pct = total ? Math.round((count / total) * 100) : 0;
+    html += '<div class="prog-pill">';
+    html += '<div class="pill-name" style="color:' + tv.color + '">' + tv.name + '</div>';
+    html += '<div class="pill-stats"><span>&#128062; Spotted: <b style="color:' + tv.color + '">' + count + '&thinsp;/&thinsp;' + total + ' (' + pct + '%)</b></span></div>';
+    html += '<div class="progress-bar"><div class="progress-fill ' + tv.id + '" style="width:' + pct + '%"></div></div>';
+    html += '</div>';
+  }
+  document.getElementById('progressSummary').innerHTML = html;
+}
+
+function renderTable() {
+  var items = getFiltered();
+
+  /* Build header */
+  var hRow1 = '<tr><th colspan="3"></th>';
+  for (var thi = 0; thi < _travellers.length; thi++) {
+    var tv = _travellers[thi];
+    hRow1 += '<th class="traveller-header" style="color:' + tv.color + ';border-left:2px solid ' + tv.color + '33">' + tv.name + '</th>';
+  }
+  hRow1 += '</tr>';
+
+  var hRow2 = '<tr class="subheader"><th style="width:36px">#</th><th>Species</th><th style="width:80px">Category</th>';
+  for (var shi = 0; shi < _travellers.length; shi++) {
+    hRow2 += '<th class="sub-col" style="width:52px;border-left:2px solid ' + _travellers[shi].color + '33">Spotted</th>';
+  }
+  hRow2 += '</tr>';
+  document.getElementById('animalsHead').innerHTML = hRow1 + hRow2;
+
+  /* Build rows */
+  var rows = '';
+  for (var ri = 0; ri < items.length; ri++) {
+    var item = items[ri];
+    var rowNum = _allAnimals.indexOf(item) + 1;
+    rows += '<tr>';
+    rows += '<td style="color:var(--color-muted);font-size:0.75rem">' + rowNum + '</td>';
+    rows += '<td class="animal-name">' + item.name + '<br><span style="color:var(--color-muted);font-size:0.72rem;font-weight:400">' + (item.region || '') + '</span></td>';
+    rows += '<td><span class="cat-badge ' + catClass(item.category) + '">' + (item.category || '') + '</span></td>';
+    for (var tdi = 0; tdi < _travellers.length; tdi++) {
+      var tdv = _travellers[tdi];
+      var vis = Store.isVisited(tdv.id, 'animals', item.id);
+      rows += '<td class="sub-col" style="border-left:2px solid ' + tdv.color + '33">';
+      rows += '<span class="cc-check ' + (vis ? 'yes' : 'no') + '" data-trav="' + tdv.id + '" data-aid="' + item.id + '">' + (vis ? '&#10003;' : '') + '</span>';
+      rows += '</td>';
+    }
+    rows += '</tr>';
+  }
+  if (!rows) {
+    rows = '<tr><td colspan="' + (3 + _travellers.length) + '" style="text-align:center;padding:2rem;color:var(--color-muted)">No results found.</td></tr>';
+  }
+  document.getElementById('animalsBody').innerHTML = rows;
+}
+
+function redraw() { renderSummary(); renderTable(); }
+
+/* ---- Load data ---- */
+Store.load(function() { redraw(); }).then(function(data) {
+  _travellers = data.travellers;
+  _allAnimals = data.animals;
+  redraw();
+
+  /* Tick clicks */
+  document.getElementById('animalsTable').addEventListener('click', function(e) {
+    var el = e.target.closest('.cc-check');
+    if (!el) return;
+    var trav = el.getAttribute('data-trav');
+    var aid  = el.getAttribute('data-aid');
+    if (trav && aid) { Store.toggle(trav, 'animals', aid); redraw(); }
+  });
+
+  /* Search */
+  document.getElementById('searchInput').addEventListener('input', function(e) {
+    searchTerm = e.target.value.toLowerCase();
+    renderTable();
+  });
+
+  /* Filter buttons */
+  var btns = document.querySelectorAll('#filterBar .filter-btn');
+  for (var bi = 0; bi < btns.length; bi++) {
+    btns[bi].addEventListener('click', function() {
+      currentFilter = this.getAttribute('data-filter');
+      var allBtns = document.querySelectorAll('#filterBar .filter-btn');
+      for (var b = 0; b < allBtns.length; b++) { allBtns[b].classList.remove('active'); }
+      this.classList.add('active');
+      renderTable();
+    });
+  }
+
+  /* Re-render when remote data arrives */
+  Store.onRemoteLoad(function() { redraw(); });
+
+}).catch(function(err) {
+  console.error('Failed to load animals data:', err);
+  document.getElementById('progressSummary').innerHTML = '<p style="color:var(--color-muted)">Could not load data.</p>';
+  document.getElementById('animalsBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--color-muted)">Could not load data.</td></tr>';
+});
+</script>
+
+<!-- Auth Login Modal -->
+<div id="auth-modal-backdrop">
+  <div id="auth-modal">
+    <h3>&#128275; Edit Mode</h3>
+    <p>Enter the password to enable editing</p>
+    <input type="password" id="auth-password-input" placeholder="Password..." autocomplete="current-password">
+    <div id="auth-error"></div>
+    <div class="auth-modal-btns">
+      <button id="auth-cancel-btn" onclick="document.getElementById('auth-modal-backdrop').classList.remove('open')">Cancel</button>
+      <button id="auth-submit-btn">Unlock</button>
     </div>
   </div>
-  <script>
-    function showLoginModal() {
-      document.getElementById('auth-modal-backdrop').classList.add('open');
-      document.getElementById('auth-password-input').value = '';
-      document.getElementById('auth-error').textContent = '';
-      setTimeout(function(){ document.getElementById('auth-password-input').focus(); }, 50);
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      var submitBtn = document.getElementById('auth-submit-btn');
-      var input = document.getElementById('auth-password-input');
-      function tryLogin() {
-        var pw = input.value;
-        if (!pw) return;
-        submitBtn.textContent = '...';
-        authLogin(pw, function(ok) {
-          if (ok) {
-            document.getElementById('auth-modal-backdrop').classList.remove('open');
-            window.location.reload();
-          } else {
-            document.getElementById('auth-error').textContent = 'Incorrect password';
-            submitBtn.textContent = 'Unlock';
-            input.value = '';
-            input.focus();
-          }
-        });
+</div>
+<script>
+function showLoginModal() {
+  document.getElementById('auth-modal-backdrop').classList.add('open');
+  document.getElementById('auth-password-input').value = '';
+  document.getElementById('auth-error').textContent = '';
+  setTimeout(function(){ document.getElementById('auth-password-input').focus(); }, 50);
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var submitBtn = document.getElementById('auth-submit-btn');
+  var input = document.getElementById('auth-password-input');
+  function tryLogin() {
+    var pw = input.value;
+    if (!pw) return;
+    submitBtn.textContent = '...';
+    authLogin(pw, function(ok) {
+      if (ok) {
+        document.getElementById('auth-modal-backdrop').classList.remove('open');
+        window.location.reload();
+      } else {
+        document.getElementById('auth-error').textContent = 'Incorrect password';
+        submitBtn.textContent = 'Unlock';
+        input.value = '';
+        input.focus();
       }
-      submitBtn.addEventListener('click', tryLogin);
-      input.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
     });
-  </script>
+  }
+  submitBtn.addEventListener('click', tryLogin);
+  input.addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
+});
+</script>
 </body>
 </html>
