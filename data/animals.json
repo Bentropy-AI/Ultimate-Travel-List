@@ -206,6 +206,15 @@
     ]
   },
   {
+    "id": "dolphin",
+    "name": "Dolphin",
+    "class": "Mammal",
+    "family": "Dolphin",
+    "continents": [
+      "All Oceans"
+    ]
+  },
+  {
     "id": "echidna",
     "name": "Echidna",
     "class": "Mammal",
@@ -327,6 +336,15 @@
     "family": "Bear",
     "continents": [
       "North America"
+    ]
+  },
+  {
+    "id": "hammerhead-shark",
+    "name": "Hammerhead Shark",
+    "class": "Fish",
+    "family": "Shark",
+    "continents": [
+      "All Oceans"
     ]
   },
   {
@@ -474,6 +492,27 @@
     ]
   },
   {
+    "id": "macaque",
+    "name": "Macaque",
+    "class": "Mammal",
+    "family": "Monkey",
+    "continents": [
+      "Asia",
+      "Europe",
+      "Africa"
+    ]
+  },
+  {
+    "id": "macaw",
+    "name": "Macaw",
+    "class": "Bird",
+    "family": "Parrot",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
     "id": "manatee",
     "name": "Manatee",
     "class": "Mammal",
@@ -571,6 +610,16 @@
     ]
   },
   {
+    "id": "ocelot",
+    "name": "Ocelot",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "South America",
+      "North America"
+    ]
+  },
+  {
     "id": "octopus",
     "name": "Octopus",
     "class": "Invertebrate",
@@ -640,6 +689,18 @@
     ]
   },
   {
+    "id": "penguin",
+    "name": "Penguin",
+    "class": "Bird",
+    "family": "Penguin",
+    "continents": [
+      "Antarctica",
+      "South America",
+      "Africa",
+      "Oceania"
+    ]
+  },
+  {
     "id": "peregrine-falcon",
     "name": "Peregrine Falcon",
     "class": "Bird",
@@ -687,6 +748,16 @@
     "continents": [
       "Europe",
       "North America"
+    ]
+  },
+  {
+    "id": "puma",
+    "name": "Puma",
+    "class": "Mammal",
+    "family": "Cat",
+    "continents": [
+      "North America",
+      "South America"
     ]
   },
   {
@@ -798,6 +869,18 @@
     "family": "Squid",
     "continents": [
       "All Oceans"
+    ]
+  },
+  {
+    "id": "stork",
+    "name": "Stork",
+    "class": "Bird",
+    "family": "Stork",
+    "continents": [
+      "Europe",
+      "Asia",
+      "Africa",
+      "South America"
     ]
   },
   {
