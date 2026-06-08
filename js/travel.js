@@ -368,8 +368,11 @@ var Store = (function() {
       /* 3. Fetch from GitHub and re-apply for accuracy */
       _fetchRemote().then(function(rec) {
         if (rec.visited && Object.keys(rec.visited).length) {
-          _applyVisited(rec.visited);
-          _cacheSave(_buildVisited());
+          /* Only overwrite if the user hasn't made local changes since load started */
+          if (_lastSaveTime === 0) {
+            _applyVisited(rec.visited);
+            _cacheSave(_buildVisited());
+          }
         }
         if (typeof onRemote === 'function') onRemote();
         _fireRemote();
