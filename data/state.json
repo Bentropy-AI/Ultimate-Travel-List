@@ -5780,6 +5780,22 @@
         "ben"
       ],
       "_id": "mq506kyl3m87189odx6"
+    },
+    {
+      "countries": [
+        "Morocco"
+      ],
+      "continent": "Africa",
+      "locations": "Marrakesh\nWith Lee",
+      "start": "2012-04-07",
+      "finish": "2012-04-14",
+      "type": "Friends",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "ben"
+      ],
+      "_id": "mq50cqdw3qszn9idu93"
     }
   ]
 }
