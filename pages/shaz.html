@@ -2658,9 +2658,9 @@
       function cardAnimalsSpotted(d) {
         if (!d.animalsData) return '';
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
-          '<span class="ins-tag">Animals spotted</span>' +
+          '<span class="ins-tag">Wildlife — animals spotted</span>' +
           '<div class="ins-hero">'+d.animalsData.spotted+' <span class="ins-unit">species</span></div>' +
-          '<div class="ins-label">Out of <strong>'+d.animalsData.total+' iconic wildlife species</strong> on the list</div>' +
+          '<div class="ins-label">Iconic wildlife species spotted in the wild, out of <strong>'+d.animalsData.total+'</strong> on the list</div>' +
           '<div class="ins-sub">Keep exploring 🌍</div>' +
           '</div>';
       }
@@ -2669,11 +2669,12 @@
         if (!d.animalsData) return '';
         var pct = d.animalsData.pct;
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.teal+'">' +
-          '<span class="ins-tag">% of wildlife list</span>' +
+          '<span class="ins-tag">Wildlife — list completion</span>' +
+          '<div class="ins-label" style="margin-bottom:.4rem">What % of the 100 iconic wildlife species have you spotted in the wild?</div>' +
           '<div class="ins-ring-wrap">'+ringCard(pct,ACCENTS.teal,70)+
           '<div class="ins-ring-info">' +
           '<div class="ins-ring-pct">'+d.animalsData.spotted+'<span style="color:var(--color-muted);font-size:1rem"> / '+d.animalsData.total+'</span></div>' +
-          '<div class="ins-label">'+pct+'% of the list spotted</div></div></div>' +
+          '<div class="ins-label">'+pct+'% of the wildlife list spotted</div></div></div>' +
           '</div>';
       }
 
@@ -2681,10 +2682,10 @@
         if (!d.animalsData || !d.animalsData.topContinent) return '';
         var top = d.animalsData.topContinent;
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
-          '<span class="ins-tag">Favourite safari continent</span>' +
+          '<span class="ins-tag">Wildlife — favourite safari continent</span>' +
+          '<div class="ins-label" style="margin-bottom:.3rem">The continent where you have spotted the most animal species in the wild</div>' +
           '<div class="ins-hero-sm">'+top.name+'</div>' +
-          '<div class="ins-label"><strong>'+top.count+' species</strong> spotted here</div>' +
-          '<div class="ins-sub">Most productive wildlife continent 🦁</div>' +
+          '<div class="ins-label"><strong>'+top.count+' animal species</strong> spotted here</div>' +
           '</div>';
       }
 
@@ -2699,12 +2700,13 @@
           html += '<div class="ins-cont-pill" style="'+(active?'border-color:'+ACCENTS.amber+';background:rgba(246,166,35,0.08)':'')+'">' +
             '<div class="ins-cont-pill-name">'+c+'</div>' +
             '<div class="ins-cont-pill-num" style="'+(active?'color:'+ACCENTS.amber:'color:var(--color-muted)')+'">'+
-            (active ? n+' sp.' : '—')+'</div></div>';
+            (active ? n+' species' : '—')+'</div></div>';
         });
         html += '</div>';
         var unlocked = Object.keys(conts).filter(function(k){ return conts[k]>0; }).length;
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
-          '<span class="ins-tag">Wildlife continents unlocked</span>' +
+          '<span class="ins-tag">Wildlife — continents unlocked</span>' +
+          '<div class="ins-label" style="margin-bottom:.4rem">How many continents and ocean zones have you spotted at least one animal in the wild?</div>' +
           '<div class="ins-hero">'+unlocked+' <span class="ins-unit">/ '+ALL_CONTS.length+'</span></div>' +
           html+'</div>';
       }
@@ -2727,7 +2729,8 @@
             '<div class="ins-bar-val">'+classes[cls].spotted+'/'+classes[cls].total+'</div></div>';
         });
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.blue+'">' +
-          '<span class="ins-tag">Class breakdown</span>' +
+          '<span class="ins-tag">Wildlife — class breakdown</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Animals spotted in the wild by taxonomic class</div>' +
           rows+'</div>';
       }
 
@@ -2751,7 +2754,8 @@
         }).join('');
         var allDone = spotted === 5;
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.coral+'">' +
-          '<span class="ins-tag">Big 5</span>' +
+          '<span class="ins-tag">Wildlife — Big 5</span>' +
+          '<div class="ins-label" style="margin-bottom:.3rem">Africa\'s iconic Big 5 safari animals spotted in the wild</div>' +
           '<div class="ins-hero">'+spotted+' <span class="ins-unit">/ 5</span></div>' +
           (allDone ? '<div class="ins-badge" style="background:rgba(224,92,92,0.15);color:'+ACCENTS.coral+'">Complete! 🏆</div>' : '') +
           rows+'</div>';
@@ -2775,7 +2779,8 @@
             '<div class="ins-bar-val">'+n+'</div></div>';
         });
         return '<div class="ins-card" style="--ins-accent:'+ACCENTS.amber+'">' +
-          '<span class="ins-tag">Sightings per continent</span>' +
+          '<span class="ins-tag">Wildlife — sightings per continent</span>' +
+          '<div class="ins-label" style="margin-bottom:.5rem">Number of animal species spotted in the wild per continent or ocean zone</div>' +
           rows+'</div>';
       }
 
