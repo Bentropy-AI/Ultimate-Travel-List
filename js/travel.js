@@ -105,6 +105,7 @@ var _fetchPromise = null;
 var _pushTimer    = null;
 var _flushCallbacks = [];
 var _visitedDirty = false;  /* true while a visited save is in flight */
+var _lastSaveTime = 0;      /* timestamp of last local save — remote fetch ignored for 30s after */
 var _tripsDirty   = false;  /* true while a trip save is in flight */
 
 function _fetchRemote() {
@@ -119,7 +120,7 @@ function _fetchRemote() {
       return r.json();
     })
     .then(function(data) {
-      if (!_visitedDirty) { _remoteRecord.visited = data.visited || {}; }
+      if (!_visitedDirty && (Date.now() - _lastSaveTime > 30000)) { _remoteRecord.visited = data.visited || {}; }
       if (!_tripsDirty)   { _remoteRecord.trips   = _normaliseTrips(data.trips || []); }
       _remoteLoaded = true;
       _fetchPromise = null;
@@ -190,6 +191,7 @@ function _pushRemote(notify) {
       }
       _visitedDirty = false;
       _tripsDirty   = false;
+      _lastSaveTime = Date.now();
       if (typeof notify === 'function') notify('ok', 'Saved \u2713');
       _flushCallbacks.forEach(function(cb){ try{ cb('ok'); } catch(e){} });
     });
@@ -331,6 +333,7 @@ var Store = (function() {
 
   function _persist() {
     _visitedDirty = true;
+    _lastSaveTime = Date.now();
     _remoteRecord.visited = _buildVisited();
     _cacheSave(_remoteRecord.visited);
     _schedulePush(_notify);
