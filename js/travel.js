@@ -366,13 +366,16 @@ var Store = (function() {
       if (cached) _applyVisited(cached);
 
       /* 3. Fetch from GitHub and re-apply for accuracy */
+      var hadCache = !!_cacheLoad();
       _fetchRemote().then(function(rec) {
         if (rec.visited && Object.keys(rec.visited).length) {
-          /* Only overwrite if the user hasn't made local changes since load started */
-          if (_lastSaveTime === 0) {
+          /* If there was no local cache, remote is the truth — apply it */
+          if (!hadCache) {
             _applyVisited(rec.visited);
             _cacheSave(_buildVisited());
           }
+          /* If there was a local cache, it is more recent than the CDN-cached
+             remote (which can be up to 10 min stale). Don't overwrite it. */
         }
         if (typeof onRemote === 'function') onRemote();
         _fireRemote();
