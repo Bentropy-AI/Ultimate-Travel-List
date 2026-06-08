@@ -2716,13 +2716,11 @@
         var classes = d.animalsData.byClass;
         var CLASS_COLOURS = {Mammal:ACCENTS.blue,Bird:ACCENTS.amber,Reptile:ACCENTS.teal,Fish:ACCENTS.cyan,Insect:ACCENTS.purple,Invertebrate:ACCENTS.coral};
         var ORDER = ['Mammal','Bird','Reptile','Fish','Insect','Invertebrate'];
-        var maxN = 0;
-        ORDER.forEach(function(c){ if(classes[c] && classes[c].spotted>maxN) maxN=classes[c].spotted; });
         var rows = '';
         ORDER.forEach(function(cls) {
           if (!classes[cls]) return;
           var col = CLASS_COLOURS[cls] || ACCENTS.blue;
-          var pct = maxN ? Math.round((classes[cls].spotted/maxN)*100) : 0;
+          var pct = classes[cls].total ? Math.round((classes[cls].spotted/classes[cls].total)*100) : 0;
           rows += '<div class="ins-bar-row">' +
             '<div class="ins-bar-label">'+cls+'</div>' +
             '<div class="ins-bar-track"><div class="ins-bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div>' +
