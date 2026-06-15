@@ -303,7 +303,7 @@
         "tikal-national-park-guatemala",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "þingvellir-national-park-iceland",
+        "\u00feingvellir-national-park-iceland",
         "red-fort-complex-india",
         "humayun-s-tomb-delhi-india",
         "qutb-minar-and-its-monuments-delhi-india",
@@ -339,7 +339,7 @@
         "vilnius-historic-centre-lithuania",
         "city-of-luxembourg-its-old-quarters-and-fortifications-luxembourg",
         "kinabalu-park-malaysia",
-        "ħal-saflieni-hypogeum-malta",
+        "\u0127al-saflieni-hypogeum-malta",
         "city-of-valletta-malta",
         "megalithic-temples-of-malta-malta",
         "sian-ka-an-mexico",
@@ -1167,7 +1167,7 @@
         "tikal-national-park-guatemala",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "þingvellir-national-park-iceland",
+        "\u00feingvellir-national-park-iceland",
         "red-fort-complex-india",
         "humayun-s-tomb-delhi-india",
         "qutb-minar-and-its-monuments-delhi-india",
@@ -1200,7 +1200,7 @@
         "historic-centre-of-riga-latvia",
         "vilnius-historic-centre-lithuania",
         "city-of-luxembourg-its-old-quarters-and-fortifications-luxembourg",
-        "ħal-saflieni-hypogeum-malta",
+        "\u0127al-saflieni-hypogeum-malta",
         "city-of-valletta-malta",
         "megalithic-temples-of-malta-malta",
         "sian-ka-an-mexico",
@@ -1927,7 +1927,7 @@
         "old-town-of-corfu-greece",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "þingvellir-national-park-iceland",
+        "\u00feingvellir-national-park-iceland",
         "masada-israel",
         "biblical-tels-megiddo-hazor-beer-sheba-israel",
         "historic-centre-of-florence-italy",
@@ -1971,7 +1971,7 @@
         "seventeenth-century-canal-ring-area-of-amsterdam-inside-the-singelgracht-netherl",
         "te-wahipounamu-south-west-new-zealand-new-zealand",
         "bryggen-norway",
-        "west-norwegian-fjords-geirangerfjord-and-nærøyfjord-norway",
+        "west-norwegian-fjords-geirangerfjord-and-n\u00e6r\u00f8yfjord-norway",
         "birthplace-of-jesus-church-of-the-nativity-and-the-pilgrimage-route-bethlehem-pa",
         "palestine-land-of-olives-and-vines-cultural-landscape-of-southern-jerusalem-battir-palestine",
         "hebron-al-khalil-old-town-palestine",
@@ -2621,7 +2621,7 @@
         "old-town-of-corfu-greece",
         "vatican-city-holy-see",
         "budapest-including-the-banks-of-the-danube-the-buda-castle-quarter-and-andrassy-avenue-hungary",
-        "þingvellir-national-park-iceland",
+        "\u00feingvellir-national-park-iceland",
         "masada-israel",
         "old-city-of-acre-israel",
         "biblical-tels-megiddo-hazor-beer-sheba-israel",
@@ -2668,7 +2668,7 @@
         "seventeenth-century-canal-ring-area-of-amsterdam-inside-the-singelgracht-netherl",
         "te-wahipounamu-south-west-new-zealand-new-zealand",
         "bryggen-norway",
-        "west-norwegian-fjords-geirangerfjord-and-nærøyfjord-norway",
+        "west-norwegian-fjords-geirangerfjord-and-n\u00e6r\u00f8yfjord-norway",
         "birthplace-of-jesus-church-of-the-nativity-and-the-pilgrimage-route-bethlehem-pa",
         "palestine-land-of-olives-and-vines-cultural-landscape-of-southern-jerusalem-battir-palestine",
         "hebron-al-khalil-old-town-palestine",
@@ -3147,7 +3147,7 @@
         "Oman"
       ],
       "continent": "Asia",
-      "locations": "Muscat, Ras al Hadd, Wahiba Sands, Nizwá, Jebel Shams, Jebel Akhdar",
+      "locations": "Muscat, Ras al Hadd, Wahiba Sands, Nizw\u00e1, Jebel Shams, Jebel Akhdar",
       "start": "2025-11-26",
       "finish": "2025-12-06",
       "type": "Travel",
@@ -3868,7 +3868,7 @@
         "Colombia"
       ],
       "continent": "South America",
-      "locations": "Bogotá, Medellín, Cartagena, Tayrona, Santa Marta",
+      "locations": "Bogot\u00e1, Medell\u00edn, Cartagena, Tayrona, Santa Marta",
       "start": "2022-08-26",
       "finish": "2022-09-12",
       "type": "Travel",
@@ -5392,7 +5392,7 @@
         "Iceland"
       ],
       "continent": "Europe",
-      "locations": "Reykjavik, Snæfellsnes (date needs confirming from book)",
+      "locations": "Reykjavik, Sn\u00e6fellsnes (date needs confirming from book)",
       "start": "2017-04-28",
       "finish": "2017-05-01",
       "type": "Travel",
@@ -6037,6 +6037,537 @@
         "ben"
       ],
       "_id": "mq50fv4kvz1062euo8"
+    },
+    {
+      "countries": [
+        "India"
+      ],
+      "continent": "Asia",
+      "locations": "Delhi, Agra, Dholpur, Jaipur, Shahpura, Goa, Amritsar\n\nExplore!* 10 Long/Mid Haul#22    (4\u2714)",
+      "start": "2026-01-30",
+      "finish": "2026-02-20",
+      "type": "Travel",
+      "utl1": [
+        "old-delhi",
+        "taj-mahal",
+        "Amber Fort",
+        "golden-temple"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2026-01-30|India"
+    },
+    {
+      "countries": [
+        "Netherlands"
+      ],
+      "continent": "Europe",
+      "locations": "Rotterdam (1\u2714)",
+      "start": "2025-11-13",
+      "finish": "2025-11-15",
+      "type": "Travel",
+      "utl1": [
+        "kinderdijk"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2025-11-13|Netherlands"
+    },
+    {
+      "countries": [
+        "Morocco"
+      ],
+      "continent": "Africa",
+      "locations": "Rabat, Chefchaouen, Fez, Ouzoud, Marrakesh, Essaouira\n\nExplore!* 9 Long/Mid Haul#21   (2\u2714)",
+      "start": "2025-10-24",
+      "finish": "2025-11-05",
+      "type": "Travel",
+      "utl1": [
+        "fez-medina",
+        "djemaa-el-fna"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2025-10-24|Morocco"
+    },
+    {
+      "countries": [
+        "Albania",
+        "Montenegro",
+        "North Macedonia"
+      ],
+      "continent": "Europe",
+      "locations": "Tirana, Kotor, Skhodra, Theth, Ohrid, Gjirokaster, Tirana (2\u2714)",
+      "start": "2025-09-09",
+      "finish": "2025-09-21",
+      "type": "Friends",
+      "utl1": [
+        "bay-of-kotor",
+        "butrint"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2025-09-09|Albania,Montenegro,North Macedonia"
+    },
+    {
+      "countries": [
+        "Majorca"
+      ],
+      "continent": "Unknown",
+      "locations": "Seaclub Alcudia Mediterranean Resort",
+      "start": "2025-06-02",
+      "finish": "2025-06-09",
+      "type": "Family",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2025-06-02|Majorca"
+    },
+    {
+      "countries": [
+        "Argentina",
+        "Chile"
+      ],
+      "continent": "South America",
+      "locations": "Salta/Tilcara\nSalinas Grandes and Humahuaca\n\nExplore!* 8 Long/Mid Haul#20   (5\u2714)",
+      "start": "2025-02-08",
+      "finish": "2025-03-01",
+      "type": "Travel",
+      "utl1": [
+        "la-boca",
+        "recoleta",
+        "torres-del-paine",
+        "perito-moreno",
+        "cerro-fitzroy"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2025-02-08|Argentina,Chile"
+    },
+    {
+      "countries": [
+        "Thailand",
+        "Cambodia"
+      ],
+      "continent": "Asia",
+      "locations": "Bangkok - Siem Reap - Temples of Angkor\nPhang Nga Bay\nKo Phi-Phi\nKhao Sok National Park\nKo Tao\nplus Koh Samui Long/Mid Haul#19 (6\u2714)",
+      "start": "2024-11-23",
+      "finish": "2024-12-08",
+      "type": "Travel",
+      "utl1": [
+        "chatuchak",
+        "temples-of-angkor",
+        "phang-nga-bay",
+        "Ko Phi-Phi",
+        "khao-sok",
+        "ko-tao"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2024-11-23|Thailand,Cambodia"
+    },
+    {
+      "countries": [
+        "Uzbekistan"
+      ],
+      "continent": "Asia",
+      "locations": "Tashkent\nKhiva\nBukhara\nSamarkand\nTashkent Long/Mid Haul#18   (2\u2714)",
+      "start": "2024-09-25",
+      "finish": "2024-10-05",
+      "type": "Travel",
+      "utl1": [
+        "kalon",
+        "registan"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2024-09-25|Uzbekistan"
+    },
+    {
+      "countries": [
+        "Italy"
+      ],
+      "continent": "Europe",
+      "locations": "Puglia:\nBari, Lecce, Ostuni, Bari",
+      "start": "2024-06-10",
+      "finish": "2024-06-19",
+      "type": "Travel",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2024-06-10|Italy"
+    },
+    {
+      "countries": [
+        "Greece"
+      ],
+      "continent": "Europe",
+      "locations": "Athens\n(with Howard and Karen)\nHotel: 18 Micon Str   (1\u2714)",
+      "start": "2024-05-23",
+      "finish": "2024-05-27",
+      "type": "Friends",
+      "utl1": [
+        "acropolis"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2024-05-23|Greece"
+    },
+    {
+      "countries": [
+        "Scotland"
+      ],
+      "continent": "Europe",
+      "locations": "Strathyre Forest Lodges with Ewan, Becky and Ishbel",
+      "start": "2024-05-13",
+      "finish": "2024-05-17",
+      "type": "Family",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2024-05-13|Scotland"
+    },
+    {
+      "countries": [
+        "Japan"
+      ],
+      "continent": "Asia",
+      "locations": "Tokyo, Fuji, Yakushima, Hiroshima, Myajima, etc Long/Mid Haul#17 (13\u2714)",
+      "start": "2023-09-17",
+      "finish": "2023-10-12",
+      "type": "Travel",
+      "utl1": [
+        "shibuyu-crossing\nmount-fuiji\nyakushima\nhiroshima-peace-memorial\nitsukushima-jinja-gate\nnaoshima-art-island\nhimeji-castle\ngreat-buddha-of-nara\nkoya-san\narashiyama-bamboo-grove\ngion-district\nkinkaju-ji\ntsukiji-(fish-market)"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2023-09-17|Japan"
+    },
+    {
+      "countries": [
+        "England"
+      ],
+      "continent": "Europe",
+      "locations": "Rockleigh Place, St Austell - post Laura\u2019s Wedding   (1\u2714)",
+      "start": "2023-08-06",
+      "finish": "2023-08-09",
+      "type": "Travel",
+      "utl1": [
+        "eden-project"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2023-08-06|England"
+    },
+    {
+      "countries": [
+        "Scotland"
+      ],
+      "continent": "Europe",
+      "locations": "Kinloch Hotel\nArran",
+      "start": "2023-06-12",
+      "finish": "2023-06-14",
+      "type": "Family",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2023-06-12|Scotland"
+    },
+    {
+      "countries": [
+        "Greece"
+      ],
+      "continent": "Europe",
+      "locations": "Halkidiki with Becky\nAnna Maria \"Paradise\"",
+      "start": "2023-04-18",
+      "finish": "2023-04-25",
+      "type": "Family",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2023-04-18|Greece"
+    },
+    {
+      "countries": [
+        "Australia",
+        "Vietnam"
+      ],
+      "continent": "Asia",
+      "locations": "Hanoi,Sydney, Tasmania, Melbourne, Great Ocean Road, Ayers Rock Resort, Cairns, Daintree, Atherton Tablelands Long/Mid Haul#16   (9\u2714)",
+      "start": "2023-02-01",
+      "finish": "2023-03-13",
+      "type": "Travel",
+      "utl1": [
+        "hanoi-old-quarter",
+        "halong-bay",
+        "port-arthur",
+        "mona",
+        "cradle-mountain",
+        "12-apostles",
+        "uluru",
+        "great-barrier-reef",
+        "cu-chi"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2023-02-01|Australia,Vietnam"
+    },
+    {
+      "countries": [
+        "Egypt",
+        "Jordan"
+      ],
+      "continent": "Africa",
+      "locations": "Dahabiya Dream (Nile) and various hotels \nLong/Mid Haul#15   (6\u2714)",
+      "start": "2022-09-19",
+      "finish": "2022-10-04",
+      "type": "Travel",
+      "utl1": [
+        "abu-simbel",
+        "karnak",
+        "luxor-temple",
+        "valley-of-the-kings",
+        "wadi-rum",
+        "Petra"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2022-09-19|Egypt,Jordan"
+    },
+    {
+      "countries": [
+        "Sweden"
+      ],
+      "continent": "Europe",
+      "locations": "Second Home Apartments Guldgr\u00e4nd, Stockholm\n(2\u2714)",
+      "start": "2022-05-02",
+      "finish": "2022-05-06",
+      "type": "Travel",
+      "utl1": [
+        "gamla-stan",
+        "vasamuseet"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2022-05-02|Sweden"
+    },
+    {
+      "countries": [
+        "Uganda"
+      ],
+      "continent": "Africa",
+      "locations": "Explore!* 7 Uganda Gorilla and Chimp Safari\n\nvarious hotels Long/Mid Haul#14\n(2\u2714)",
+      "start": "2022-01-21",
+      "finish": "2022-02-05",
+      "type": "Travel",
+      "utl1": [
+        "bwindi",
+        "murchison-falls"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2022-01-21|Uganda"
+    },
+    {
+      "countries": [
+        "Croatia"
+      ],
+      "continent": "Europe",
+      "locations": "Dubrovnik, Hvar, Plitvica and Split\n(2\u2714)",
+      "start": "2021-09-22",
+      "finish": "2021-09-30",
+      "type": "Travel",
+      "utl1": [
+        "plitvice",
+        "diocletians"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2021-09-22|Croatia"
+    },
+    {
+      "countries": [
+        "England",
+        "Scotland"
+      ],
+      "continent": "Europe",
+      "locations": "Newcastle\nWedding in Crail\n\n(2\u2714)",
+      "start": "2021-07-18",
+      "finish": "2021-07-25",
+      "type": "Family",
+      "utl1": [
+        "stirling",
+        "Bamburgh Castle"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth",
+        "ben",
+        "shaz"
+      ],
+      "_id": "2021-07-18|England,Scotland"
+    },
+    {
+      "countries": [
+        "England"
+      ],
+      "continent": "Europe",
+      "locations": "Meare\nThe Woodshed AirBnB\nwith Becky and Ewan and Jura!",
+      "start": "2020-08-18",
+      "finish": "2020-08-23",
+      "type": "Family",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth",
+        "ben",
+        "shaz"
+      ],
+      "_id": "2020-08-18|England"
+    },
+    {
+      "countries": [
+        "Italy"
+      ],
+      "continent": "Europe",
+      "locations": "Lake Como\nAlbergo Ristorante Silvio (Bellagio)\nApartments Rossini\nVarenna",
+      "start": "2020-08-03",
+      "finish": "2020-08-10",
+      "type": "Travel",
+      "utl1": [],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2020-08-03|Italy"
+    },
+    {
+      "countries": [
+        "Italy"
+      ],
+      "continent": "Europe",
+      "locations": "Milan, Genoa and Cinque Terra\n\nwith Mick and Ali #17\nMonocase Milan\nQuartro Piano Rooms Genoa\n\n(2\u2714)",
+      "start": "2019-09-30",
+      "finish": "2019-10-04",
+      "type": "Friends",
+      "utl1": [
+        "duomo-florence",
+        "cinque-terra"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2019-09-30|Italy"
+    },
+    {
+      "countries": [
+        "Brazil"
+      ],
+      "continent": "South America",
+      "locations": "Group Tour of Pantanal Long/Mid Haul#13\n(5\u2714)",
+      "start": "2019-08-20",
+      "finish": "2019-09-09",
+      "type": "Travel",
+      "utl1": [
+        "ipanema",
+        "pao-de-acucar",
+        "Pantanal",
+        "iguaz\u00fa-falls",
+        "cristo-redentor"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2019-08-20|Brazil"
+    },
+    {
+      "countries": [
+        "Turkey"
+      ],
+      "continent": "Europe",
+      "locations": "Istanbul and Cappadocia (with Howard and Karen)\n(4\u2714)",
+      "start": "2019-06-15",
+      "finish": "2019-06-20",
+      "type": "Friends",
+      "utl1": [
+        "aya-sofya",
+        "blue-mosque",
+        "topkapi",
+        "cappadocia"
+      ],
+      "utl2": [],
+      "travellers": [
+        "paul",
+        "ruth"
+      ],
+      "_id": "2019-06-15|Turkey"
     }
   ]
 }
